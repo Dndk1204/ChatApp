@@ -1,7 +1,7 @@
 body {
     margin: 0;
     font-family: 'Roboto Mono', monospace;
-    background-color: #1a1a1a;
+    background-color: wheat;
     color: #f0f0f0;
     display: flex;
     flex-direction: column;
