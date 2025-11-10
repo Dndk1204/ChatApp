@@ -1,0 +1,248 @@
+body {
+    margin: 0;
+    font-family: 'Roboto Mono', monospace;
+    background-color: #1a1a1a;
+    color: #f0f0f0;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 40px;
+    background-color: #121212;
+    border-bottom: 1px solid #333;
+    color: #f0f0f0;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+}
+
+.logo a {
+    text-decoration: none;
+    color: #f0f0f0;
+    display: flex;
+    align-items: center;
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
+.main-nav a,
+.auth-buttons a,
+.auth-buttons span {
+    color: #f0f0f0;
+    text-decoration: none;
+    margin-left: 20px;
+    font-size: 0.9em;
+    letter-spacing: 1px;
+    transition: color 0.3s ease;
+}
+
+.main-nav a:hover,
+.auth-buttons a:hover {
+    color: #ff6666;
+}
+
+.auth-buttons .btn-text {
+    padding: 5px 10px;
+    border: 1px solid transparent;
+}
+
+.auth-buttons .logged-in-user {
+    margin-right: 15px;
+    font-weight: bold;
+    color: #66ccff;
+}
+
+.hero-section {
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    background-color: #1a1a1a;
+    padding: 50px 20px;
+}
+
+.center-content {
+    max-width: 800px;
+    width: 100%;
+}
+
+.main-logo-circle {
+    width: 100px;
+    height: 100px;
+    background-color: #f0f0f0;
+    border-radius: 50%;
+    margin: 0 auto 30px auto;
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+}
+
+.app-title {
+    font-size: 3.5em;
+    letter-spacing: 5px;
+    margin-bottom: 10px;
+    color: #f0f0f0;
+}
+
+.tagline {
+    font-size: 1.5em;
+    color: #ff6666;
+    margin-bottom: 30px;
+    letter-spacing: 2px;
+}
+
+.slogan {
+    font-size: 1em;
+    color: #aaaaaa;
+    margin-bottom: 50px;
+    letter-spacing: 1.5px;
+}
+
+.action-buttons a {
+    display: inline-block;
+    padding: 12px 30px;
+    margin: 0 15px;
+    border: 2px solid #f0f0f0;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 1.1em;
+    letter-spacing: 1px;
+    transition: all 0.3s ease;
+}
+
+.btn-primary {
+    background-color: transparent;
+    color: #f0f0f0;
+}
+
+.btn-primary:hover {
+    background-color: #f0f0f0;
+    color: #1a1a1a;
+}
+
+.btn-secondary {
+    background-color: #f0f0f0;
+    color: #1a1a1a;
+    border-color: #f0f0f0;
+}
+
+.btn-secondary:hover {
+    background-color: transparent;
+    color: #f0f0f0;
+    border-color: #f0f0f0;
+}
+
+footer {
+    text-align: center;
+    padding: 20px;
+    background-color: #121212;
+    color: #888;
+    font-size: 0.8em;
+    border-top: 1px solid #333;
+}
+
+/* ======================================= */
+/* CSS CHO TRANG LOGIN VÀ REGISTER         */
+/* ======================================= */
+
+.form-page-content {
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 50px 20px;
+}
+
+.form-container {
+    width: 100%;
+    max-width: 400px;
+    background-color: #2a2a2a;
+    border-radius: 8px;
+    padding: 30px 40px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.form-title {
+    color: #ff6666;
+    text-align: center;
+    font-size: 2em;
+    letter-spacing: 2px;
+    margin-bottom: 30px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    color: #f0f0f0;
+    margin-bottom: 8px;
+    font-size: 0.9em;
+    letter-spacing: 1px;
+}
+
+.form-group input[type="text"],
+.form-group input[type="password"],
+.form-group input[type="email"] {
+    width: 100%;
+    padding: 12px 15px;
+    background-color: #333333;
+    border: 1px solid #555555;
+    border-radius: 5px;
+    color: #f0f0f0;
+    font-family: 'Roboto Mono', monospace;
+    font-size: 1em;
+    box-sizing: border-box;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.form-group input[type="text"]:focus,
+.form-group input[type="password"]:focus,
+.form-group input[type="email"]:focus {
+    border-color: #ff6666;
+    box-shadow: 0 0 5px rgba(255, 102, 102, 0.3);
+    outline: none;
+}
+
+.btn-submit {
+    width: 100%;
+    padding: 12px;
+    background-color: #ff6666;
+    border: none;
+    border-radius: 5px;
+    color: #1a1a1a;
+    font-family: 'Roboto Mono', monospace;
+    font-size: 1.1em;
+    font-weight: bold;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.1s ease;
+    margin-top: 10px;
+}
+
+.btn-submit:hover {
+    background-color: #ff8080;
+}
+
+.btn-submit:active {
+    transform: scale(0.98);
+}
+
+.form-error {
+    color: #ff6666;
+    background-color: rgba(255, 102, 102, 0.1);
+    border: 1px solid #ff6666;
+    border-radius: 5px;
+    padding: 10px;
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 0.9em;
+}
