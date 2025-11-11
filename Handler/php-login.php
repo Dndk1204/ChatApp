@@ -27,9 +27,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $_SESSION['username'] = $user['Username'];
                 $_SESSION['role'] = $user['Role'];
 
+                // --- CẬP NHẬT TRẠNG THÁI ONLINE ---
+                $sql_update = "UPDATE Users SET IsOnline = 1 WHERE UserId = ?";
+                $stmt_update = $conn->prepare($sql_update);
+                if ($stmt_update) {
+                    $stmt_update->bind_param("i", $user['UserId']);
+                    $stmt_update->execute();
+                    $stmt_update->close();
+                }
                 $stmt->close();
                 $conn->close();
-                header("Location: ../index.php");
+                header("Location: ../chat.php"); // Chuyển hướng đến trang chat
                 exit();
 
             } else {
@@ -43,13 +51,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $_SESSION['error_message'] = $e->getMessage();
         
         if (isset($stmt) && $stmt) $stmt->close();
-        $conn->close();
+        if ($conn) $conn->close();
         header("Location: ../login.php");
         exit();
     }
 
 } else {
-    $conn->close();
+    if ($conn) $conn->close();
     header("Location: ../index.php");
     exit();
 }
