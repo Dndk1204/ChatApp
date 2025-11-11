@@ -30,8 +30,16 @@
         </nav>
         <div class="auth-buttons">
             <?php if (isset($_SESSION['user_id'])): ?>
-                <span class="logged-in-user">Xin chào, <?php echo htmlspecialchars($_SESSION['username']); ?></span>
-                <a href="logout.php" class="btn-text">Logout</a>
+                <span class="logged-in-user">Hellu, <?php echo htmlspecialchars($_SESSION['username']); ?></span>
+                <div class="avatar-menu">
+                    
+                    <?php $avatar = ltrim(($_SESSION['avatar'] ?? 'images/default-avatar.jpg'), '/'); ?>
+                    <img src="<?php echo htmlspecialchars($avatar); ?>" alt="avatar" class="avatar-thumb" id="avatarBtn">
+                    <div class="avatar-dropdown" id="avatarDropdown">
+                        <a href="profile.php">Chỉnh sửa hồ sơ</a>
+                        <a href="logout.php">Logout</a>
+                    </div>
+                </div>
             <?php else: ?>
                 <a href="login.php" class="btn-text">Login</a>
                 <a href="register.php" class="btn-text">Register</a>
@@ -65,4 +73,17 @@
     </main>
 
 </body>
+<script>
+    (function(){
+        const avatarBtn = document.getElementById('avatarBtn');
+        const avatarDropdown = document.getElementById('avatarDropdown');
+        document.addEventListener('click', (e) => {
+            if (avatarBtn && (e.target === avatarBtn || avatarBtn.contains(e.target))) {
+                avatarDropdown.classList.toggle('open');
+            } else if (avatarDropdown && !avatarDropdown.contains(e.target)) {
+                avatarDropdown.classList.remove('open');
+            }
+        });
+    })();
+</script>
 </html>

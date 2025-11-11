@@ -8,7 +8,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $username = $_POST['username'];
         $password = $_POST['password'];
 
-        $sql = "SELECT UserId, Username, Password, Role FROM Users WHERE Username = ?";
+        $sql = "SELECT UserId, Username, Password, Role, AvatarPath FROM Users WHERE Username = ?";
         $stmt = $conn->prepare($sql);
 
         if ($stmt === false) {
@@ -26,6 +26,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $_SESSION['user_id'] = $user['UserId'];
                 $_SESSION['username'] = $user['Username'];
                 $_SESSION['role'] = $user['Role'];
+                $defaultAvatar = 'images/default-avatar.jpg';
+                $avatarPath = $user['AvatarPath'] ?? '';
+                if (empty($avatarPath)) {
+                    $_SESSION['avatar'] = $defaultAvatar;
+                } else {
+                    $_SESSION['avatar'] = ltrim($avatarPath, '/');
+                }
 
                 // --- CẬP NHẬT TRẠNG THÁI ONLINE ---
                 $sql_update = "UPDATE Users SET IsOnline = 1 WHERE UserId = ?";
