@@ -29,14 +29,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt->bind_param("ssss", $username, $email, $hashed_password, $role);
         $stmt->execute(); 
         
+        $_SESSION['success_message'] = "Account registered successfully!";
+        
         $stmt->close();
         $conn->close();
-        header("Location: ../login.php");
+        
+        header("Location: ../register.php"); 
         exit();
 
     } catch (mysqli_sql_exception $e) {
         if ($e->getCode() == 1062) {
-            $_SESSION['error_message'] = "Tên đăng nhập hoặc Email đã tồn tại.";
+            $_SESSION['error_message'] = "Username or Email already exists.";
         } else {
             $_SESSION['error_message'] = "Lỗi CSDL: " . $e->getMessage();
         }

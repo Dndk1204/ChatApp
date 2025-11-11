@@ -41,10 +41,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 exit();
 
             } else {
-                throw new Exception("Tên đăng nhập hoặc mật khẩu không đúng.");
+                throw new Exception("Username or password incorrect.");
             }
         } else {
-            throw new Exception("Tên đăng nhập hoặc mật khẩu không đúng.");
+            throw new Exception("Username or password incorrect.");
         }
 
     } catch (Exception $e) {
