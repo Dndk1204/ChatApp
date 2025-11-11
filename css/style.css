@@ -251,3 +251,129 @@ footer {
     margin-bottom: 20px;
     font-size: 0.9em;
 }
+
+/* ======================================= */
+/* CSS CHO TRANG ADMIN DASHBOARD           */
+/* ======================================= */
+
+.admin-container {
+    max-width: 1200px;
+    margin: 24px auto;
+    padding: 0 16px;
+}
+
+.header-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 0;
+}
+
+.admin-title {
+    margin: 0;
+    font-size: 22px;
+    color: #f0f0f0;
+}
+
+.section {
+    background-color: #2a2a2a;
+    border-radius: 8px;
+    border: 1px solid #333;
+    margin-bottom: 24px;
+}
+
+.section-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid #333;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.section-title {
+    margin: 0;
+    font-size: 18px;
+    color: #ff6666;
+}
+
+.section-body {
+    padding: 16px 20px;
+    overflow-x: auto;
+}
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+th, td {
+    border-bottom: 1px solid #3b3b3b;
+    padding: 10px 12px;
+    text-align: left;
+    font-size: 14px;
+    color: #f0f0f0;
+}
+
+th {
+    background: #1f1f1f;
+    font-weight: 600;
+}
+
+.badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 12px;
+}
+
+.badge-online { background: #166534; color: #dcfce7; }
+.badge-offline { background: #7f1d1d; color: #fee2e2; }
+.badge-admin { background: #3730a3; color: #e0e7ff; }
+
+.action-row {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.btn {
+    appearance: none;
+    border: 1px solid #d1d5db;
+    background: #1f1f1f;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 13px;
+    cursor: pointer;
+    color: #f0f0f0;
+}
+
+.btn:hover {
+    background: #2a2a2a;
+}
+
+.btn-primary {
+    border-color: #3b82f6;
+    color: #bfdbfe;
+    background: #111827;
+}
+
+.btn-danger {
+    border-color: #ef4444;
+    color: #fecaca;
+    background: #111827;
+}
+
+.btn-outline {
+    border-color: #555;
+    background: transparent;
+}
+
+.flash {
+    margin-bottom: 16px;
+    padding: 10px 12px;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+.flash-success { background: rgba(16,185,129,0.15); color: #a7f3d0; border: 1px solid #065f46; }
+.flash-error { background: rgba(239,68,68,0.15); color: #fecaca; border: 1px solid #991b1b; }
