@@ -46,11 +46,11 @@
             <?php
                 if (isset($_SESSION['error_message'])) {
                     echo '<p class="form-error">' . $_SESSION['error_message'] . '</p>';
-                    unset($_SESSION['error_message']); // Xóa thông báo sau khi hiển thị
+                    unset($_SESSION['error_message']);
                 }
             ?>
 
-            <form action="handle-login.php" method="POST">
+            <form action="Handler/php-login.php" method="POST">
                 <div class="form-group">
                     <label for="username">Username</label>
                     <input type="text" id="username" name="username" required>
