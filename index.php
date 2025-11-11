@@ -1,12 +1,18 @@
 <?php
     session_start();
+
+    // Chuyển hướng người dùng đã đăng nhập đến trang chat
+    if (isset($_SESSION['user_id'])) {
+        header("Location: chat.php");
+        exit();
+    }
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Not NONONONOT Home</title>
+    <title>ChatApp Home</title>
     <link rel="stylesheet" href="./css/style.css">
 </head>
 <body>
