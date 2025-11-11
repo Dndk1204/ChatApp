@@ -269,7 +269,7 @@ if ($conn) {
             <a href="friend_requests.php">FRIEND REQUESTS</a>
             <a href="friends.php">FRIENDS</a>
             <?php if (isset($_SESSION['role']) && $_SESSION['role'] == 'Admin'):?>
-                <a href="admin_dashboard.php">ADMIN DASHBOARD</a>
+                <a href="admin_dashboard.php">ADMIN </a>
             <?php endif; ?>
         </nav>
         <div class="auth-buttons">

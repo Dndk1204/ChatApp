@@ -24,7 +24,7 @@
                 <a href="friend_requests.php">FRIEND REQUESTS</a>
                 <a href="friends.php">FRIENDS</a>
                 <?php if (isset($_SESSION['role']) && $_SESSION['role'] == 'Admin'): ?>
-                    <a href="admin_dashboard.php">ADMIN DASHBOARD</a>
+                    <a href="Admin/index.php">ADMIN DASHBOARD</a>
                 <?php endif; ?>
             <?php endif; ?>
         </nav>
