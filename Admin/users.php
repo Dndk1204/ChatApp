@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/_auth.php';
+require_once __DIR__ . '/_helpers.php';
 
 $flash_success = '';
 $flash_error = '';
@@ -47,24 +48,7 @@ try {
 	<link href="https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap" rel="stylesheet">
 </head>
 <body>
-	<header class="navbar">
-		<div class="logo">
-			<a href="../index.php">
-				<div class="logo-circle"></div>
-				<span>ChatApp</span>
-			</a>
-		</div>
-		<nav class="main-nav">
-			<a href="../index.php">HOME</a>
-			<a href="./index.php">THỐNG KÊ</a>
-			<a href="./users.php">USERS</a>
-			<a href="./messages.php">MESSAGES</a>
-		</nav>
-		<div class="auth-buttons">
-			<span class="logged-in-user">Admin: <?php echo htmlspecialchars($_SESSION['username']); ?></span>
-			<a href="../logout.php" class="btn-text">Logout</a>
-		</div>
-	</header>
+	<?php admin_render_header('users'); ?>
 
 	<main class="admin-container">
 		<div class="header-bar">
@@ -74,8 +58,7 @@ try {
 			</div>
 		</div>
 
-		<?php if (!empty($flash_success)): ?><div class="flash flash-success"><?php echo htmlspecialchars($flash_success); ?></div><?php endif; ?>
-		<?php if (!empty($flash_error)): ?><div class="flash flash-error"><?php echo htmlspecialchars($flash_error); ?></div><?php endif; ?>
+		<?php admin_render_flash($flash_success, $flash_error); ?>
 
 		<section class="section">
 			<div class="section-header">
@@ -106,7 +89,7 @@ try {
 							<td>
 								<div class="action-row">
 									<form method="post" onsubmit="return confirm('Xác nhận cập nhật quyền?');">
-										<input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(get_csrf_token()); ?>">
+										<?php admin_csrf_field(); ?>
 										<input type="hidden" name="action" value="update_user_role">
 										<input type="hidden" name="user_id" value="<?php echo (int)$u['UserId']; ?>">
 										<select name="role">
