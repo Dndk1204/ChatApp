@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 10, 2025 at 05:24 PM
+-- Generation Time: Nov 11, 2025 at 02:17 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -84,13 +84,6 @@ CREATE TABLE `friends` (
   `FriendUserId` int(11) NOT NULL,
   `IsConfirmed` tinyint(1) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Dumping data for table `friends`
---
-
-INSERT INTO `friends` (`FriendId`, `UserId`, `FriendUserId`, `IsConfirmed`) VALUES
-(1, 1, 2, 0);
 
 -- --------------------------------------------------------
 
@@ -186,10 +179,7 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`UserId`, `Username`, `Password`, `Email`, `IsOnline`, `Role`, `FullName`, `PhoneNumber`, `Address`, `DateOfBirth`, `Gender`, `AvatarPath`) VALUES
-(1, 'UserA', 'hash_cua_PasswordA', 'userA@example.com', 1, 'User', 'John Doe', '1234567890', '123 Test Street', '1990-01-01', 'Male', '/wwwroot/images/avatar1.jpg'),
-(2, 'UserB', 'hash_cua_PasswordB', 'userB@example.com', 0, 'User', NULL, NULL, NULL, '2000-01-01', NULL, '/images/default-avatar.jpg'),
-(3, 'UserC', 'hash_cua_PasswordC', 'userC@example.com', 0, 'User', NULL, NULL, NULL, '2000-01-01', NULL, '/images/default-avatar.jpg'),
-(4, 'admin', 'hash_cua_AdminPass', 'admin@example.com', 0, 'Admin', NULL, NULL, NULL, '2000-01-01', NULL, '/images/default-avatar.jpg');
+(9, 'admin', '$2y$10$pWGlzpGyj2cW15NBExjNpORdGqgxchX.nC81BcoGlAZhrJ2bGqF5a', 'admin@gmail.com', 0, 'Admin', NULL, NULL, NULL, NULL, NULL, '/images/default-avatar.jpg');
 
 --
 -- Indexes for dumped tables
@@ -306,7 +296,7 @@ ALTER TABLE `emotes`
 -- AUTO_INCREMENT for table `friends`
 --
 ALTER TABLE `friends`
-  MODIFY `FriendId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `FriendId` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `groups`
@@ -342,7 +332,7 @@ ALTER TABLE `posts`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `UserId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `UserId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- Constraints for dumped tables
