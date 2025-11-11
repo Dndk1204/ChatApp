@@ -377,3 +377,42 @@ th {
 
 .flash-success { background: rgba(16,185,129,0.15); color: #a7f3d0; border: 1px solid #065f46; }
 .flash-error { background: rgba(239,68,68,0.15); color: #fecaca; border: 1px solid #991b1b; }
+
+/* ======================================= */
+/* AVATAR DROPDOWN                         */
+/* ======================================= */
+.avatar-menu {
+    position: relative;
+    display: inline-block;
+}
+.avatar-thumb {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1px solid #444;
+    cursor: pointer;
+}
+.avatar-dropdown {
+    position: absolute;
+    right: 0;
+    margin-top: 8px;
+    background: #1f1f1f;
+    border: 1px solid #333;
+    border-radius: 6px;
+    min-width: 180px;
+    display: none;
+    z-index: 1000;
+}
+.avatar-dropdown.open { display: block; }
+.avatar-dropdown a {
+    display: block;
+    padding: 10px 12px;
+    color: #f0f0f0;
+    text-decoration: none;
+    border-bottom: 1px solid #2a2a2a;
+}
+.avatar-dropdown a:last-child { border-bottom: none; }
+.avatar-dropdown a:hover {
+    background: #2a2a2a;
+}

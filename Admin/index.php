@@ -1,36 +1,12 @@
 <?php
 require_once __DIR__ . '/_auth.php';
+require_once __DIR__ . '/_helpers.php';
 
 // Kiểm tra cột CreatedAt
-$hasCreatedAt = false;
-try {
-	$colRes = $conn->query("SHOW COLUMNS FROM Users LIKE 'CreatedAt'");
-	if ($colRes && $colRes->num_rows === 1) {
-		$hasCreatedAt = true;
-	}
-} catch (Exception $e) {
-	$hasCreatedAt = false;
-}
+$hasCreatedAt = admin_has_created_at($conn);
 
 // Lấy thống kê
-$stats = [
-	'online' => 0,
-	'today' => null,
-	'week' => null,
-	'month' => null
-];
-try {
-	$res = $conn->query('SELECT COUNT(*) AS c FROM Users WHERE IsOnline = 1');
-	if ($res) { $row = $res->fetch_assoc(); $stats['online'] = intval($row['c'] ?? 0); }
-	if ($hasCreatedAt) {
-		$res = $conn->query('SELECT COUNT(*) AS c FROM Users WHERE DATE(CreatedAt) = CURDATE()');
-		if ($res) { $row = $res->fetch_assoc(); $stats['today'] = intval($row['c'] ?? 0); }
-		$res = $conn->query("SELECT COUNT(*) AS c FROM Users WHERE YEARWEEK(CreatedAt, 1) = YEARWEEK(CURDATE(), 1)");
-		if ($res) { $row = $res->fetch_assoc(); $stats['week'] = intval($row['c'] ?? 0); }
-		$res = $conn->query("SELECT COUNT(*) AS c FROM Users WHERE YEAR(CreatedAt) = YEAR(CURDATE()) AND MONTH(CreatedAt) = MONTH(CURDATE())");
-		if ($res) { $row = $res->fetch_assoc(); $stats['month'] = intval($row['c'] ?? 0); }
-	}
-} catch (Exception $e) { /* ignore */ }
+$stats = admin_get_stats($conn, $hasCreatedAt);
 ?>
 <!DOCTYPE html>
 <html lang="vi">
@@ -42,24 +18,7 @@ try {
 	<link href="https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap" rel="stylesheet">
 </head>
 <body>
-	<header class="navbar">
-		<div class="logo">
-			<a href="../index.php">
-				<div class="logo-circle"></div>
-				<span>ChatApp</span>
-			</a>
-		</div>
-		<nav class="main-nav">
-			<a href="../index.php">HOME</a>
-			<a href="./index.php">THỐNG KÊ</a>
-			<a href="./users.php">USERS</a>
-			<a href="./messages.php">MESSAGES</a>
-		</nav>
-		<div class="auth-buttons">
-			<span class="logged-in-user">Admin: <?php echo htmlspecialchars($_SESSION['username']); ?></span>
-			<a href="../logout.php" class="btn-text">Logout</a>
-		</div>
-	</header>
+	<?php admin_render_header('stats'); ?>
 
 	<main class="admin-container">
 		<div class="header-bar">
