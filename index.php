@@ -1,11 +1,5 @@
 <?php
     session_start();
-
-    // Chuyển hướng người dùng đã đăng nhập đến trang chat
-    if (isset($_SESSION['user_id'])) {
-        header("Location: chat.php");
-        exit();
-    }
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -27,7 +21,7 @@
             <?php if (isset($_SESSION['user_id'])):?>
                 <a href="index.php">HOME</a>
                 <a href="posts.php">POSTS</a>
-                <a href="friend_requests.php">FRIEND REQUESTS</a>
+                <a href="chat.php">CHAT</a>
                 <a href="friends.php">FRIENDS</a>
                 <?php if (isset($_SESSION['role']) && $_SESSION['role'] == 'Admin'):?>
                     <a href="admin_dashboard.php">ADMIN DASHBOARD</a>
