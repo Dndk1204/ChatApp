@@ -31,37 +31,37 @@ if ($conn) {
     <link rel="stylesheet" href="./css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap" rel="stylesheet">
     <style>
-        /* CSS bổ sung cho giao diện chat */
+        /* === GIAO DIỆN CHÍNH === */
         body {
             display: flex;
             flex-direction: column;
             min-height: 100vh;
-            background-color: #1a1a1a; /* Match hero section */
+            background-color: #1a1a1a;
         }
         main.form-page-content {
-             /* Đảm bảo main chiếm không gian còn lại */
             flex-grow: 1;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 20px; /* Thêm padding cho màn hình nhỏ */
+            padding: 20px;
         }
         .chat-container {
             display: flex;
-            /* height: calc(100vh - 70px); 70px là chiều cao navbar */
-            height: 85vh; /* Chiều cao tương đối */
-            width: 100%; /* Chiếm toàn bộ chiều rộng main */
+            height: 85vh;
+            width: 100%;
             max-width: 1200px;
             margin: 0 auto;
-            background-color: #333333;
+            background-color: #333;
             border-radius: 8px;
             overflow: hidden;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
         }
+
+        /* === DANH SÁCH NGƯỜI DÙNG === */
         .user-list {
-            width: 30%; /* Sử dụng % cho responsive */
-            min-width: 250px; /* Chiều rộng tối thiểu */
-            max-width: 350px; /* Chiều rộng tối đa */
+            width: 30%;
+            min-width: 250px;
+            max-width: 350px;
             background-color: #2a2a2a;
             padding: 15px;
             overflow-y: auto;
@@ -69,137 +69,49 @@ if ($conn) {
             display: flex;
             flex-direction: column;
         }
-        .chat-area {
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden; /* Ngăn chat area tràn */
-        }
-        .chat-header {
-            padding: 15px;
-            background-color: #121212;
-            color: #ff6666;
-            font-size: 1.2em;
-            font-weight: bold;
-            border-bottom: 1px solid #444;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-shrink: 0; /* Không co lại */
-        }
-        #message-window {
-            flex-grow: 1;
-            padding: 20px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-        .message-input-area {
-            padding: 15px;
-            background-color: #2a2a2a;
-            border-top: 1px solid #444;
-            display: flex;
-            flex-shrink: 0; /* Không co lại */
-        }
-        .message-input-area input {
-            flex-grow: 1;
-            padding: 10px 15px;
-            border-radius: 20px;
-            border: none;
-            background-color: #333333;
-            color: #f0f0f0;
-            margin-right: 10px;
-            font-family: 'Roboto Mono', monospace;
-            font-size: 1em;
-        }
-        .message-input-area button {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 20px;
-            background-color: #ff6666;
-            color: #1a1a1a;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background-color 0.2s;
-            font-family: 'Roboto Mono', monospace;
-        }
-        .message-input-area button:disabled {
-            background-color: #555;
-            cursor: not-allowed;
-        }
-        .message-input-area button:hover:not(:disabled) {
-            background-color: #ff8080;
-        }
-        
-        /* Message Bubbles */
-        .message {
-            max-width: 70%;
-            padding: 10px 15px;
-            border-radius: 15px;
-            word-wrap: break-word;
-            line-height: 1.4;
-        }
-        .sent {
-            align-self: flex-end;
-            background-color: #ff6666;
-            color: #1a1a1a;
-            border-bottom-right-radius: 2px;
-        }
-        .received {
-            align-self: flex-start;
-            background-color: #555555;
-            color: #f0f0f0;
-            border-bottom-left-radius: 2px;
-        }
-        .message-info {
-            font-size: 0.75em;
-            margin-top: 5px;
-            opacity: 0.7;
-        }
-        .message-username {
-            font-weight: bold;
-            margin-bottom: 3px;
-            font-size: 0.9em;
-        }
-        
-        /* User List Styling */
-         #users-container {
-            flex-grow: 1;
-            overflow-y: auto;
-         }
         .user-list h3 {
-            color:#f0f0f0; 
-            margin-bottom: 15px; 
-            border-bottom: 1px solid #444; 
+            color: #f0f0f0;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #444;
             padding-bottom: 10px;
             flex-shrink: 0;
+        }
+        #search-user-input {
+            width: 100%;
+            padding: 8px 10px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            border: 1px solid #555;
+            background-color: #3e3e3e;
+            color: #f0f0f0;
+            font-family: 'Roboto Mono', monospace;
+            box-sizing: border-box;
+        }
+        #users-container {
+            flex-grow: 1;
+            overflow-y: auto;
         }
         .user-item {
             padding: 10px;
             margin-bottom: 5px;
             border-radius: 5px;
             cursor: pointer;
-            transition: background-color 0.2s;
+            transition: background-color 0.2s, border 0.2s;
             display: flex;
             align-items: center;
             justify-content: space-between;
             word-break: break-all;
+            border: 1px solid transparent;
         }
-        .user-item:hover {
-            background-color: #3e3e3e;
-        }
+        .user-item:hover { background-color: #3e3e3e; }
         .user-item.active {
-            background-color: #ff6666;
-            color: #1a1a1a;
             font-weight: bold;
+            border: 1px solid #ff6666;
+            background-color: #1a1a1a;
         }
-        .user-item.active .status-indicator {
-            background-color: #1a1a1a !important;
-        }
-        .user-item.active .user-status-text {
-            color: #2a2a2a;
-        }
+        .user-item.active .status-indicator { border: 1px solid #ff6666; }
+        .user-item.active .user-status-text { color: #ccc; }
+
         .user-details {
             display: flex;
             align-items: center;
@@ -218,7 +130,7 @@ if ($conn) {
             flex-shrink: 0;
         }
         .user-status-text {
-            font-size: 0.8em; 
+            font-size: 0.8em;
             color: #aaa;
             flex-shrink: 0;
             margin-left: 10px;
@@ -226,30 +138,222 @@ if ($conn) {
         .online { background-color: #4CAF50; }
         .offline { background-color: #888; }
 
-        /* Responsive */
+        /* === KHU VỰC CHAT === */
+        .chat-area-wrapper {
+            flex-grow: 1;
+            display: flex;
+            overflow: hidden;
+        }
+        .chat-area {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            width: 100%;
+            transition: width 0.3s ease;
+        }
+        .chat-area.with-media-viewer { width: 70%; }
+
+        /* Header */
+        .chat-header {
+            padding: 15px;
+            background-color: #121212;
+            color: #ff6666;
+            font-size: 1.2em;
+            font-weight: bold;
+            border-bottom: 1px solid #444;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        /* Tin nhắn */
+        #message-window {
+            flex-grow: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .message {
+            max-width: 70%;
+            padding: 10px 15px;
+            border-radius: 15px;
+            word-wrap: break-word;
+            line-height: 1.4;
+        }
+        .sent {
+            align-self: flex-end;
+            background-color: #ff6666;
+            color: #1a1a1a;
+            border-bottom-right-radius: 2px;
+        }
+        .received {
+            align-self: flex-start;
+            background-color: #555;
+            color: #f0f0f0;
+            border-bottom-left-radius: 2px;
+        }
+        .message-text-content { white-space: pre-wrap; }
+        .message-info {
+            font-size: 0.75em;
+            margin-top: 5px;
+            opacity: 0.7;
+            text-align: right;
+        }
+        .message-image {
+            max-width: 100%;
+            height: auto;
+            max-height: 300px;
+            border-radius: 8px;
+            cursor: zoom-in;
+            margin-top: 5px;
+        }
+
+        /* === NHẬP TIN NHẮN === */
+        .message-input-area {
+            padding: 10px 15px;
+            background-color: #2a2a2a;
+            border-top: 1px solid #444;
+            display: flex;
+            align-items: center;
+            flex-shrink: 0;
+            position: relative;
+        }
+        .input-group {
+            display: flex;
+            flex-grow: 1;
+            border-radius: 20px;
+            background-color: #333;
+            margin-right: 10px;
+        }
+        .message-input-area input[type="text"] {
+            flex-grow: 1;
+            padding: 10px 15px;
+            border-radius: 20px;
+            border: none;
+            background-color: transparent;
+            color: #f0f0f0;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 1em;
+            outline: none;
+        }
+        .input-button {
+            background: none;
+            border: none;
+            color: #ff6666;
+            font-size: 1.5em;
+            cursor: pointer;
+            padding: 0 10px;
+            transition: color 0.2s;
+            line-height: 1;
+        }
+        .input-button:hover { color: #f0f0f0; }
+
+        #send-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 20px;
+            background-color: #ff6666;
+            color: #1a1a1a;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            font-family: 'Roboto Mono', monospace;
+        }
+        #send-btn:disabled { background-color: #555; cursor: not-allowed; }
+        #send-btn:hover:not(:disabled) { background-color: #ff8080; }
+
+        /* === EMOJI PICKER === */
+        #emoji-picker {
+            position: absolute;
+            bottom: 100%;
+            left: 0;
+            background: #1f1f1f;
+            border: 1px solid #444;
+            border-radius: 8px 8px 0 0;
+            padding: 10px;
+            display: none;
+            z-index: 10;
+            max-width: 300px;
+        }
+        #emoji-picker.open { display: block; }
+        .emoji-item {
+            cursor: pointer;
+            font-size: 1.5em;
+            padding: 5px;
+            display: inline-block;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+        .emoji-item:hover { background: #333; }
+
+        /* === MEDIA VIEWER === */
+        #media-viewer {
+            width: 30%;
+            min-width: 200px;
+            background-color: #1f1f1f;
+            border-left: 1px solid #444;
+            display: none;
+            flex-direction: column;
+            padding: 15px;
+            overflow-y: auto;
+            flex-shrink: 0;
+        }
+        #media-viewer.open { display: flex; }
+        .media-viewer-title {
+            color: #ff6666;
+            font-size: 1.1em;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #444;
+            text-align: center;
+        }
+        .media-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .media-item {
+            width: calc(50% - 5px);
+            height: 100px;
+            overflow: hidden;
+            border-radius: 4px;
+            cursor: pointer;
+            border: 1px solid #444;
+        }
+        .media-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* === RESPONSIVE === */
         @media (max-width: 768px) {
             .chat-container {
                 flex-direction: column;
-                height: calc(100vh - 55px); /* Điều chỉnh chiều cao navbar mobile */
+                height: calc(100vh - 55px);
             }
             .user-list {
                 width: 100%;
                 max-width: 100%;
-                height: 200px; /* Chiều cao cố định cho danh sách user */
+                height: 200px;
                 min-height: 150px;
                 border-right: none;
                 border-bottom: 1px solid #444;
             }
-            .chat-area {
-                 /* Chiếm phần còn lại */
-                 overflow: hidden;
+            .chat-area-wrapper { flex-direction: column; }
+            .chat-area, .chat-area.with-media-viewer { width: 100%; }
+            #media-viewer {
+                width: 100%;
+                height: 200px;
+                border-left: none;
+                border-top: 1px solid #444;
             }
-            .navbar {
-                padding: 10px 20px;
-            }
-            .main-nav {
-                display: none; /* Ẩn nav chính trên mobile */
-            }
+            .navbar { padding: 10px 20px; }
+            .main-nav { display: none; }
         }
 
     </style>
@@ -288,55 +392,109 @@ if ($conn) {
     <main class="form-page-content">
         <div class="chat-container">
             
-            <!-- Danh sách người dùng -->
             <div class="user-list">
                 <h3>Người dùng</h3>
+                <input type="text" id="search-user-input" placeholder="Tìm kiếm Username...">
+                
                 <div id="users-container">
-                    <!-- Users will be loaded here via JS -->
                     <p style="text-align: center; color: #aaa;">Đang tải...</p>
                 </div>
             </div>
 
-            <!-- Khu vực chat -->
-            <div class="chat-area">
-                <div id="chat-header" class="chat-header">
-                    Chọn một người dùng để bắt đầu chat
+            <div class="chat-area-wrapper">
+                <div class="chat-area" id="chat-area">
+                    <div id="chat-header" class="chat-header">
+                        Chọn một người dùng để bắt đầu chat
+                    </div>
+
+                    <div id="message-window">
+                        </div>
+                    
+                    <div class="message-input-area">
+                        <div id="emoji-picker"></div>
+                        
+                        <div class="input-group">
+                                                    
+                        <button id="toggle-media-viewer-btn" type="button" class="input-button" style="font-size:1em;color:#f0f0f0;padding:5px 10px;border-radius:4px;" onclick="toggleMediaViewer()">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-backpack4-fill" viewBox="0 0 16 16">
+                            <path d="M8 0a2 2 0 0 0-2 2H3.5a2 2 0 0 0-2 2v1a2 2 0 0 0 2 2h4v.5a.5.5 0 0 0 1 0V7h4a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H10a2 2 0 0 0-2-2m1 2a1 1 0 0 0-2 0zm-4 9v2h6v-2h-1v.5a.5.5 0 0 1-1 0V11z"/>
+                            <path d="M14 7.599A3 3 0 0 1 12.5 8H9.415a1.5 1.5 0 0 1-2.83 0H3.5A3 3 0 0 1 2 7.599V14a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2zM4 10.5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-.5.5h-7a.5.5 0 0 1-.5-.5z"/>
+                            </svg>
+                        </button>
+                    
+                            <button id="emoji-btn" class="input-button" onclick="toggleEmojiPicker()" disabled>😀</button>
+                            
+                            <input type="file" id="file-input" accept="image/*" style="display:none;">
+                            <button id="file-input-btn" class="input-button" onclick="document.getElementById('file-input').click()" disabled>🖼️</button>
+                            
+                            <input type="text" id="message-input" placeholder="Nhập tin nhắn..." disabled>
+                        </div>
+                        <button id="send-btn" onclick="sendMessage()" disabled>Gửi</button>
+
+                    </div>
                 </div>
-                <div id="message-window">
-                    <!-- Messages will be loaded here -->
-                </div>
-                <div class="message-input-area">
-                    <input type="text" id="message-input" placeholder="Nhập tin nhắn..." disabled>
-                    <button id="send-btn" onclick="sendMessage()" disabled>Gửi</button>
+
+                <div id="media-viewer">
+                    <h4 class="media-viewer-title">Ảnh đã chia sẻ</h4>
+                    <div id="media-grid" class="media-grid">
+                        <p style="text-align: center; color: #aaa; font-size: 0.9em;">Chưa có ảnh nào được chia sẻ trong cuộc hội thoại này.</p>
+                    </div>
                 </div>
             </div>
-
         </div>
     </main>
 
-    <script>
+<script>
         const currentUserId = <?php echo json_encode($current_user_id); ?>;
         const currentUsername = <?php echo json_encode($current_username); ?>;
         let receiverId = null;
         let receiverUsername = null;
+        const chatArea = document.getElementById('chat-area');
         const messageWindow = document.getElementById('message-window');
         const messageInput = document.getElementById('message-input');
         const sendBtn = document.getElementById('send-btn');
         const chatHeader = document.getElementById('chat-header');
         const usersContainer = document.getElementById('users-container');
+        const searchInput = document.getElementById('search-user-input');
+        const fileInput = document.getElementById('file-input');
+        const toggleMediaViewerBtn = document.getElementById('toggle-media-viewer-btn');
+        const mediaViewer = document.getElementById('media-viewer');
+        const mediaGrid = document.getElementById('media-grid');
+        const emojiPicker = document.getElementById('emoji-picker');
+        const emojiButton = document.getElementById('emoji-btn');
+        const fileInputBtn = document.getElementById('file-input-btn');
         
-        // lastMessageTimestamp sẽ lưu mốc thời gian (dưới dạng số milliseconds)
-        // của tin nhắn *cuối cùng* đã được hiển thị.
         let lastMessageTimestamp = 0; 
-        
         let userPollInterval;
         let messagePollInterval;
+        let mediaPollInterval;
 
-        // --- HÀM TẢI DANH SÁCH NGƯỜI DÙNG ---
-        function loadUsers() {
-            const url = 'Handler/php-fetch-users.php';
-            // console.log('Fetching users...'); // Debug
+        // Emoji list (có thể mở rộng)
+        const emojis = ['😀', '😂', '😍', '🤔', '😎', '😭', '🥺', '👍', '❤️', '🔥', '🥳', '🤯'];
+        
+        // --- CHUẨN BỊ EMOJI PICKER ---
+        function initEmojiPicker() {
+            emojiPicker.innerHTML = emojis.map(e => `<span class="emoji-item" data-emoji="${e}">${e}</span>`).join('');
+            document.querySelectorAll('.emoji-item').forEach(item => {
+                item.addEventListener('click', (e) => {
+                    messageInput.value += e.target.getAttribute('data-emoji');
+                    messageInput.focus();
+                    emojiPicker.classList.remove('open');
+                });
+            });
+        }
+        initEmojiPicker();
 
+        // --- BẬT/TẮT EMOJI PICKER ---
+        function toggleEmojiPicker() {
+             if (receiverId === null) return;
+             emojiPicker.classList.toggle('open');
+        }
+
+        // --- 1. HÀM TẢI VÀ TÌM KIẾM NGƯỜI DÙNG ---
+        function loadUsers(search_query = '') {
+            const url = `Handler/php-fetch-users.php?search=${encodeURIComponent(search_query)}`;
+            
             fetch(url)
                 .then(response => {
                     if (!response.ok) throw new Error(`Lỗi ${response.status} khi tải người dùng.`);
@@ -344,6 +502,10 @@ if ($conn) {
                 })
                 .then(users => {
                     usersContainer.innerHTML = '';
+                    if (users.length === 0 && search_query !== '') {
+                        usersContainer.innerHTML = '<p style="text-align: center; color: #aaa; margin-top: 10px;">Không tìm thấy người dùng.</p>';
+                        return;
+                    }
                     users.forEach(user => {
                         if (user.UserId != currentUserId) {
                             const userItem = document.createElement('div');
@@ -374,26 +536,31 @@ if ($conn) {
                 .catch(error => console.error('Lỗi khi tải danh sách người dùng:', error));
         }
         
+        // Xử lý tìm kiếm khi người dùng gõ
+        searchInput.addEventListener('input', () => {
+            const query = searchInput.value.trim();
+            loadUsers(query);
+        });
 
-        // --- HÀM CHỌN NGƯỜI DÙNG ĐỂ CHAT ---
+        // --- HÀM CHỌN NGƯỜI DÙNG ĐỂ CHAT (SELECT USER) ---
         function selectUser(id, username) {
-            if (receiverId === id) return; // Không chọn lại người đang chat
+            if (receiverId === id) return;
 
             receiverId = id;
             receiverUsername = username;
             
-            //Thông báo cho loadMessages biết đây là lần tải đầu tiên cho người dùng này
             lastMessageTimestamp = 0; 
-            
-            //Xóa sạch cửa sổ chat cũ
             messageWindow.innerHTML = ''; 
 
             chatHeader.innerHTML = `Chat với: ${htmlspecialchars(receiverUsername)}`;
+            toggleMediaViewerBtn.style.display = 'block'; // Hiển thị nút Media
+
             messageInput.disabled = false;
             sendBtn.disabled = false;
+            emojiButton.disabled = false;
+            fileInputBtn.disabled = false;
             messageInput.focus();
             
-            // Cập nhật trạng thái active trong danh sách
             document.querySelectorAll('.user-item').forEach(item => {
                 item.classList.remove('active');
             });
@@ -402,25 +569,25 @@ if ($conn) {
                 activeUserItem.classList.add('active');
             }
 
-            // Xóa Polling cũ (nếu có) và bắt đầu tải ngay lập tức
             if (messagePollInterval) clearInterval(messagePollInterval);
-            loadMessages(); // Tải lần đầu
+            if (mediaPollInterval) clearInterval(mediaPollInterval);
             
-            // Bắt đầu polling mới
+            loadMessages();
+            loadMediaViewer();
+            
             messagePollInterval = setInterval(loadMessages, 2000); 
+            mediaPollInterval = setInterval(loadMediaViewer, 10000); 
         }
 
-        // --- HÀM TẢI TIN NHẮN (Polling) ---
+        // --- HÀM TẢI VÀ HIỂN THỊ TIN NHẮN ---
         function loadMessages() {
             if (!receiverId) return;
 
             const url = 'Handler/php-fetch-messages.php';
-            // console.log(`Fetching messages since: ${lastMessageTimestamp}`); // Debug
 
             fetch(url, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                // Gửi mốc thời gian (milliseconds) lên server
                 body: `receiver_id=${receiverId}&last_timestamp=${lastMessageTimestamp}`
             })
             .then(response => {
@@ -430,7 +597,6 @@ if ($conn) {
             .then(messages => {
                 if (messages.length > 0) {
                     
-                    // Kiểm tra xem người dùng có đang cuộn ở cuối cửa sổ không
                     const shouldScroll = messageWindow.scrollHeight - messageWindow.clientHeight <= messageWindow.scrollTop + 50;
                     
                     let htmlToAppend = '';
@@ -440,37 +606,41 @@ if ($conn) {
                         const isSent = msg.SenderId == currentUserId;
                         const messageClass = isSent ? 'sent' : 'received';
                         
-                        //Chuyển đổi thời gian YYYY-MM-DD HH:MM:SS (từ MySQL) sang Date object
                         const date = parseMySQLDateTime(msg.SentAt);
-                        const newTimestamp = date.getTime(); // Lấy milliseconds
+                        const newTimestamp = date.getTime();
 
-                        // Đảm bảo không xử lý lại tin nhắn cũ
                         if (newTimestamp > lastMessageTimestamp) {
                             const timeString = date.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+                            let contentHTML = '';
+
+                            // Kiểm tra MessageType được giả lập từ PHP Handler
+                            if (msg.MessageType === 'image' && msg.FilePath) {
+                                // Path được chuẩn hóa
+                                const imagePath = msg.FilePath.startsWith('/') ? msg.FilePath.substring(1) : msg.FilePath;
+                                contentHTML = `<img src="${htmlspecialchars(imagePath)}" alt="Image" class="message-image" onclick="viewImage(this.src)">`;
+                            } else {
+                                // Sử dụng content (text)
+                                contentHTML = `<div class="message-text-content">${linkify(htmlspecialchars(msg.Content))}</div>`;
+                            }
 
                             htmlToAppend += `
                                 <div class="message ${messageClass}">
-                                    <div class="message-username">${isSent ? 'Bạn' : htmlspecialchars(msg.SenderName)}</div>
-                                    ${htmlspecialchars(msg.Content)}
+                                    <div class="message-username">${isSent ? '' : htmlspecialchars(msg.SenderName)}</div>
+                                    ${contentHTML}
                                     <div class="message-info">${timeString}</div>
                                 </div>
                             `;
                             
-                            // Cập nhật mốc thời gian mới nhất trong loạt tin nhắn này
                             if (newTimestamp > latestTimestampInBatch) {
                                 latestTimestampInBatch = newTimestamp;
                             }
                         }
                     });
                     
-                    // Cập nhật mốc thời gian toàn cục
                     lastMessageTimestamp = latestTimestampInBatch;
 
-                    // Chỉ *nối* (append) tin nhắn mới vào cửa sổ
                     messageWindow.innerHTML += htmlToAppend;
                     
-                    // Cuộn xuống nếu người dùng đang ở cuối
-                    // Hoặc nếu đây là lần tải đầu tiên (lastMessageTimestamp vừa bị reset)
                     if (shouldScroll || (messages.length > 0 && lastMessageTimestamp === latestTimestampInBatch && messageWindow.innerHTML === htmlToAppend)) {
                          messageWindow.scrollTop = messageWindow.scrollHeight;
                     }
@@ -478,46 +648,63 @@ if ($conn) {
             })
             .catch(error => {
                 console.error('Lỗi khi tải tin nhắn:', error);
-                if (messagePollInterval) clearInterval(messagePollInterval);
             });
         }
-
-        // Hàm tiện ích để chuyển đổi chuỗi DateTime của MySQL
-        function parseMySQLDateTime(dateTimeStr) {
-            // dateTimeStr có dạng "YYYY-MM-DD HH:MM:SS"
-            const parts = dateTimeStr.split(/[- :]/);
-            // new Date(year, monthIndex (0-11), day, hour, minute, second)
-            // Chú ý: parts[1] - 1 vì tháng trong JS bắt đầu từ 0
-            return new Date(parts[0], parts[1] - 1, parts[2], parts[3], parts[4], parts[5]);
-        }
         
-        // Hàm tiện ích để tránh lỗi XSS
-        function htmlspecialchars(str) {
-            if (typeof str !== 'string') return '';
-            return str.replace(/&/g, "&amp;")
-                    .replace(/</g, "&lt;")
-                    .replace(/>/g, "&gt;")
-                    .replace(/"/g, "&quot;")
-                    .replace(/'/g, "&#039;");
+        // --- HÀM TẢI MEDIA CHO MEDIA VIEWER (KHO LƯU TRỮ ẢNH) ---
+        function loadMediaViewer() {
+            if (!receiverId) return;
+            
+            const url = 'Handler/php-fetch-messages.php';
+            
+            fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                // Lấy tất cả tin nhắn
+                body: `receiver_id=${receiverId}&last_timestamp=0` 
+            })
+            .then(response => response.json())
+            .then(messages => {
+                mediaGrid.innerHTML = '';
+                let mediaCount = 0;
+                
+                messages.reverse().forEach(msg => { // Đảo ngược để ảnh mới nhất lên đầu
+                    // Kiểm tra MessageType được giả lập từ PHP Handler
+                    if (msg.MessageType === 'image' && msg.FilePath) {
+                        // Path được chuẩn hóa
+                        const imagePath = msg.FilePath.startsWith('/') ? msg.FilePath.substring(1) : msg.FilePath;
+                        const mediaItem = document.createElement('div');
+                        mediaItem.className = 'media-item';
+                        mediaItem.innerHTML = `<img src="${htmlspecialchars(imagePath)}" alt="Shared Image" onclick="viewImage(this.src)">`;
+                        mediaGrid.appendChild(mediaItem);
+                        mediaCount++;
+                    }
+                });
+
+                if (mediaCount === 0) {
+                    mediaGrid.innerHTML = '<p style="text-align: center; color: #aaa; font-size: 0.9em;">Chưa có ảnh nào được chia sẻ trong cuộc hội thoại này.</p>';
+                }
+            })
+            .catch(error => console.error('Lỗi khi tải media:', error));
         }
 
 
-        // --- HÀM GỬI TIN NHẮN ---
+        // --- HÀM GỬI TIN NHẮN (TEXT) ---
         function sendMessage() {
             const content = messageInput.value.trim();
             if (content === '' || receiverId === null) return;
 
-            const tempMessageContent = content; // Giữ lại nội dung
-            messageInput.value = ''; // Xóa nội dung ngay lập tức
+            const tempMessageContent = content;
+            messageInput.value = ''; 
             messageInput.focus();
             
             const url = 'Handler/php-send-message.php';
-            // console.log('Sending message...'); // Debug
 
             fetch(url, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: `receiver_id=${receiverId}&content=${encodeURIComponent(tempMessageContent)}`
+                // Gửi nội dung tin nhắn thường
+                body: `receiver_id=${receiverId}&content=${encodeURIComponent(tempMessageContent)}` 
             })
             .then(response => {
                 if (!response.ok) {
@@ -539,25 +726,114 @@ if ($conn) {
             .catch(error => {
                 console.error('Lỗi khi gửi tin nhắn:', error);
                 alert('Lỗi mạng. Không thể gửi tin nhắn. Chi tiết: ' + error.message);
-                // Hoàn lại nội dung tin nhắn nếu có lỗi
                 messageInput.value = tempMessageContent; 
             });
         }
+        
+        // --- HÀM GỬI MEDIA (IMAGE) ---
+        fileInput.addEventListener('change', sendMedia);
 
+        function sendMedia() {
+            if (!receiverId || fileInput.files.length === 0) return;
+
+            const file = fileInput.files[0];
+            const formData = new FormData();
+            formData.append('receiver_id', receiverId);
+            formData.append('image', file);
+            
+            // Xóa file đã chọn khỏi input
+            fileInput.value = '';
+            
+            const url = 'Handler/php-send-media.php';
+
+            fetch(url, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(errorData => {
+                        throw new Error(errorData.message || `Lỗi HTTP ${response.status}`);
+                    }).catch(() => {
+                        throw new Error(`Lỗi Server không xác định (Mã: ${response.status})`);
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.status === 'success') {
+                    loadMessages(); 
+                    loadMediaViewer(); 
+                } else {
+                    throw new Error(data.message || 'Lỗi gửi ảnh không rõ.');
+                }
+            })
+            .catch(error => {
+                console.error('Lỗi khi gửi ảnh:', error);
+                alert('Lỗi: ' + error.message);
+            });
+        }
+        
+        // --- 3. HÀM CHUYỂN ĐỔI MEDIA VIEWER ---
+        function toggleMediaViewer() {
+            const isOpen = mediaViewer.classList.toggle('open');
+            if (isOpen) {
+                chatArea.classList.add('with-media-viewer');
+                loadMediaViewer(); // Tải lại media khi mở
+            } else {
+                chatArea.classList.remove('with-media-viewer');
+            }
+        }
+        
+        // --- HÀM TIỆN ÍCH ---
+        function viewImage(src) {
+            // Mở ảnh trong cửa sổ mới khi click
+            window.open(src, '_blank');
+        }
+
+        function parseMySQLDateTime(dateTimeStr) {
+            const parts = dateTimeStr.split(/[- :]/);
+            return new Date(parts[0], parts[1] - 1, parts[2], parts[3], parts[4], parts[5]);
+        }
+        
+        function htmlspecialchars(str) {
+            if (typeof str !== 'string') return '';
+            return str.replace(/&/g, "&amp;")
+                    .replace(/</g, "&lt;")
+                    .replace(/>/g, "&gt;")
+                    .replace(/"/g, "&quot;")
+                    .replace(/'/g, "&#039;");
+        }
+        
+        function linkify(inputText) {
+            let replacedText;
+            const replacePattern1 = /(\b(https?|ftp):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/gim;
+            replacedText = inputText.replace(replacePattern1, '<a href="$1" target="_blank">$1</a>');
+            const replacePattern2 = /(^|[^\/])(www\.[\S]+(\b|$))/gim;
+            replacedText = replacedText.replace(replacePattern2, '$1<a href="http://$2" target="_blank">$2</a>');
+            return replacedText;
+        }
+        
+        // --- KHỞI ĐỘNG VÀ LISTENERS ---
         // Bắt sự kiện Enter để gửi tin nhắn
         messageInput.addEventListener('keydown', function(event) {
             if (event.key === 'Enter') {
-                event.preventDefault(); // Ngăn chặn xuống dòng
+                event.preventDefault(); 
                 sendMessage();
             }
         });
         
-        // --- KHỞI ĐỘNG ỨNG DỤNG ---
+        // Đóng emoji picker khi click ra ngoài
+        document.addEventListener('click', (e) => {
+             if (emojiPicker.classList.contains('open') && !emojiPicker.contains(e.target) && e.target !== emojiButton && !messageInput.contains(e.target)) {
+                emojiPicker.classList.remove('open');
+            }
+        });
         
-        // Bắt đầu tải danh sách người dùng và lặp lại
         loadUsers();
         userPollInterval = setInterval(loadUsers, 5000); // 5 giây
-        // Avatar dropdown
+        
+        // Avatar dropdown (giữ nguyên logic cũ)
         (function(){
             const avatarBtn = document.getElementById('avatarBtn');
             const avatarDropdown = document.getElementById('avatarDropdown');
@@ -569,7 +845,6 @@ if ($conn) {
                 }
             });
         })();
-    </script>
-
+</script>
 </body>
 </html>

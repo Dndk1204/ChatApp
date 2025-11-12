@@ -11,21 +11,33 @@ if (!isset($_SESSION['user_id']) || !$conn) {
 }
 
 $current_user_id = $_SESSION['user_id'];
+$search_query = isset($_GET['search']) ? trim($_GET['search']) : '';
+$users = [];
 
 try {
-    //UserId, Username và IsOnline
     $sql = "SELECT UserId, Username, IsOnline FROM Users WHERE UserId != ?";
+    $params = [$current_user_id];
+    $types = "i";
+
+    if (!empty($search_query)) {
+        // Tìm kiếm theo Username chứa chuỗi tìm kiếm
+        $sql .= " AND Username LIKE ?";
+        $params[] = "%" . $search_query . "%";
+        $types .= "s";
+    }
+
+    $sql .= " ORDER BY IsOnline DESC, Username ASC"; // Ưu tiên hiển thị online lên trên
+
     $stmt = $conn->prepare($sql);
 
     if ($stmt === false) {
         throw new Exception("Lỗi chuẩn bị CSDL: " . $conn->error);
     }
 
-    $stmt->bind_param("i", $current_user_id);
+    $stmt->bind_param($types, ...$params);
     $stmt->execute();
     $result = $stmt->get_result();
     
-    $users = [];
     while ($row = $result->fetch_assoc()) {
         $users[] = $row;
     }

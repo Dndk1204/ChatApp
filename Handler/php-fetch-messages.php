@@ -10,10 +10,8 @@ if (!isset($_SESSION['user_id']) || $_SERVER["REQUEST_METHOD"] != "POST" || !$co
     exit();
 }
 
-$sender_id = $_SESSION['user_id'];//ID người gửi
-$receiver_id = isset($_POST['receiver_id']) ? (int)$_POST['receiver_id'] : 0;// ID người nhận
-
-// Lấy mốc thời gian (dưới dạng milliseconds từ 1970)
+$sender_id = $_SESSION['user_id'];
+$receiver_id = isset($_POST['receiver_id']) ? (int)$_POST['receiver_id'] : 0;
 $last_timestamp_ms = isset($_POST['last_timestamp']) ? (float)$_POST['last_timestamp'] : 0;
 
 if ($receiver_id === 0) {
@@ -28,46 +26,62 @@ try {
     
     $sql = "";
     $stmt = null;
-
-    // Truy vấn chỉ lấy tin nhắn mới hơn mốc thời gian
-    // và liên quan đến cuộc hội thoại này
+    $types = "";
+    $params = [];
     
-    // Nếu last_timestamp = 0 (lần tải đầu tiên), lấy TẤT CẢ tin nhắn
+    // Chỉ chọn MessageId, SenderId, Content, SentAt và Username
+    $select_cols = "m.MessageId, m.SenderId, m.Content, m.SentAt, u.Username AS SenderName";
+    
+    // Điều kiện chung cho tin nhắn giữa 2 người
+    $where_conversation = "(m.SenderId = ? AND m.ReceiverId = ?) OR (m.SenderId = ? AND m.ReceiverId = ?)";
+
     if ($last_timestamp_ms == 0) {
-        $sql = "SELECT m.MessageId, m.SenderId, m.Content, m.SentAt, u.Username AS SenderName 
+        // Tải LẦN ĐẦU: lấy tất cả tin nhắn
+        $sql = "SELECT {$select_cols}
                 FROM Messages m
                 JOIN Users u ON m.SenderId = u.UserId
-                WHERE (m.SenderId = ? AND m.ReceiverId = ?) 
-                   OR (m.SenderId = ? AND m.ReceiverId = ?)
+                WHERE {$where_conversation}
                 ORDER BY m.SentAt ASC";
         
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("iiii", $sender_id, $receiver_id, $receiver_id, $sender_id);
+        $types = "iiii";
+        $params = [$sender_id, $receiver_id, $receiver_id, $sender_id];
 
     } else {
-        // Nếu last_timestamp > 0, chỉ lấy tin nhắn MỚI
-        // Chuyển đổi milliseconds (từ JS) sang giây và định dạng cho MySQL
-        // Thêm 0.001 giây (1ms) để tránh lấy lại tin nhắn cuối cùng
+        // Tải tin nhắn MỚI (Polling)
         $last_timestamp_sql = date('Y-m-d H:i:s', ($last_timestamp_ms / 1000) + 0.001);
 
-        $sql = "SELECT m.MessageId, m.SenderId, m.Content, m.SentAt, u.Username AS SenderName 
+        $sql = "SELECT {$select_cols}
                 FROM Messages m
                 JOIN Users u ON m.SenderId = u.UserId
-                WHERE ((m.SenderId = ? AND m.ReceiverId = ?) 
-                   OR (m.SenderId = ? AND m.ReceiverId = ?))
+                WHERE ({$where_conversation})
                 AND m.SentAt > ?
                 ORDER BY m.SentAt ASC";
         
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("iiiis", $sender_id, $receiver_id, $receiver_id, $sender_id, $last_timestamp_sql);
+        $types = "iiiis";
+        $params = [$sender_id, $receiver_id, $receiver_id, $sender_id, $last_timestamp_sql];
     }
 
-
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param($types, ...$params);
     $stmt->execute();
     $result = $stmt->get_result();
 
     if ($result) {
         while ($row = $result->fetch_assoc()) {
+            
+            // Xử lý để xác định MessageType và FilePath
+            $content = $row['Content'] ?? '';
+            $row['MessageType'] = 'text';
+            $row['FilePath'] = null;
+
+            if (str_starts_with($content, '[IMG]')) {
+                $row['MessageType'] = 'image';
+                // Lấy đường dẫn ảnh (loại bỏ tiền tố "[IMG]")
+                $row['FilePath'] = substr($content, 5); 
+                // Thiết lập lại Content là rỗng để frontend không hiển thị chuỗi "[IMG]..."
+                $row['Content'] = ''; 
+            }
+            
             $messages[] = $row;
         }
     }
