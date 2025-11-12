@@ -31,13 +31,27 @@ if ($conn) {
     <link rel="stylesheet" href="./css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --color-primary: #A8DADC;
+            --color-primary-dark: #74C0C9;
+            --color-secondary: #F1FAEE;
+            --color-bg: #EAF4F4;
+            --color-card: #FFFFFF;
+            --color-text: #2B2D42;
+            --color-text-muted: #6C757D;
+            --color-success: #81C784;
+            --color-error: #E57373;
+            --color-accent: #457B9D;
+            --color-border: #D0E2E2;
+        }
         /* === GIAO DIỆN CHÍNH === */
         body {
             display: flex;
             flex-direction: column;
             min-height: 100vh;
-            background-color: #1a1a1a;
+            background-color: var(--color-bg);
         }
+
         main.form-page-content {
             flex-grow: 1;
             display: flex;
@@ -45,16 +59,17 @@ if ($conn) {
             justify-content: center;
             padding: 20px;
         }
+
         .chat-container {
             display: flex;
             height: 85vh;
             width: 100%;
             max-width: 1200px;
             margin: 0 auto;
-            background-color: #333;
+            background-color: var(--color-card);
             border-radius: 8px;
             overflow: hidden;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
         }
 
         /* === DANH SÁCH NGƯỜI DÙNG === */
@@ -62,28 +77,30 @@ if ($conn) {
             width: 30%;
             min-width: 250px;
             max-width: 350px;
-            background-color: #2a2a2a;
+            background-color: var(--color-primary);
             padding: 15px;
             overflow-y: auto;
-            border-right: 1px solid #444;
+            border-right: 1px solid var(--color-border);
             display: flex;
             flex-direction: column;
         }
+
         .user-list h3 {
-            color: #f0f0f0;
+            color: var(--color-text);
             margin-bottom: 15px;
-            border-bottom: 1px solid #444;
+            border-bottom: 1px solid var(--color-border);
             padding-bottom: 10px;
             flex-shrink: 0;
         }
+
         #search-user-input {
             width: 100%;
             padding: 8px 10px;
             margin-bottom: 15px;
             border-radius: 5px;
-            border: 1px solid #555;
-            background-color: #3e3e3e;
-            color: #f0f0f0;
+            border: 1px solid var(--color-border);
+            background-color: var(--color-secondary);
+            color: var(--color-text);
             font-family: 'Roboto Mono', monospace;
             box-sizing: border-box;
         }
@@ -103,14 +120,22 @@ if ($conn) {
             word-break: break-all;
             border: 1px solid transparent;
         }
-        .user-item:hover { background-color: #3e3e3e; }
+        .user-item:hover {
+            background-color: var(--color-primary-dark);
+        }
+
         .user-item.active {
             font-weight: bold;
-            border: 1px solid #ff6666;
-            background-color: #1a1a1a;
+            border: 1px solid var(--color-accent);
+            background-color: var(--color-secondary);
         }
-        .user-item.active .status-indicator { border: 1px solid #ff6666; }
-        .user-item.active .user-status-text { color: #ccc; }
+        .user-item.active .status-indicator {
+            border: 1px solid var(--color-accent);
+        }
+
+        .user-item.active .user-status-text {
+            color: var(--color-text-muted);
+        }
 
         .user-details {
             display: flex;
@@ -135,8 +160,8 @@ if ($conn) {
             flex-shrink: 0;
             margin-left: 10px;
         }
-        .online { background-color: #4CAF50; }
-        .offline { background-color: #888; }
+        .status-indicator.online { background-color: var(--color-success); }
+        .status-indicator.offline { background-color: var(--color-text-muted); }
 
         /* === KHU VỰC CHAT === */
         .chat-area-wrapper {
@@ -144,6 +169,7 @@ if ($conn) {
             display: flex;
             overflow: hidden;
         }
+
         .chat-area {
             flex-grow: 1;
             display: flex;
@@ -157,11 +183,11 @@ if ($conn) {
         /* Header */
         .chat-header {
             padding: 15px;
-            background-color: #121212;
-            color: #ff6666;
+            background-color: var(--color-primary);
+            color: var(--color-text);
             font-size: 1.2em;
             font-weight: bold;
-            border-bottom: 1px solid #444;
+            border-bottom: 1px solid var(--color-border);
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -186,14 +212,15 @@ if ($conn) {
         }
         .sent {
             align-self: flex-end;
-            background-color: #ff6666;
-            color: #1a1a1a;
+            background-color: var(--color-accent);
+            color: var(--color-card);
             border-bottom-right-radius: 2px;
         }
+
         .received {
             align-self: flex-start;
-            background-color: #555;
-            color: #f0f0f0;
+            background-color: var(--color-primary-dark);
+            color: var(--color-text);
             border-bottom-left-radius: 2px;
         }
         .message-text-content { white-space: pre-wrap; }
@@ -212,30 +239,155 @@ if ($conn) {
             margin-top: 5px;
         }
 
+        /* ========================================= */
+/* NAVBAR + AVATAR DROPDOWN                  */
+/* ========================================= */
+header.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--color-primary);
+    padding: 12px 24px;
+    border-bottom: 2px solid var(--color-border);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    position: relative;
+}
+
+header.navbar .logo a {
+    text-decoration: none;
+    color: var(--color-text);
+    font-weight: bold;
+    font-size: 1.2em;
+}
+
+header.navbar .main-nav a,
+header.navbar .auth-buttons a {
+    color: var(--color-text);
+    text-decoration: none;
+    margin-left: 20px;
+    font-size: 0.9em;
+    transition: color 0.2s ease;
+}
+
+header.navbar .main-nav a:hover,
+header.navbar .auth-buttons a:hover {
+    color: var(--color-accent);
+}
+
+/* Avatar + Username */
+.auth-buttons {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    position: relative;
+}
+
+.logged-in-user {
+    font-weight: 600;
+    color: var(--color-accent);
+}
+
+.avatar-menu {
+    position: relative;
+}
+
+.avatar-thumb {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--color-primary-dark);
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.avatar-thumb:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 10px rgba(69,123,157,0.3);
+}
+
+/* Dropdown */
+.avatar-dropdown {
+    position: absolute;
+    right: 0;
+    top: 50px; /* cách avatar */
+    background: var(--color-card);
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    min-width: 180px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    display: none;
+    z-index: 50;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.avatar-dropdown.open {
+    display: flex;
+}
+
+.avatar-dropdown a {
+    display: block;
+    padding: 10px 12px;
+    color: var(--color-text);
+    text-decoration: none;
+    border-bottom: 1px solid var(--color-border);
+    font-weight: 500;
+    transition: background 0.2s ease;
+}
+
+.avatar-dropdown a:last-child {
+    border-bottom: none;
+}
+
+.avatar-dropdown a:hover {
+    background: var(--color-secondary);
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+    header.navbar {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 12px 15px;
+        gap: 8px;
+    }
+    .auth-buttons {
+        width: 100%;
+        justify-content: space-between;
+    }
+    .avatar-dropdown {
+        top: 45px;
+        right: 0;
+        min-width: 150px;
+    }
+}
+
+
         /* === NHẬP TIN NHẮN === */
         .message-input-area {
             padding: 10px 15px;
-            background-color: #2a2a2a;
-            border-top: 1px solid #444;
+            background-color: var(--color-primary);
+            border-top: 1px solid var(--color-border);
             display: flex;
             align-items: center;
             flex-shrink: 0;
-            position: relative;
         }
         .input-group {
             display: flex;
             flex-grow: 1;
             border-radius: 20px;
-            background-color: #333;
+            background-color: var(--color-secondary);
             margin-right: 10px;
         }
+
         .message-input-area input[type="text"] {
             flex-grow: 1;
             padding: 10px 15px;
             border-radius: 20px;
             border: none;
             background-color: transparent;
-            color: #f0f0f0;
+            color: var(--color-text);
             font-family: 'Roboto Mono', monospace;
             font-size: 1em;
             outline: none;
@@ -243,28 +395,30 @@ if ($conn) {
         .input-button {
             background: none;
             border: none;
-            color: #ff6666;
+            color: var(--color-accent);
             font-size: 1.5em;
             cursor: pointer;
             padding: 0 10px;
             transition: color 0.2s;
             line-height: 1;
         }
-        .input-button:hover { color: #f0f0f0; }
+
+        .input-button:hover { color: var(--color-text); }
 
         #send-btn {
             padding: 10px 20px;
             border: none;
             border-radius: 20px;
-            background-color: #ff6666;
-            color: #1a1a1a;
+            background-color: var(--color-accent);
+            color: var(--color-card);
             font-weight: bold;
             cursor: pointer;
             transition: background-color 0.2s;
             font-family: 'Roboto Mono', monospace;
         }
-        #send-btn:disabled { background-color: #555; cursor: not-allowed; }
-        #send-btn:hover:not(:disabled) { background-color: #ff8080; }
+
+        #send-btn:disabled { background-color: var(--color-text-muted); cursor: not-allowed; }
+        #send-btn:hover:not(:disabled) { background-color: var(--color-primary-dark); }
 
         /* === EMOJI PICKER === */
         #emoji-picker {
@@ -370,7 +524,7 @@ if ($conn) {
         <nav class="main-nav">
             <a href="index.php">HOME</a>
             <a href="posts.php">POSTS</a>
-            <a href="friend_requests.php">FRIEND REQUESTS</a>
+            <a href="chat.php">CHAT</a>
             <a href="friends.php">FRIENDS</a>
             <?php if (isset($_SESSION['role']) && $_SESSION['role'] == 'Admin'):?>
                 <a href="admin_dashboard.php">ADMIN </a>

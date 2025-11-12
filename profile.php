@@ -147,7 +147,9 @@ $avatar = ltrim($avatar, '/');
 		</div>
 		<nav class="main-nav">
 			<a href="index.php">HOME</a>
+			<a href="post.php">POST</a>
 			<a href="chat.php">CHAT</a>
+			<a href="friends.php">FRIENDS</a>
 		</nav>
 		<div class="auth-buttons">
 			<span class="logged-in-user">Hellu, <?php echo htmlspecialchars($_SESSION['username']); ?></span>

@@ -1,11 +1,5 @@
 <?php
     session_start();
-
-    // Chuyển hướng người dùng đã đăng nhập đến trang chat
-    if (isset($_SESSION['user_id'])) {
-        header("Location: chat.php");
-        exit();
-    }
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -15,35 +9,77 @@
     <title>ChatApp Home</title>
     <link rel="stylesheet" href="./css/style.css">
 </head>
+<style>
+    /* === HERO SECTION === */
+.hero-section {
+    display: flex;
+    align-items: center;       /* căn giữa theo chiều dọc */
+    justify-content: center;   /* căn giữa theo chiều ngang */
+    min-height: calc(100vh - 70px); /* full height trừ navbar (70px giả định) */
+    background-color: var(--color-primary);
+    text-align: center;
+    padding: 20px;
+}
+
+.hero-section .center-content {
+    max-width: 800px;
+    color: var(--color-text);
+}
+
+.hero-section .app-title {
+    font-size: 3em;
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: var(--color-accent);
+}
+
+.hero-section .tagline {
+    font-size: 1.5em;
+    margin-bottom: 5px;
+    color: var(--color-text);
+}
+
+.hero-section .slogan {
+    font-size: 1.2em;
+    margin-bottom: 20px;
+    color: var(--color-text-muted);
+}
+
+.hero-section .action-buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.hero-section .btn {
+    padding: 12px 25px;
+    border-radius: 25px;
+    font-weight: bold;
+    text-decoration: none;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.hero-section .btn-primary {
+    background-color: var(--color-accent);
+    color: var(--color-card);
+}
+
+.hero-section .btn-primary:hover {
+    background-color: var(--color-primary-dark);
+}
+
+.hero-section .btn-secondary {
+    background-color: var(--color-secondary);
+    color: var(--color-text);
+}
+
+.hero-section .btn-secondary:hover {
+    background-color: var(--color-bg);
+}
+</style>
 <body>
-    <header class="navbar">
-        <div class="logo">
-            <a href="index.php">
-                <div class="logo-circle"></div>
-                <span>ChatApp</span>
-            </a>
-        </div>
-        <nav class="main-nav">
-            <?php if (isset($_SESSION['user_id'])):?>
-                <a href="index.php">HOME</a>
-                <a href="posts.php">POSTS</a>
-                <a href="friend_requests.php">FRIEND REQUESTS</a>
-                <a href="friends.php">FRIENDS</a>
-                <?php if (isset($_SESSION['role']) && $_SESSION['role'] == 'Admin'):?>
-                    <a href="admin_dashboard.php">ADMIN DASHBOARD</a>
-                <?php endif; ?>
-            <?php endif; ?>
-        </nav>
-        <div class="auth-buttons">
-            <?php if (isset($_SESSION['user_id'])):?>
-                <span class="logged-in-user">Xin chào, <?php echo htmlspecialchars($_SESSION['username']); ?></span>
-                <a href="logout.php" class="btn-text">Logout</a>
-            <?php else:?>
-                <a href="login.php" class="btn-text">Login</a>
-                <a href="register.php" class="btn-text">Register</a>
-            <?php endif; ?>
-        </div>
-    </header>
+    <?php include 'navbar.php'; ?>
 
     <main class="hero-section">
         <div class="center-content">
