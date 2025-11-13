@@ -26,7 +26,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $_SESSION['user_id'] = $user['UserId'];
                 $_SESSION['username'] = $user['Username'];
                 $_SESSION['role'] = $user['Role'];
-                $defaultAvatar = 'images/default-avatar.jpg';
+                $defaultAvatar = 'uploads/default-avatar.jpg';
                 $avatarPath = $user['AvatarPath'] ?? '';
                 if (empty($avatarPath)) {
                     $_SESSION['avatar'] = $defaultAvatar;
