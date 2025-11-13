@@ -82,7 +82,7 @@ switch ($action) {
     // 👬 Lấy danh sách bạn bè đã xác nhận
     case 'fetch_friends':
     $stmt = $conn->prepare("
-        SELECT u.UserId, u.Username, u.FullName, u.AvatarPath, u.IsOnline, u.LastSeen
+        SELECT u.UserId, u.Username, u.AvatarPath, u.IsOnline, u.LastSeen
         FROM users u
         WHERE u.UserId IN (
             SELECT FriendUserId FROM friends WHERE UserId=? AND IsConfirmed=1
