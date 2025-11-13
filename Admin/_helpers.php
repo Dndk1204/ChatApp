@@ -19,26 +19,32 @@ function admin_render_flash($flash_success, $flash_error) {
 }
 
 function admin_render_header($active = '') {
-	$username = htmlspecialchars($_SESSION['username'] ?? 'Admin');
-	echo '
-	<header class="navbar">
-		<div class="logo">
-			<a href="../index.php">
-				<div class="logo-circle"></div>
-				<span>ChatApp</span>
-			</a>
-		</div>
-		<nav class="main-nav">
-			<a href="../index.php">HOME</a>
-			<a href="./index.php">THỐNG KÊ</a>
-			<a href="./users.php">USERS</a>
-			<a href="./messages.php">MESSAGES</a>
-		</nav>
-		<div class="auth-buttons">
-			<span class="logged-in-user">Admin: ' . $username . '</span>
-			<a href="../Handler/logout.php" class="btn-text">Logout</a>
-		</div>
-	</header>';
+    // Tách biến $active (tên trang hiện tại)
+    $username = htmlspecialchars($_SESSION['username'] ?? 'Admin');
+    $stats_active = ($active === 'stats') ? 'class="active"' : '';
+    $users_active = ($active === 'users') ? 'class="active"' : '';
+    $messages_active = ($active === 'messages') ? 'class="active"' : '';
+    $reports_active = ($active === 'reports') ? 'class="active"' : ''; // Dòng mới
+
+    echo '
+    <header class="navbar">
+        <div class="logo">
+            <a href="../index.php">
+                <div class="logo-circle"></div>
+                <span>ChatApp</span>
+            </a>
+        </div>
+        <nav class="main-nav">
+            <a href="../index.php">HOME</a>
+            <a href="./index.php" ' . $stats_active . '>THỐNG KÊ</a>
+            <a href="./users.php" ' . $users_active . '>USERS</a>
+            <a href="./messages.php" ' . $messages_active . '>MESSAGES</a>
+            <a href="./manage_reports.php" ' . $reports_active . '>BÁO CÁO</a> </nav>
+        <div class="auth-buttons">
+            <span class="logged-in-user">Admin: ' . $username . '</span>
+            <a href="../Handler/logout.php" class="btn-text">Logout</a>
+        </div>
+    </header>';
 }
 
 function admin_has_created_at($conn) {
