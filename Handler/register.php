@@ -46,7 +46,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         if (isset($stmt) && $stmt) $stmt->close();
         $conn->close();
-        header("Location: ../register.php");
+        header("Location: ../Pages/register.php");
         exit();
         
     } catch (Exception $e) {
@@ -54,7 +54,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         
         if (isset($stmt) && $stmt) $stmt->close();
         $conn->close();
-        header("Location: ../register.php");
+        header("Location: ../Pages/register.php");
         exit();
     }
 

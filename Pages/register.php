@@ -76,7 +76,7 @@
                     }
                 ?>
 
-                <form action="Handler/register.php" method="POST">
+                <form action="../Handler/register.php" method="POST">
                     <div class="form-group">
                         <label for="username">Username</label>
                         <input type="text" id="username" name="username" required>
