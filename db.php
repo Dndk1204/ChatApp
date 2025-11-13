@@ -11,5 +11,6 @@
         die("Kết nối CSDL thất bại: " . $conn->connect_error);
     }
 
-    mysqli_set_charset($conn, "utf8"); 
+    // [QUAN TRỌNG] Sửa "utf8" thành "utf8mb4"
+    mysqli_set_charset($conn, "utf8mb4"); 
 ?>
