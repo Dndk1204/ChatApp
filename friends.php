@@ -18,7 +18,7 @@ $userId = $_SESSION['user_id'];
 <style>
 /* === 🌿 PASTEL SOCIAL MEDIA THEME === */
 :root {
-    --color-primary: #A8DADC;
+    --color-primary: #6F9DE1FF;
     --color-primary-dark: #74C0C9;
     --color-secondary: #F1FAEE;
     --color-bg: #EAF4F4;

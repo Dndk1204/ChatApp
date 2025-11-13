@@ -31,27 +31,6 @@ if ($conn) {
     <link rel="stylesheet" href="./css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --color-primary: #A8DADC;
-            --color-primary-dark: #74C0C9;
-            --color-secondary: #F1FAEE;
-            --color-bg: #EAF4F4;
-            --color-card: #FFFFFF;
-            --color-text: #2B2D42;
-            --color-text-muted: #6C757D;
-            --color-success: #81C784;
-            --color-error: #E57373;
-            --color-accent: #457B9D;
-            --color-border: #D0E2E2;
-        }
-        /* === GIAO DIỆN CHÍNH === */
-        body {
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-            background-color: var(--color-bg);
-        }
-
         main.form-page-content {
             flex-grow: 1;
             display: flex;
@@ -86,7 +65,7 @@ if ($conn) {
         }
 
         .user-list h3 {
-            color: var(--color-text);
+            color: #FFFFFF;
             margin-bottom: 15px;
             border-bottom: 1px solid var(--color-border);
             padding-bottom: 10px;
@@ -184,7 +163,7 @@ if ($conn) {
         .chat-header {
             padding: 15px;
             background-color: var(--color-primary);
-            color: var(--color-text);
+            color: #FFFFFFFF;
             font-size: 1.2em;
             font-weight: bold;
             border-bottom: 1px solid var(--color-border);
@@ -219,9 +198,8 @@ if ($conn) {
 
         .received {
             align-self: flex-start;
-            background-color: var(--color-primary-dark);
+            background-color: #EFF3E1FF !important;
             color: var(--color-text);
-            border-bottom-left-radius: 2px;
         }
         .message-text-content { white-space: pre-wrap; }
         .message-info {
@@ -237,6 +215,11 @@ if ($conn) {
             border-radius: 8px;
             cursor: zoom-in;
             margin-top: 5px;
+        }
+
+        .message-username {
+            color: #457B9D;
+            font-weight: bold;
         }
 
         /* ========================================= */
@@ -267,6 +250,7 @@ header.navbar .auth-buttons a {
     margin-left: 20px;
     font-size: 0.9em;
     transition: color 0.2s ease;
+    font-weight: bold;
 }
 
 header.navbar .main-nav a:hover,
@@ -280,11 +264,6 @@ header.navbar .auth-buttons a:hover {
     align-items: center;
     gap: 8px;
     position: relative;
-}
-
-.logged-in-user {
-    font-weight: 600;
-    color: var(--color-accent);
 }
 
 .avatar-menu {
@@ -448,7 +427,7 @@ header.navbar .auth-buttons a:hover {
         #media-viewer {
             width: 30%;
             min-width: 200px;
-            background-color: #1f1f1f;
+            background-color: #F7F7F7FF;
             border-left: 1px solid #444;
             display: none;
             flex-direction: column;
@@ -458,7 +437,7 @@ header.navbar .auth-buttons a:hover {
         }
         #media-viewer.open { display: flex; }
         .media-viewer-title {
-            color: #ff6666;
+            color: #282525FF;
             font-size: 1.1em;
             margin-bottom: 15px;
             padding-bottom: 10px;
@@ -510,6 +489,11 @@ header.navbar .auth-buttons a:hover {
             .main-nav { display: none; }
         }
 
+        p {
+            padding: 0;
+            margin: 0;
+        }
+
     </style>
 </head>
 <body>
@@ -558,7 +542,7 @@ header.navbar .auth-buttons a:hover {
             <div class="chat-area-wrapper">
                 <div class="chat-area" id="chat-area">
                     <div id="chat-header" class="chat-header">
-                        Chọn một người dùng để bắt đầu chat
+                        <p>Chọn một người dùng để bắt đầu chat</p>
                     </div>
 
                     <div id="message-window">
@@ -570,7 +554,7 @@ header.navbar .auth-buttons a:hover {
                         <div class="input-group">
                                                     
                         <button id="toggle-media-viewer-btn" type="button" class="input-button" style="font-size:1em;color:#f0f0f0;padding:5px 10px;border-radius:4px;" onclick="toggleMediaViewer()">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-backpack4-fill" viewBox="0 0 16 16">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="#75B7DDFF" class="bi bi-backpack4-fill" viewBox="0 0 16 16" stroke="#2B2D42" stroke-width="1">
                             <path d="M8 0a2 2 0 0 0-2 2H3.5a2 2 0 0 0-2 2v1a2 2 0 0 0 2 2h4v.5a.5.5 0 0 0 1 0V7h4a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H10a2 2 0 0 0-2-2m1 2a1 1 0 0 0-2 0zm-4 9v2h6v-2h-1v.5a.5.5 0 0 1-1 0V11z"/>
                             <path d="M14 7.599A3 3 0 0 1 12.5 8H9.415a1.5 1.5 0 0 1-2.83 0H3.5A3 3 0 0 1 2 7.599V14a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2zM4 10.5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-.5.5h-7a.5.5 0 0 1-.5-.5z"/>
                             </svg>
