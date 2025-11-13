@@ -1,11 +1,12 @@
 <?php
 session_start();
-require_once '../db.php';
+// (1) Đường dẫn này ĐÚNG
+require_once '../db.php'; 
 
-// (1) Kiểm tra đăng nhập và phương thức POST
+// (2) Kiểm tra đăng nhập và POST
 if (!isset($_SESSION['user_id']) || $_SERVER["REQUEST_METHOD"] != "POST" || !$conn) {
     $_SESSION['error_message'] = "Truy cập không hợp lệ.";
-    header("Location: ../login.php");
+    header("Location: ../../Pages/login.php"); 
     exit();
 }
 
@@ -15,12 +16,13 @@ $content = $_POST['content'];
 
 if ($post_id === 0) {
     $_SESSION['error_message'] = "Bài đăng không hợp lệ.";
-    header("Location: ../posts.php");
+    // SỬA ĐÚNG:
+    header("Location: ../../Pages/PostPages/posts.php"); 
     exit();
 }
 
 try {
-    // (2) Kiểm tra quyền sở hữu và lấy đường dẫn ảnh cũ
+    // (3) Kiểm tra quyền sở hữu và lấy ảnh cũ
     $sql_get = "SELECT ImagePath FROM posts WHERE PostId = ? AND UserId = ?";
     $stmt_get = $conn->prepare($sql_get);
     $stmt_get->bind_param("ii", $post_id, $user_id);
@@ -29,20 +31,21 @@ try {
 
     if ($result->num_rows != 1) {
         $_SESSION['error_message'] = "Bạn không có quyền sửa bài đăng này.";
-        header("Location: ../posts.php");
+        // SỬA ĐÚNG:
+        header("Location: ../../Pages/PostPages/posts.php"); 
         exit();
     }
     
     $post = $result->fetch_assoc();
     $old_image_path = $post['ImagePath'];
-    $new_image_path = $old_image_path; // Mặc định giữ ảnh cũ
+    $new_image_path = $old_image_path; 
     $stmt_get->close();
 
 
-    // (3) Xử lý file upload MỚI (nếu có)
+    // (4) Xử lý file upload MỚI
     if (isset($_FILES['image']) && $_FILES['image']['error'] == 0) {
         
-        $target_dir = "../uploads/posts/"; 
+        $target_dir = "../../uploads/posts/"; // ĐÚNG
         $file_extension = pathinfo($_FILES["image"]["name"], PATHINFO_EXTENSION);
         $safe_extensions = ['jpg', 'jpeg', 'png', 'gif'];
         
@@ -51,29 +54,30 @@ try {
             $target_file_path = $target_dir . $target_file_name;
 
             if (move_uploaded_file($_FILES["image"]["tmp_name"], $target_file_path)) {
-                // Upload thành công, gán đường dẫn mới
                 $new_image_path = "uploads/posts/" . $target_file_name;
                 
-                // (4) Xóa ảnh cũ (nếu có)
+                // (5) Xóa ảnh cũ
                 if (!empty($old_image_path)) {
-                    $old_image_server_path = "../" . $old_image_path;
+                    $old_image_server_path = "../../" . $old_image_path; // ĐÚNG
                     if (file_exists($old_image_server_path)) {
                         unlink($old_image_server_path);
                     }
                 }
             } else {
                 $_SESSION['error_message'] = "Lỗi khi upload ảnh mới.";
-                header("Location: ../edit_post.php?id=" . $post_id);
+                // SỬA ĐÚNG:
+                header("Location: ../../Pages/PostPages/edit_post.php?id=" . $post_id); 
                 exit();
             }
         } else {
             $_SESSION['error_message'] = "Định dạng ảnh không hợp lệ.";
-            header("Location: ../edit_post.php?id=" . $post_id);
+            // SỬA ĐÚNG:
+            header("Location: ../../Pages/PostPages/edit_post.php?id=" . $post_id); 
             exit();
         }
     }
 
-    // (5) Cập nhật CSDL với nội dung và đường dẫn ảnh mới
+    // (6) Cập nhật CSDL
     $sql_update = "UPDATE posts SET Content = ?, ImagePath = ? WHERE PostId = ? AND UserId = ?";
     $stmt_update = $conn->prepare($sql_update);
     $stmt_update->bind_param("ssii", $content, $new_image_path, $post_id, $user_id);
@@ -82,14 +86,16 @@ try {
     $stmt_update->close();
     $conn->close();
     
-    // (6) Quay về trang posts
-    header("Location: ../posts.php");
+    // (7) Quay về trang posts (ĐÂY LÀ DÒNG QUAN TRỌNG NHẤT)
+    // SỬA ĐÚNG:
+    header("Location: ../../Pages/PostPages/posts.php"); 
     exit();
 
 } catch (Exception $e) {
     $_SESSION['error_message'] = $e->getMessage();
     if ($conn) $conn->close();
-    header("Location: ../edit_post.php?id=" . $post_id);
+    // SỬA ĐÚNG:
+    header("Location: ../../Pages/PostPages/edit_post.php?id=" . $post_id); 
     exit();
 }
 ?>

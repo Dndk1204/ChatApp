@@ -160,7 +160,7 @@ button.reject { background: var(--color-error); color: #fff; }
         <?php if (isset($_SESSION['user_id'])): ?>
             <span class="logged-in-user">Xin chào, <?php echo htmlspecialchars($current_username); ?></span>
             <div class="avatar-menu">
-                <?php $avatar = ltrim(($_SESSION['avatar'] ?? 'uploads/default-avatar.jpg'), '/'); ?>
+                <?php $avatar = ltrim(($_SESSION['avatar'] ?? 'images/default-avatar.jpg'), '/'); ?>
                 <img src="<?php echo htmlspecialchars($avatar); ?>" alt="avatar" class="avatar-thumb" id="avatarBtn">
                 <div class="avatar-dropdown" id="avatarDropdown">
                     <a href="Pages/profile.php">Chỉnh sửa hồ sơ</a>
@@ -265,11 +265,11 @@ function toggleOverlay(show, data={}) {
     // Đảm bảo avatar hợp lệ
     const validAvatar = (data.avatar && data.avatar !== 'null' && data.avatar !== 'undefined' && data.avatar.trim() !== '') 
       ? data.avatar 
-      : './uploads/default-avatar.jpg';
+      : './images/default-avatar.jpg';
     const overlayAvatarEl = document.getElementById('overlayAvatar');
     overlayAvatarEl.src = validAvatar;
     overlayAvatarEl.onerror = function() {
-      this.src = './uploads/default-avatar.jpg';
+      this.src = './images/default-avatar.jpg';
     };
   } else selectedFriendId = null;
 }
