@@ -14,7 +14,7 @@ $stmt_current_user = $conn->prepare($sql_current_user);
 $stmt_current_user->bind_param("i", $current_user_id);
 $stmt_current_user->execute();
 $current_user_avatar_result = $stmt_current_user->get_result();
-$current_user_avatar = $current_user_avatar_result->num_rows > 0 ? $current_user_avatar_result->fetch_assoc()['AvatarPath'] : '/images/default-avatar.jpg';
+$current_user_avatar = $current_user_avatar_result->num_rows > 0 ? $current_user_avatar_result->fetch_assoc()['AvatarPath'] : '/uploads/default-avatar.jpg';
 $stmt_current_user->close();
 
 // Lấy TẤT CẢ các emotes một lần để dùng
