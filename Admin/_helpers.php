@@ -36,7 +36,7 @@ function admin_render_header($active = '') {
 		</nav>
 		<div class="auth-buttons">
 			<span class="logged-in-user">Admin: ' . $username . '</span>
-			<a href="../logout.php" class="btn-text">Logout</a>
+			<a href="../Handler/logout.php" class="btn-text">Logout</a>
 		</div>
 	</header>';
 }
