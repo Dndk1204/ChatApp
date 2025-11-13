@@ -394,6 +394,69 @@ COMMIT;
 -- !40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT;
 -- !40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS;
 -- !40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION;
+-- Constraints for table `postemotes`
+--
+ALTER TABLE `postemotes`
+  ADD CONSTRAINT `postemotes_ibfk_1` FOREIGN KEY (`PostId`) REFERENCES `posts` (`PostId`) ON DELETE CASCADE,
+  ADD CONSTRAINT `postemotes_ibfk_2` FOREIGN KEY (`UserId`) REFERENCES `users` (`UserId`) ON DELETE CASCADE,
+  ADD CONSTRAINT `postemotes_ibfk_3` FOREIGN KEY (`EmoteId`) REFERENCES `emotes` (`EmoteId`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `posts`
+--
+ALTER TABLE `posts`
+  ADD CONSTRAINT `posts_ibfk_1` FOREIGN KEY (`UserId`) REFERENCES `users` (`UserId`);
+COMMIT;
+
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+CREATE TABLE `hidden_feeds` (
+  `Id` int(11) NOT NULL AUTO_INCREMENT,
+  `HiderId` int(11) NOT NULL COMMENT 'ID của người đi ẩn',
+  `HiddenId` int(11) NOT NULL COMMENT 'ID của người bị ẩn',
+  PRIMARY KEY (`Id`),
+  UNIQUE KEY `UQ_Hide_Pair` (`HiderId`,`HiddenId`),
+  KEY `FK_HiddenFeeds_Hidden` (`HiddenId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Thêm khóa ngoại (Foreign Keys)
+ALTER TABLE `hidden_feeds`
+  ADD CONSTRAINT `FK_HiddenFeeds_Hider` FOREIGN KEY (`HiderId`) REFERENCES `users` (`UserId`) ON DELETE CASCADE,
+  ADD CONSTRAINT `FK_HiddenFeeds_Hidden` FOREIGN KEY (`HiddenId`) REFERENCES `users` (`UserId`) ON DELETE CASCADE;
+  CREATE TABLE `blocked_users` (
+  `Id` int(11) NOT NULL AUTO_INCREMENT,
+  `BlockerId` int(11) NOT NULL COMMENT 'ID của người đi chặn',
+  `BlockedId` int(11) NOT NULL COMMENT 'ID của người bị chặn',
+  PRIMARY KEY (`Id`),
+  UNIQUE KEY `UQ_Block_Pair` (`BlockerId`,`BlockedId`),
+  KEY `FK_BlockedUsers_Blocked` (`BlockedId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Thêm khóa ngoại (Foreign Keys)
+ALTER TABLE `blocked_users`
+  ADD CONSTRAINT `FK_BlockedUsers_Blocker` FOREIGN KEY (`BlockerId`) REFERENCES `users` (`UserId`) ON DELETE CASCADE,
+  ADD CONSTRAINT `FK_BlockedUsers_Blocked` FOREIGN KEY (`BlockedId`) REFERENCES `users` (`UserId`) ON DELETE CASCADE;
+
+CREATE TABLE `reports` (
+  `ReportId` int(11) NOT NULL AUTO_INCREMENT,
+  `PostId` int(11) NOT NULL COMMENT 'Bài đăng bị báo xấu',
+  `ReporterId` int(11) NOT NULL COMMENT 'Người báo xấu',
+  `ReportedAt` datetime NOT NULL DEFAULT current_timestamp(),
+  `Status` enum('pending','resolved') NOT NULL DEFAULT 'pending' COMMENT 'Trạng thái: chờ xử lý, đã xử lý',
+  PRIMARY KEY (`ReportId`),
+  KEY `FK_Reports_Post` (`PostId`),
+  KEY `FK_Reports_Reporter` (`ReporterId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Thêm khóa ngoại (Foreign Keys)
+ALTER TABLE `reports`
+  ADD CONSTRAINT `FK_Reports_Post` FOREIGN KEY (`PostId`) REFERENCES `posts` (`PostId`) ON DELETE CASCADE,
+  ADD CONSTRAINT `FK_Reports_Reporter` FOREIGN KEY (`ReporterId`) REFERENCES `users` (`UserId`) ON DELETE CASCADE;
+-- ĐÂY LÀ LỆNH DÙNG TRONG PHP, KHÔNG PHẢI CHẠY TRỰC TIẾP --
+DELETE FROM friends 
+WHERE (UserId = ? AND FriendUserId = ?) 
+   OR (UserId = ? AND FriendUserId = ?);
 
 ALTER TABLE `Users`
 ADD COLUMN IF NOT EXISTS `CreatedAt` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP;
