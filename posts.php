@@ -9,6 +9,8 @@ if (!isset($_SESSION['user_id'])) {
 
 $current_user_id = $_SESSION['user_id'];
 $current_username = $_SESSION['username'];
+
+// Lấy AvatarPath của user hiện tại (để dùng trong JS)
 $sql_current_user = "SELECT AvatarPath FROM users WHERE UserId = ?";
 $stmt_current_user = $conn->prepare($sql_current_user);
 $stmt_current_user->bind_param("i", $current_user_id);
@@ -16,6 +18,7 @@ $stmt_current_user->execute();
 $current_user_avatar_result = $stmt_current_user->get_result();
 $current_user_avatar = $current_user_avatar_result->num_rows > 0 ? $current_user_avatar_result->fetch_assoc()['AvatarPath'] : '/images/default-avatar.jpg';
 $stmt_current_user->close();
+
 
 // Lấy TẤT CẢ các emotes một lần để dùng
 $emotes_map = [];
@@ -71,64 +74,82 @@ function renderComments($post_id, $comments_by_parent, $parent_id = NULL) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nhật ký - ChatApp</title>
-    <link rel="stylesheet" href="./css/style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap" rel="stylesheet">
-    <style>
-        /* (Toàn bộ CSS của bạn giữ nguyên) */
-        /* ... */
-        /* (CSS cho .post-card, .reaction-btn, .comment-replies, .options-dropdown, v.v...) */
+    <link rel="stylesheet" href="./css/style.css"> <style>
+        /* Biến màu (giả định từ file style.css của bạn) */
+        :root {
+            --color-accent: #1D3557; /* Màu xanh đậm (giả định) */
+            --color-primary-dark: #005f73; /* (Giả định) */
+            --color-card: #FFFFFF;
+            --color-bg: #F1FAEE;
+            --color-secondary: #E9E9E9;
+            --color-text: #212529;
+            --color-text-muted: #6c757d;
+            --color-danger: #E63946;
+        }
+
         /* CSS cho trang Posts */
         .page-content {
             flex-grow: 1; display: flex; justify-content: center;
-            padding: 50px 20px; background-color: #1a1a1a;
+            padding: 50px 20px;
+            background-color: var(--color-bg, #F1FAEE); /* Nền sáng */
         }
         .post-feed { width: 100%; max-width: 700px; }
         .post-feed-header {
             display: flex; justify-content: space-between; align-items: center;
             margin-bottom: 25px;
         }
-        .post-feed-header h1 { color: #f0f0f0; letter-spacing: 2px; }
+        .post-feed-header h1 { 
+            color: var(--color-text, #212529); /* Text đậm */
+            letter-spacing: 2px; 
+        }
         .btn-create-post {
-            padding: 10px 20px; background-color: #ff6666; color: #1a1a1a;
+            padding: 10px 20px;
+            background-color: var(--color-accent, #1D3557); /* Nút màu chính */
+            color: var(--color-card, #FFFFFF);
             text-decoration: none; border-radius: 5px; font-weight: bold;
             transition: background-color 0.3s ease;
         }
-        .btn-create-post:hover { background-color: #ff8080; }
+        .btn-create-post:hover { background-color: var(--color-primary-dark, #005f73); }
 
         /* Card bài đăng */
         .post-card {
-            background-color: #2a2a2a; border-radius: 8px; margin-bottom: 25px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3); overflow: hidden;
+            background-color: var(--color-card, #FFFFFF); /* Nền thẻ màu trắng */
+            border-radius: 8px; margin-bottom: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); /* Bóng mờ */
+            overflow: hidden;
+            border: 1px solid #E0E0E0;
         }
         .post-header { display: flex; align-items: center; padding: 15px 20px; }
         .post-avatar {
             width: 45px; height: 45px; border-radius: 50%;
-            margin-right: 15px; border: 2px solid #444;
+            margin-right: 15px; border: 2px solid #EEE;
         }
         .post-user-info { display: flex; flex-direction: column; flex-grow: 1; }
-        .post-username { font-weight: bold; color: #ff6666; font-size: 1.1em; }
-        .post-time { font-size: 0.8em; color: #aaa; }
+        .post-username { 
+            font-weight: bold; 
+            color: var(--color-accent, #1D3557); /* Tên màu chính */
+            font-size: 1.1em; 
+        }
+        .post-time { font-size: 0.8em; color: var(--color-text-muted, #6c757d); }
         .post-content {
             padding: 0 20px 15px 20px; line-height: 1.6;
             white-space: pre-wrap; word-wrap: break-word;
+            color: var(--color-text, #212529);
         }
         .post-image {
             width: 100%; max-height: 500px; object-fit: cover;
-            background-color: #333;
+            background-color: #EEE;
         }
 
         /* Tương tác: Reactions (AJAX) */
         .post-interactions {
-            padding: 10px 20px; border-top: 1px solid #333;
+            padding: 10px 20px; border-top: 1px solid #EEE;
             display: flex; justify-content: space-between; align-items: center;
         }
-        .reaction-buttons-wrapper {
-            display: flex;
-            gap: 5px;
-        }
+        .reaction-buttons-wrapper { display: flex; gap: 5px; }
         .reaction-btn {
-            background: #333;
-            border: 1px solid #444;
+            background: var(--color-secondary, #E9E9E9); /* Nền nút xám nhạt */
+            border: 1px solid #DDD;
             border-radius: 5px;
             font-size: 1.2em;
             cursor: pointer;
@@ -137,32 +158,25 @@ function renderComments($post_id, $comments_by_parent, $parent_id = NULL) {
         }
         .reaction-btn:hover {
             transform: scale(1.1);
-            background: #444;
+            background: #DDD;
         }
         .reaction-btn.active { /* Nút được chọn */
-            background: #555;
-            border-color: #ff6666;
+            background: #DDD;
+            border-color: var(--color-accent, #1D3557);
             transform: scale(1.1);
         }
 
-        .post-stats {
-            font-size: 0.9em; color: #aaa;
-        }
+        .post-stats { font-size: 0.9em; color: var(--color-text-muted, #6c757d); }
         .top-emotes-display { margin-right: 5px; }
 
         /* Khu vực bình luận */
         .comment-section {
             padding: 10px 20px 15px 20px;
-            border-top: 1px solid #333;
-            background-color: #222;
+            border-top: 1px solid #EEE;
+            background-color: #F9F9F9; /* Nền khu vực bình luận */
         }
-        .comments-list { 
-             display: flex; flex-direction: column; gap: 10px;
-        }
-        .comment { 
-            display: flex; gap: 10px; 
-            font-size: 0.9em;
-        }
+        .comments-list { display: flex; flex-direction: column; gap: 10px; }
+        .comment { display: flex; gap: 10px; font-size: 0.9em; }
         .comment-avatar {
             width: 30px; height: 30px; border-radius: 50%;
             flex-shrink: 0;
@@ -172,20 +186,25 @@ function renderComments($post_id, $comments_by_parent, $parent_id = NULL) {
             width: 100%;
         }
         .comment-content {
-            background-color: #333; padding: 8px 12px;
+            background-color: var(--color-secondary, #E9E9E9); /* Nền bong bóng chat */
+            padding: 8px 12px;
             border-radius: 10px; display: inline-block; max-width: fit-content;
         }
-        .comment-username { font-weight: bold; color: #66ccff; margin-right: 5px; }
-        .comment-text { color: #f0f0f0; }
+        .comment-username { 
+            font-weight: bold; 
+            color: var(--color-primary-dark, #005f73); /* Tên người bình luận */
+            margin-right: 5px; 
+        }
+        .comment-text { color: var(--color-text, #212529); }
         
         /* Bình luận trả lời */
         .comment-actions { margin-top: 3px; }
         .reply-btn {
-            background: none; border: none; color: #aaa;
+            background: none; border: none; color: var(--color-text-muted, #6c757d);
             font-size: 0.8em; cursor: pointer; padding: 0;
             text-decoration: none;
         }
-        .reply-btn:hover { color: #f0f0f0; }
+        .reply-btn:hover { color: var(--color-text, #212529); }
         .comment-replies { 
             margin-left: 40px; 
             padding-top: 10px;
@@ -198,82 +217,66 @@ function renderComments($post_id, $comments_by_parent, $parent_id = NULL) {
         }
 
         /* Form đăng bình luận */
-        .comment-form-container { padding-top: 15px; border-top: 1px solid #333; margin-top: 15px; }
+        .comment-form-container { padding-top: 15px; border-top: 1px solid #EEE; margin-top: 15px; }
         .comment-form { display: flex; gap: 10px; }
         .comment-input {
             flex-grow: 1; padding: 8px 12px; border-radius: 15px;
-            border: none; background-color: #333; color: #f0f0f0;
+            border: 1px solid #CCC; /* Border cho input */
+            background-color: #FFFFFF; 
+            color: var(--color-text, #212529);
             font-family: 'Roboto Mono', monospace;
         }
         .comment-submit-btn {
-            background-color: #ff6666; border: none; color: #1a1a1a;
+            background-color: var(--color-accent, #1D3557);
+            border: none;
+            color: var(--color-card, #FFFFFF);
             padding: 8px 15px; border-radius: 15px;
             font-weight: bold; cursor: pointer;
         }
         .reply-info {
-            font-size: 0.8em; color: #aaa; margin-bottom: 5px;
+            font-size: 0.8em; color: var(--color-text-muted, #6c757d);
+            margin-bottom: 5px;
         }
         .cancel-reply-btn {
-            background: none; border: none; color: #ff6666;
+            background: none; border: none; color: var(--color-danger, #E63946);
             cursor: pointer; margin-left: 5px;
         }
 
         /* CSS CHO MENU TÙY CHỌN (Sửa/Xóa) */
         .post-options { position: relative; }
         .options-btn {
-            background: none; border: none; color: #aaa;
+            background: none; border: none; color: var(--color-text-muted, #6c757d);
             font-size: 1.5em; cursor: pointer; padding: 5px; line-height: 1;
         }
-        .options-btn:hover { color: #f0f0f0; }
+        .options-btn:hover { color: var(--color-text, #212529); }
         .options-dropdown {
             display: none; position: absolute; right: 0; top: 30px;
-            background-color: #333; border-radius: 5px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+            background-color: var(--color-card, #FFFFFF);
+            border-radius: 5px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
             overflow: hidden; z-index: 10;
+            border: 1px solid #EEE;
         }
         .options-dropdown a, .options-dropdown button {
-            display: block; padding: 10px 15px; color: #f0f0f0;
+            display: block; padding: 10px 15px; color: var(--color-text, #212529);
             text-decoration: none; font-size: 0.9em; background: none;
             border: none; width: 100%; text-align: left; cursor: pointer;
         }
-        .options-dropdown a:hover, .options-dropdown button:hover { background-color: #444; }
+        .options-dropdown a:hover, .options-dropdown button:hover { 
+            background-color: var(--color-secondary, #E9E9E9); 
+        }
         .options-dropdown .delete-btn:hover,
         .options-dropdown .unfriend-btn:hover,
         .options-dropdown .report-btn:hover {
-            background-color: #ff6666;
-            color: #1a1a1a;
+            background-color: var(--color-danger, #E63946);
+            color: #FFFFFF;
         }
         .options-dropdown.show { display: block; }
     </style>
 </head>
 <body>
 
-    <header class="navbar">
-        <div class="logo">
-            <a href="index.php">
-                <div class="logo-circle"></div>
-                <span>ChatApp</span>
-            </a>
-        </div>
-        <nav class="main-nav">
-            <a href="index.php">HOME</a>
-            <a href="posts.php">POSTS</a>
-            <a href="friend_requests.php">FRIEND REQUESTS</a>
-            <a href="friends.php">FRIENDS</a>
-            <?php if (isset($_SESSION['role']) && $_SESSION['role'] == 'Admin'):?>
-                <a href="admin_dashboard.php">ADMIN DASHBOARD</a>
-            <?php endif; ?>
-        </nav>
-        <div class="auth-buttons">
-            <?php if (isset($_SESSION['user_id'])):?>
-                <span class="logged-in-user">Xin chào, <?php echo htmlspecialchars($current_username); ?></span>
-                <a href="logout.php" class="btn-text">Logout</a>
-            <?php else:?>
-                <a href="login.php" class="btn-text">Login</a>
-                <a href="register.php" class="btn-text">Register</a>
-            <?php endif; ?>
-        </div>
-    </header>
+    <?php include 'navbar.php'; ?>
 
     <main class="page-content">
         <div class="post-feed">
@@ -296,7 +299,6 @@ function renderComments($post_id, $comments_by_parent, $parent_id = NULL) {
                           ORDER BY p.PostedAt DESC";
             
             $stmt_posts = $conn->prepare($sql_posts);
-            // Bind 2 ID của user hiện tại vào 2 câu sub-query
             $stmt_posts->bind_param("ii", $current_user_id, $current_user_id);
             $stmt_posts->execute();
             $result_posts = $stmt_posts->get_result();
@@ -306,7 +308,7 @@ function renderComments($post_id, $comments_by_parent, $parent_id = NULL) {
                     $post_id = $post['PostId'];
             ?>
             
-                <div class="post-card" id="post-<?php echo $post_id; ?>">
+                <div class="post-card" id="post-<?php echo $post_id; ?>" data-user-id="<?php echo $post['UserId']; ?>">
                     <div class="post-header">
                         <img src="<?php echo htmlspecialchars($post['AvatarPath']); ?>" alt="Avatar" class="post-avatar">
                         <div class="post-user-info">
@@ -321,7 +323,7 @@ function renderComments($post_id, $comments_by_parent, $parent_id = NULL) {
                                     <a href="edit_post.php?id=<?php echo $post_id; ?>">Chỉnh sửa</a>
                                     <button class="delete-btn" onclick="deletePost(<?php echo $post_id; ?>)">Xóa bài đăng</button>
                                 <?php else: // Nếu là bài của NGƯỜI KHÁC ?>
-                                    <button onclick="hideFeed(<?php echo $post['UserId']; ?>, <?php echo $post_id; ?>)">Ẩn nhật ký của <?php echo htmlspecialchars($post['Username']); ?></button>
+                                    <button onclick="hideFeed(<?php echo $post['UserId']; ?>)">Ẩn nhật ký của <?php echo htmlspecialchars($post['Username']); ?></button>
                                     <button onclick="blockUser(<?php echo $post['UserId']; ?>)">Chặn <?php echo htmlspecialchars($post['Username']); ?> xem nhật ký</button>
                                     <button class="report-btn" onclick="reportPost(<?php echo $post_id; ?>)">Báo xấu</button>
                                     <button class="unfriend-btn" onclick="unfriendUser(<?php echo $post['UserId']; ?>)">Xóa bạn</button>
@@ -342,7 +344,6 @@ function renderComments($post_id, $comments_by_parent, $parent_id = NULL) {
                     <div class="post-interactions">
                         <div class="reaction-buttons-wrapper" id="reaction-wrapper-<?php echo $post_id; ?>">
                             <?php
-                            // Lấy reaction của user HIỆN TẠI
                             $sql_user_emote = "SELECT EmoteId FROM postemotes WHERE PostId = ? AND UserId = ?";
                             $stmt_user_emote = $conn->prepare($sql_user_emote);
                             $stmt_user_emote->bind_param("ii", $post_id, $current_user_id);
@@ -351,7 +352,6 @@ function renderComments($post_id, $comments_by_parent, $parent_id = NULL) {
                             $user_emote_id = ($user_emote_result->num_rows > 0) ? $user_emote_result->fetch_assoc()['EmoteId'] : 0;
                             $stmt_user_emote->close();
                             
-                            // Hiển thị 5 nút
                             foreach ($emotes_map as $emote_id => $emote):
                                 $is_active = ($user_emote_id == $emote_id) ? 'active' : '';
                             ?>
@@ -365,7 +365,6 @@ function renderComments($post_id, $comments_by_parent, $parent_id = NULL) {
                         
                         <div class="post-stats" id="post-stats-<?php echo $post_id; ?>">
                             <?php
-                            // Lấy tổng count và top emotes
                             $sql_stats = "SELECT EmoteId, COUNT(*) as Count 
                                           FROM postemotes 
                                           WHERE PostId = ? 
@@ -401,7 +400,6 @@ function renderComments($post_id, $comments_by_parent, $parent_id = NULL) {
                         $stmt_comments->execute();
                         $result_comments = $stmt_comments->get_result();
                         
-                        // Sắp xếp vào mảng cây
                         $comments_by_parent = [];
                         while($comment = $result_comments->fetch_assoc()) {
                             $comments_by_parent[$comment['ParentCommentId']][] = $comment;
@@ -434,7 +432,6 @@ function renderComments($post_id, $comments_by_parent, $parent_id = NULL) {
                 echo "<p style='text-align: center; color: #aaa;'>Chưa có bài đăng nào.</p>";
             endif;
             
-            // Đóng kết nối cuối cùng
             $conn->close();
             ?>
 
@@ -442,14 +439,30 @@ function renderComments($post_id, $comments_by_parent, $parent_id = NULL) {
     </main>
 
     <script>
-        // TẤT CẢ ĐỀU DÙNG AJAX
-
+        // Script cho Avatar Dropdown (từ index.php)
+        document.addEventListener('DOMContentLoaded', function() {
+            const avatarBtn = document.getElementById('avatarBtn');
+            const avatarDropdown = document.getElementById('avatarDropdown');
+            if (avatarBtn && avatarDropdown) {
+                avatarBtn.addEventListener('click', function(event) {
+                    event.stopPropagation(); 
+                    avatarDropdown.classList.toggle('open');
+                });
+                document.addEventListener('click', function(event) {
+                    if (avatarDropdown.classList.contains('open') && !avatarDropdown.contains(event.target)) {
+                        avatarDropdown.classList.remove('open');
+                    }
+                });
+            }
+        });
+    </script>
+    
+    <script>
         // Truyền dữ liệu từ PHP sang JS
         const emotesMap = <?php echo json_encode($emotes_map); ?>;
         const currentUsername = <?php echo json_encode($current_username); ?>;
         const currentUserAvatar = <?php echo json_encode($current_user_avatar); ?>;
         
-        // Hàm tiện ích để tránh lỗi XSS
         function htmlspecialchars(str) {
             if (typeof str !== 'string') return '';
             return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
@@ -550,7 +563,6 @@ function renderComments($post_id, $comments_by_parent, $parent_id = NULL) {
                     cancelReply(postId);
                     const comment = data.comment;
                     const newCommentHtml = createCommentHtml(comment, postId);
-
                     if (comment.ParentCommentId === null || comment.ParentCommentId == 0) {
                         let list = document.querySelector(`#post-${postId} .comments-list`);
                         if (!list) {
@@ -618,9 +630,8 @@ function renderComments($post_id, $comments_by_parent, $parent_id = NULL) {
         }
         
         // -----------------------
-        // [MỚI] 4 HÀM CHO CÁC TÍNH NĂNG MỚI
+        // 4 HÀM CHO CÁC TÍNH NĂNG MỚI
         // -----------------------
-
         function unfriendUser(userId) {
             if (!confirm('Bạn có chắc chắn muốn hủy kết bạn với người này?')) { return; }
             fetch('Handler/Post/php-unfriend.php', {
@@ -630,13 +641,13 @@ function renderComments($post_id, $comments_by_parent, $parent_id = NULL) {
             })
             .then(response => response.json())
             .then(data => {
-                alert(data.message); // Thông báo thành công hoặc lỗi
+                alert(data.message);
             })
             .catch(error => console.error('Lỗi khi hủy kết bạn:', error));
         }
 
-        function hideFeed(userId, postId) {
-            if (!confirm('Bạn có muốn ẩn tất cả bài đăng từ người này?')) { return; }
+        function hideFeed(userId) {
+            if (!confirm('Bạn có muốn ẩn tất cả bài đăng từ người này? (Bạn sẽ phải tải lại trang)')) { return; }
             fetch('Handler/Post/php-hide-feed.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -648,9 +659,6 @@ function renderComments($post_id, $comments_by_parent, $parent_id = NULL) {
                 if (data.status === 'success') {
                     // Ẩn tất cả bài đăng của user này khỏi DOM
                     document.querySelectorAll(`.post-card[data-user-id="${userId}"]`).forEach(post => post.remove());
-                    // Lưu ý: Cần thêm `data-user-id` vào thẻ `.post-card`
-                    // Hoặc đơn giản là tải lại trang:
-                    location.reload(); 
                 }
             })
             .catch(error => console.error('Lỗi khi ẩn feed:', error));
