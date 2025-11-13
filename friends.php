@@ -228,7 +228,15 @@ function toggleOverlay(show, data={}) {
   if (show) {
     selectedFriendId = data.id;
     document.getElementById('overlayName').textContent = data.name;
-    document.getElementById('overlayAvatar').src = data.avatar;
+    // Đảm bảo avatar hợp lệ
+    const validAvatar = (data.avatar && data.avatar !== 'null' && data.avatar !== 'undefined' && data.avatar.trim() !== '') 
+      ? data.avatar 
+      : './images/default-avatar.jpg';
+    const overlayAvatarEl = document.getElementById('overlayAvatar');
+    overlayAvatarEl.src = validAvatar;
+    overlayAvatarEl.onerror = function() {
+      this.src = './images/default-avatar.jpg';
+    };
   } else selectedFriendId = null;
 }
 
@@ -248,11 +256,13 @@ async function loadFriends() {
     const color = f.IsOnline ? '#43A047' : '#888';
     const status = f.IsOnline ? 'Online' : (f.LastSeen ? timeAgo(f.LastSeen) : 'Offline');
     const avatar = f.AvatarPath || './uploads/default-avatar.jpg';
+    const displayName = (f.FullName || f.Username || 'Unknown').replace(/'/g, "\\'");
+    const escapedAvatar = avatar.replace(/'/g, "\\'");
     return `
-      <div class="friend-item" onclick="toggleOverlay(true, {id:${f.UserId}, name:'${f.FullName||f.Username}', avatar:'${avatar}'})">
+      <div class="friend-item" onclick="toggleOverlay(true, {id:${f.UserId}, name:'${displayName}', avatar:'${escapedAvatar}'})" style="cursor: pointer;">
         <img src="${avatar}" class="avatar-img" onerror="this.src='./uploads/default-avatar.jpg'">
         <div class="friend-info">
-          <strong>${f.FullName||f.Username}</strong>
+          <strong>${displayName}</strong>
           <small>${status}</small>
         </div>
         <span class="status-dot" style="background:${color};"></span>

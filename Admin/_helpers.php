@@ -74,4 +74,106 @@ function admin_get_stats($conn, $hasCreatedAt) {
 	return $stats;
 }
 
+/**
+ * Render HTML head section cho admin pages
+ */
+function admin_render_head($title) {
+	echo '<!DOCTYPE html>
+<html lang="vi">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>' . htmlspecialchars($title) . '</title>
+	<link rel="stylesheet" href="../css/admin.css">
+	<link href="https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap" rel="stylesheet">
+</head>
+<body>';
+}
+
+/**
+ * Tính toán phân trang
+ */
+function admin_get_pagination($current_page, $total_items, $items_per_page) {
+	$current_page = max(1, intval($current_page));
+	$total_pages = ceil($total_items / $items_per_page);
+	$offset = ($current_page - 1) * $items_per_page;
+	
+	return [
+		'current_page' => $current_page,
+		'total_pages' => $total_pages,
+		'offset' => $offset,
+		'items_per_page' => $items_per_page
+	];
+}
+
+/**
+ * Render phân trang
+ */
+function admin_render_pagination($current_page, $total_pages, $total_items, $item_label = 'mục') {
+	if ($total_pages <= 1) return;
+	
+	$start_page = max(1, $current_page - 2);
+	$end_page = min($total_pages, $current_page + 2);
+	
+	echo '<div class="pagination">';
+	
+	// Trang đầu tiên
+	if ($start_page > 1) {
+		echo '<a href="?page=1" class="pagination-btn">1</a>';
+		if ($start_page > 2) {
+			echo '<span class="pagination-ellipsis">...</span>';
+		}
+	}
+	
+	// Các trang xung quanh
+	for ($i = $start_page; $i <= $end_page; $i++) {
+		if ($i == $current_page) {
+			echo '<span class="pagination-btn active">' . $i . '</span>';
+		} else {
+			echo '<a href="?page=' . $i . '" class="pagination-btn">' . $i . '</a>';
+		}
+	}
+	
+	// Trang cuối cùng
+	if ($end_page < $total_pages) {
+		if ($end_page < $total_pages - 1) {
+			echo '<span class="pagination-ellipsis">...</span>';
+		}
+		echo '<a href="?page=' . $total_pages . '" class="pagination-btn">' . $total_pages . '</a>';
+	}
+	
+	echo '</div>';
+	echo '<div class="pagination-info">';
+	echo 'Trang ' . $current_page . ' / ' . $total_pages . ' (' . $total_items . ' ' . $item_label . ')';
+	echo '</div>';
+}
+
+/**
+ * Xử lý POST request với CSRF validation
+ */
+function admin_handle_post($callback) {
+	$flash_success = '';
+	$flash_error = '';
+	
+	if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+		if (!validate_csrf($_POST['csrf_token'] ?? '')) {
+			$flash_error = 'CSRF token không hợp lệ.';
+		} else {
+			try {
+				$result = $callback();
+				if (isset($result['success'])) {
+					$flash_success = $result['success'];
+				}
+				if (isset($result['error'])) {
+					$flash_error = $result['error'];
+				}
+			} catch (Exception $ex) {
+				$flash_error = $ex->getMessage();
+			}
+		}
+	}
+	
+	return ['success' => $flash_success, 'error' => $flash_error];
+}
+
 

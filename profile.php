@@ -14,7 +14,7 @@ $flash_error = '';
 // Load current user
 $user = null;
 if ($conn) {
-	$stmt = $conn->prepare('SELECT UserId, Username, Email, FullName, AvatarPath FROM Users WHERE UserId = ?');
+	$stmt = $conn->prepare('SELECT UserId, Username, Email, FullName, AvatarPath, PhoneNumber, Address, DateOfBirth, Gender FROM Users WHERE UserId = ?');
 	if ($stmt) {
 		$stmt->bind_param('i', $userId);
 		$stmt->execute();
@@ -35,6 +35,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 		$newUsername = trim($_POST['username'] ?? '');
 		$newEmail = trim($_POST['email'] ?? '');
 		$newFullName = trim($_POST['full_name'] ?? '');
+		$newPhoneNumber = trim($_POST['phone_number'] ?? '');
+		$newAddress = trim($_POST['address'] ?? '');
+		$newDateOfBirth = trim($_POST['date_of_birth'] ?? '');
+		$newGender = trim($_POST['gender'] ?? '');
 
 		if ($newUsername === '' || $newEmail === '') {
 			throw new Exception('Username và Email là bắt buộc.');
@@ -103,9 +107,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 			}
 		}
 
-		$stmt = $conn->prepare('UPDATE Users SET Username = ?, Email = ?, FullName = ?, AvatarPath = ? WHERE UserId = ?');
+		// Convert empty string to NULL for optional fields
+		$newPhoneNumber = $newPhoneNumber === '' ? null : $newPhoneNumber;
+		$newAddress = $newAddress === '' ? null : $newAddress;
+		$newDateOfBirth = $newDateOfBirth === '' ? null : $newDateOfBirth;
+		$newGender = $newGender === '' ? null : $newGender;
+
+		$stmt = $conn->prepare('UPDATE Users SET Username = ?, Email = ?, FullName = ?, AvatarPath = ?, PhoneNumber = ?, Address = ?, DateOfBirth = ?, Gender = ? WHERE UserId = ?');
 		if (!$stmt) throw new Exception('Lỗi CSDL: ' . $conn->error);
-		$stmt->bind_param('ssssi', $newUsername, $newEmail, $newFullName, $avatarPathToSave, $userId);
+		$stmt->bind_param('ssssssssi', $newUsername, $newEmail, $newFullName, $avatarPathToSave, $newPhoneNumber, $newAddress, $newDateOfBirth, $newGender, $userId);
 		$stmt->execute();
 		$stmt->close();
 
@@ -117,6 +127,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 		$user['Email'] = $newEmail;
 		$user['FullName'] = $newFullName;
 		$user['AvatarPath'] = $avatarPathToSave;
+		$user['PhoneNumber'] = $newPhoneNumber;
+		$user['Address'] = $newAddress;
+		$user['DateOfBirth'] = $newDateOfBirth;
+		$user['Gender'] = $newGender;
 
 		$flash_success = 'Cập nhật hồ sơ thành công.';
 	} catch (Exception $e) {
@@ -193,6 +207,35 @@ $avatar = ltrim($avatar, '/');
 				<div class="form-group">
 					<label>Họ và tên</label>
 					<input type="text" name="full_name" value="<?php echo htmlspecialchars($user['FullName'] ?? ''); ?>">
+				</div>
+				<div class="form-group">
+					<label>Số điện thoại</label>
+					<input type="tel" name="phone_number" value="<?php echo htmlspecialchars($user['PhoneNumber'] ?? ''); ?>" placeholder="VD: 0123456789">
+				</div>
+				<div class="form-group">
+					<label>Địa chỉ</label>
+					<input type="text" name="address" value="<?php echo htmlspecialchars($user['Address'] ?? ''); ?>" placeholder="VD: 123 Đường ABC, Quận XYZ">
+				</div>
+				<div class="form-group">
+					<label>Ngày sinh</label>
+					<input type="date" name="date_of_birth" value="<?php echo htmlspecialchars($user['DateOfBirth'] ?? ''); ?>">
+				</div>
+				<div class="form-group">
+					<label>Giới tính</label>
+					<div style="display: flex; gap: 20px; align-items: center; margin-top: 8px;">
+						<label style="display: flex; align-items: center; gap: 6px; cursor: pointer; font-weight: normal;">
+							<input type="radio" name="gender" value="Nam" <?php echo (isset($user['Gender']) && $user['Gender'] === 'Nam') ? 'checked' : ''; ?>>
+							<span>Nam</span>
+						</label>
+						<label style="display: flex; align-items: center; gap: 6px; cursor: pointer; font-weight: normal;">
+							<input type="radio" name="gender" value="Nữ" <?php echo (isset($user['Gender']) && $user['Gender'] === 'Nữ') ? 'checked' : ''; ?>>
+							<span>Nữ</span>
+						</label>
+						<label style="display: flex; align-items: center; gap: 6px; cursor: pointer; font-weight: normal;">
+							<input type="radio" name="gender" value="Khác" <?php echo (isset($user['Gender']) && $user['Gender'] === 'Khác') ? 'checked' : ''; ?>>
+							<span>Khác</span>
+						</label>
+					</div>
 				</div>
 				<button type="submit" class="btn-submit">Lưu</button>
 			</form>
