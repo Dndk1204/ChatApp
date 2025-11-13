@@ -633,7 +633,7 @@ header.navbar .auth-buttons a:hover {
         function loadUsers(search_query = '') {
             const url = `Handler/php-fetch-users.php?search=${encodeURIComponent(search_query)}`;
             
-            fetch(url)
+            return fetch(url)
                 .then(response => {
                     if (!response.ok) throw new Error(`Lỗi ${response.status} khi tải người dùng.`);
                     return response.json();
@@ -642,7 +642,7 @@ header.navbar .auth-buttons a:hover {
                     usersContainer.innerHTML = '';
                     if (users.length === 0 && search_query !== '') {
                         usersContainer.innerHTML = '<p style="text-align: center; color: #aaa; margin-top: 10px;">Không tìm thấy người dùng.</p>';
-                        return;
+                        return users;
                     }
                     users.forEach(user => {
                         if (user.UserId != currentUserId) {
@@ -670,8 +670,12 @@ header.navbar .auth-buttons a:hover {
                             usersContainer.appendChild(userItem);
                         }
                     });
+                    return users;
                 })
-                .catch(error => console.error('Lỗi khi tải danh sách người dùng:', error));
+                .catch(error => {
+                    console.error('Lỗi khi tải danh sách người dùng:', error);
+                    return [];
+                });
         }
         
         // Xử lý tìm kiếm khi người dùng gõ
@@ -968,7 +972,25 @@ header.navbar .auth-buttons a:hover {
             }
         });
         
-        loadUsers();
+        // Kiểm tra friend_id từ URL và tự động chọn người dùng
+        const urlParams = new URLSearchParams(window.location.search);
+        const friendIdFromUrl = urlParams.get('friend_id');
+        
+        loadUsers().then(users => {
+            if (friendIdFromUrl) {
+                const friendId = parseInt(friendIdFromUrl);
+                // Tìm user trong danh sách
+                const friendUser = users.find(u => u.UserId == friendId);
+                if (friendUser && friendUser.UserId != currentUserId) {
+                    // Tự động chọn người bạn này
+                    selectUser(friendUser.UserId, friendUser.Username);
+                    // Xóa friend_id khỏi URL để tránh reload lại
+                    const newUrl = window.location.pathname;
+                    window.history.replaceState({}, '', newUrl);
+                }
+            }
+        });
+        
         userPollInterval = setInterval(loadUsers, 5000); // 5 giây
         
         // Avatar dropdown (giữ nguyên logic cũ)
