@@ -57,7 +57,7 @@
             
             <script>
                 setTimeout(function() {
-                    window.location.href = 'Pages/login.php';
+                    window.location.href = '../Pages/login.php';
                 }, 5000); // 5000 milliseconds = 5 giây
             </script>
 
