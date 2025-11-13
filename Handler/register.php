@@ -34,7 +34,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt->close();
         $conn->close();
         
-        header("Location: ../register.php"); 
+        header("Location: ../Pages/register.php"); 
         exit();
 
     } catch (mysqli_sql_exception $e) {
@@ -60,7 +60,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 } else {
     $conn->close();
-    header("Location: ../index.php");
+    header("Location: ../Pages/index.php");
     exit();
 }
 ?>
