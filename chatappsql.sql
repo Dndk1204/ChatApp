@@ -171,7 +171,7 @@ CREATE TABLE `users` (
   `Address` varchar(200) DEFAULT NULL,
   `DateOfBirth` date DEFAULT NULL,
   `Gender` varchar(10) DEFAULT NULL,
-  `AvatarPath` varchar(255) NOT NULL DEFAULT '/images/default-avatar.jpg'
+  `AvatarPath` varchar(255) NOT NULL DEFAULT 'uploads/default-avatar.jpg'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
