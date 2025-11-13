@@ -248,32 +248,7 @@ function renderComments($post_id, $comments_by_parent, $parent_id = NULL) {
 </head>
 <body>
 
-    <header class="navbar">
-        <div class="logo">
-            <a href="index.php">
-                <div class="logo-circle"></div>
-                <span>ChatApp</span>
-            </a>
-        </div>
-        <nav class="main-nav">
-            <a href="index.php">HOME</a>
-            <a href="posts.php">POSTS</a>
-            <a href="friend_requests.php">FRIEND REQUESTS</a>
-            <a href="friends.php">FRIENDS</a>
-            <?php if (isset($_SESSION['role']) && $_SESSION['role'] == 'Admin'):?>
-                <a href="admin_dashboard.php">ADMIN DASHBOARD</a>
-            <?php endif; ?>
-        </nav>
-        <div class="auth-buttons">
-            <?php if (isset($_SESSION['user_id'])):?>
-                <span class="logged-in-user">Xin chào, <?php echo htmlspecialchars($current_username); ?></span>
-                <a href="logout.php" class="btn-text">Logout</a>
-            <?php else:?>
-                <a href="login.php" class="btn-text">Login</a>
-                <a href="register.php" class="btn-text">Register</a>
-            <?php endif; ?>
-        </div>
-    </header>
+    <?php include 'navbar.php'; ?>
 
     <main class="page-content">
         <div class="post-feed">
