@@ -16,7 +16,7 @@
     align-items: center;       /* căn giữa theo chiều dọc */
     justify-content: center;   /* căn giữa theo chiều ngang */
     min-height: calc(100vh - 70px); /* full height trừ navbar (70px giả định) */
-    background-color: var(--color-primary);
+    background-color: #F1FAEE;
     text-align: center;
     padding: 20px;
 }
