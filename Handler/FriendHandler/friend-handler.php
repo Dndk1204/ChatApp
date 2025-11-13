@@ -1,5 +1,5 @@
 <?php
-require_once('db.php');
+require_once('../db.php');
 session_start();
 
 // Kiểm tra đăng nhập
@@ -100,6 +100,15 @@ switch ($action) {
     }
     echo json_encode($friends);
     break;
+
+    // 🗑️ Hủy kết bạn
+    case 'unfriend':
+        $friend_id = intval($_POST['friend_id']);
+        $stmt = $conn->prepare("DELETE FROM friends WHERE (UserId=? AND FriendUserId=?) OR (UserId=? AND FriendUserId=?)");
+        $stmt->bind_param('iiii', $user_id, $friend_id, $friend_id, $user_id);
+        $stmt->execute();
+        echo json_encode(['status' => 'success']);
+        break;
     
     default:
         echo json_encode(['status' => 'error', 'message' => 'Action không hợp lệ']);

@@ -160,10 +160,10 @@ button.reject { background: var(--color-error); color: #fff; }
         <?php if (isset($_SESSION['user_id'])): ?>
             <span class="logged-in-user">Xin chào, <?php echo htmlspecialchars($current_username); ?></span>
             <div class="avatar-menu">
-                <?php $avatar = ltrim(($_SESSION['avatar'] ?? 'images/default-avatar.jpg'), '/'); ?>
-                <img src="<?php echo htmlspecialchars($avatar); ?>" alt="avatar" class="avatar-thumb" id="avatarBtn">
+                <?php $avatar = ltrim(($_SESSION['avatar'] ?? 'uploads/default-avatar.jpg'), '/'); ?>
+                <img src="../../<?php echo htmlspecialchars($avatar); ?>" alt="avatar" class="avatar-thumb" id="avatarBtn">
                 <div class="avatar-dropdown" id="avatarDropdown">
-                    <a href="Pages/profile.php">Chỉnh sửa hồ sơ</a>
+                    <a href="../profile.php">Chỉnh sửa hồ sơ</a>
                     <a href="../../Handler/logout.php">Logout</a>
                 </div>
             </div>
@@ -206,7 +206,7 @@ button.reject { background: var(--color-error); color: #fff; }
 </div>
 
 <script>
-const api = './../../Handler/FriendHandler/friend-handler.php';
+const api = '../../Handler/FriendHandler/friend-handler.php';
 const searchInput = document.getElementById('searchInput');
 const searchResults = document.getElementById('search-results');
 const overlay = document.getElementById('friendOverlay');
@@ -222,10 +222,10 @@ const renderList = (selector, data, template, emptyMsg) => {
 searchInput.addEventListener('input', async e => {
   const q = e.target.value.trim();
   if (!q) return searchResults.style.display = 'none';
-  const users = await (await fetch(`./../../Handler/FriendHandler/search_user.php?q=${encodeURIComponent(q)}`)).json();
+  const users = await (await fetch(`../../Handler/FriendHandler/search_user.php?q=${encodeURIComponent(q)}`)).json();
   renderList('#search-results', users, u => `
     <div onclick="sendFriend(${u.UserId})">
-      <img src="${u.AvatarPath || './uploads/default-avatar.jpg'}" onerror="this.src='./uploads/default-avatar.jpg'">
+      <img src="../../${u.AvatarPath || 'uploads/default-avatar.jpg'}" onerror="this.src='../../uploads/default-avatar.jpg'">
       ${u.Username}
     </div>`, 'Không tìm thấy người dùng nào');
   searchResults.style.display = 'block';
@@ -237,24 +237,46 @@ document.addEventListener('click', e => {
 });
 
 async function sendFriend(id) {
-  const res = await fetchPost({action:'send', friend_id:id});
-  alert(res.status==='sent'?'Đã gửi lời mời kết bạn!':'Đã có yêu cầu hoặc đã là bạn!');
+  try {
+    const res = await fetchPost({action:'send', friend_id:id});
+    if (res.status === 'sent') {
+      alert('Đã gửi lời mời kết bạn!');
+      searchResults.style.display = 'none';
+      searchInput.value = '';
+      loadRequests();
+    } else if (res.status === 'exists') {
+      alert('Đã có yêu cầu hoặc đã là bạn!');
+    } else {
+      alert('Có lỗi xảy ra: ' + (res.message || 'Unknown error'));
+    }
+  } catch (e) {
+    alert('Lỗi kết nối: ' + e.message);
+  }
 }
 
 async function loadRequests() {
-  const data = await fetchPost({action:'fetch_requests'});
-  renderList('#requests', data, r => `
+  try {
+    const data = await fetchPost({action:'fetch_requests'});
+    renderList('#requests', data, r => `
     <div class="request-item">
-      <img src="${r.sender_avatar || './uploads/default-avatar.jpg'}" class="avatar-img">
+      <img src="../../${r.sender_avatar || 'uploads/default-avatar.jpg'}" class="avatar-img">
       <b>${r.sender_name}</b>
       <button onclick="respond(${r.sender_id},'accept')" class="accept">Chấp nhận</button>
       <button onclick="respond(${r.sender_id},'reject')" class="reject">Từ chối</button>
     </div>`, 'Không có lời mời nào.');
+  } catch (e) {
+    console.error('Lỗi tải lời mời:', e);
+  }
 }
 
 async function respond(id, type) {
-  await fetchPost({action:type, friend_id:id});
-  loadRequests(); loadFriends();
+  try {
+    await fetchPost({action:type, friend_id:id});
+    loadRequests(); 
+    loadFriends();
+  } catch (e) {
+    alert('Có lỗi xảy ra: ' + e.message);
+  }
 }
 
 function toggleOverlay(show, data={}) {
@@ -264,12 +286,12 @@ function toggleOverlay(show, data={}) {
     document.getElementById('overlayName').textContent = data.name;
     // Đảm bảo avatar hợp lệ
     const validAvatar = (data.avatar && data.avatar !== 'null' && data.avatar !== 'undefined' && data.avatar.trim() !== '') 
-      ? data.avatar 
-      : './images/default-avatar.jpg';
+      ? '../../' + data.avatar 
+      : '../../uploads/default-avatar.jpg';
     const overlayAvatarEl = document.getElementById('overlayAvatar');
     overlayAvatarEl.src = validAvatar;
     overlayAvatarEl.onerror = function() {
-      this.src = './images/default-avatar.jpg';
+      this.src = '../../uploads/default-avatar.jpg';
     };
   } else selectedFriendId = null;
 }
@@ -283,25 +305,29 @@ function timeAgo(date) {
 }
 
 async function loadFriends() {
-  const friends = await fetchPost({action:'fetch_friends'});
-  if (JSON.stringify(friends) === JSON.stringify(cachedFriends)) return;
-  cachedFriends = friends;
-  renderList('#friends-list', friends, f => {
-    const color = f.IsOnline ? '#43A047' : '#888';
-    const status = f.IsOnline ? 'Online' : (f.LastSeen ? timeAgo(f.LastSeen) : 'Offline');
-    const avatar = f.AvatarPath || './uploads/default-avatar.jpg';
-    const displayName = (f.FullName || f.Username || 'Unknown').replace(/'/g, "\\'");
-    const escapedAvatar = avatar.replace(/'/g, "\\'");
-    return `
+  try {
+    const friends = await fetchPost({action:'fetch_friends'});
+    if (JSON.stringify(friends) === JSON.stringify(cachedFriends)) return;
+    cachedFriends = friends;
+    renderList('#friends-list', friends, f => {
+      const color = f.IsOnline ? '#43A047' : '#888';
+      const status = f.IsOnline ? 'Online' : (f.LastSeen ? timeAgo(f.LastSeen) : 'Offline');
+      const avatar = (f.AvatarPath ? '../../' + f.AvatarPath : '../../uploads/default-avatar.jpg');
+      const displayName = (f.FullName || f.Username || 'Unknown').replace(/'/g, "\\'");
+      const escapedAvatar = avatar.replace(/'/g, "\\'");
+      return `
       <div class="friend-item" onclick="toggleOverlay(true, {id:${f.UserId}, name:'${displayName}', avatar:'${escapedAvatar}'})" style="cursor: pointer;">
-        <img src="${avatar}" class="avatar-img" onerror="this.src='./uploads/default-avatar.jpg'">
+        <img src="${avatar}" class="avatar-img" onerror="this.src='../../uploads/default-avatar.jpg'">
         <div class="friend-info">
           <strong>${displayName}</strong>
           <small>${status}</small>
         </div>
         <span class="status-dot" style="background:${color};"></span>
       </div>`;
-  }, 'Bạn chưa có bạn bè 😢');
+    }, 'Bạn chưa có bạn bè 😢');
+  } catch (e) {
+    console.error('Lỗi tải bạn bè:', e);
+  }
 }
 
 document.getElementById('msgBtn').onclick = () => selectedFriendId && (location = `chat.php?friend_id=${selectedFriendId}`);

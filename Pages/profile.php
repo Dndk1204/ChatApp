@@ -79,7 +79,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 				}
 				$ext = $allowed[$mime];
 				// Tạo thư mục theo user: uploads/avatars/u_{userId}
-				$baseDir = __DIR__ . '/uploads/avatars';
+				$baseDir = dirname(__DIR__) . '/uploads/avatars';
 				$userDir = $baseDir . '/u_' . $userId;
 				if (!is_dir($userDir)) {
 					if (!is_dir($baseDir)) {
@@ -143,7 +143,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 	}
 }
 
-$defaultAvatar = 'images/default-avatar.jpg';
+$defaultAvatar = 'uploads/default-avatar.jpg';
 $avatar = $_SESSION['avatar'] ?? ($user['AvatarPath'] ?: $defaultAvatar);
 $avatar = ltrim($avatar, '/');
 ?>
@@ -177,7 +177,7 @@ $avatar = ltrim($avatar, '/');
         <?php if (isset($_SESSION['user_id'])): ?>
             <span class="logged-in-user">Xin chào, <?php echo htmlspecialchars($current_username); ?></span>
             <div class="avatar-menu">
-                <?php $avatar = ltrim(($_SESSION['avatar'] ?? 'images/default-avatar.jpg'), '/'); ?>
+                <?php $avatar = ltrim(($_SESSION['avatar'] ?? 'uploads/default-avatar.jpg'), '/'); ?>
                 <img src="../<?php echo htmlspecialchars($avatar); ?>" alt="avatar" class="avatar-thumb" id="avatarBtn">
                 <div class="avatar-dropdown" id="avatarDropdown">
                     <a href="../Pages/profile.php">Chỉnh sửa hồ sơ</a>
@@ -206,7 +206,7 @@ $avatar = ltrim($avatar, '/');
 				<div class="form-group">
 					<label>Ảnh đại diện hiện tại</label>
 					<div style="display:flex;align-items:center;gap:12px;">
-						<img src="<?php echo htmlspecialchars($avatar); ?>" alt="avatar" style="width:64px;height:64px;border-radius:50%;object-fit:cover;border:1px solid #444;">
+						<img src="../<?php echo htmlspecialchars($avatar); ?>" alt="avatar" style="width:64px;height:64px;border-radius:50%;object-fit:cover;border:1px solid #444;">
 						<input type="file" name="avatar" accept="image/*">
 					</div>
 				</div>

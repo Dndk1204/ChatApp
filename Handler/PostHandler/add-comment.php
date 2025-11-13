@@ -44,9 +44,10 @@ try {
     $new_comment = [
         'CommentId' => $new_comment_id,
         'Username' => $user_info['Username'],
-        'AvatarPath' => $user_info['AvatarPath'], // Gửi avatar path
+        'AvatarPath' => $user_info['AvatarPath'],
         'Content' => $content,
-        'ParentCommentId' => $parent_id
+        'ParentCommentId' => $parent_id,
+        'CommentedAt' => date('Y-m-d H:i:s')
     ];
     
     echo json_encode(['status' => 'success', 'comment' => $new_comment]);

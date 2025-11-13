@@ -14,7 +14,7 @@ $stmt_current_user = $conn->prepare($sql_current_user);
 $stmt_current_user->bind_param("i", $current_user_id);
 $stmt_current_user->execute();
 $current_user_avatar_result = $stmt_current_user->get_result();
-$current_user_avatar = $current_user_avatar_result->num_rows > 0 ? $current_user_avatar_result->fetch_assoc()['AvatarPath'] : '/images/default-avatar.jpg';
+$current_user_avatar = $current_user_avatar_result->num_rows > 0 ? $current_user_avatar_result->fetch_assoc()['AvatarPath'] : 'uploads/default-avatar.jpg';
 $stmt_current_user->close();
 
 // Lấy TẤT CẢ các emotes một lần để dùng
@@ -41,11 +41,14 @@ function renderComments($post_id, $comments_by_parent, $parent_id = NULL) {
         $comment_id = $comment['CommentId'];
         ?>
         <div class="comment" id="comment-<?php echo $comment_id; ?>">
-            <img src="<?php echo htmlspecialchars($comment['AvatarPath']); ?>" alt="Avatar" class="comment-avatar">
+            <img src="../../<?php echo htmlspecialchars($comment['AvatarPath'] ?: 'uploads/default-avatar.jpg'); ?>" alt="Avatar" class="comment-avatar">
             <div class="comment-bubble">
                 <div class="comment-content">
                     <span class="comment-username"><?php echo htmlspecialchars($comment['Username']); ?>:</span>
                     <span class="comment-text"><?php echo htmlspecialchars($comment['Content']); ?></span>
+                </div>
+                <div class="comment-meta">
+                    <span class="comment-time"><?php echo isset($comment['CommentedAt']) ? date('d/m/Y \lúc H:i', strtotime($comment['CommentedAt'])) : ''; ?></span>
                 </div>
                 <div class="comment-actions">
                     <button class="reply-btn" onclick="setReply(<?php echo $post_id; ?>, <?php echo $comment_id; ?>, '<?php echo htmlspecialchars($comment['Username']); ?>')">
@@ -75,21 +78,6 @@ function renderComments($post_id, $comments_by_parent, $parent_id = NULL) {
     <link rel="stylesheet" href="./../../css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap" rel="stylesheet">
 <style>
-        /* TÁI ĐỊNH NGHĨA BIẾN MÀU (GIỐNG TRANG CHAT) */
-        :root {
-            --color-bg: #F0F8F8; 
-            --color-primary: #B0E0E6;
-            --color-primary-dark: #9ACCCB;
-            --color-card: #FFFFFF;
-            --color-secondary: #F5F5F5;
-            --color-accent: #5499C7; /* Màu xanh nhấn chính */
-            --color-border: #E0E0E0;
-            --color-text: #333333;
-            --color-text-muted: #888888;
-            --color-danger: #E63946; /* Giữ màu đỏ cho nút xóa/báo xấu */
-            --received-bubble-bg: #F1F1F1;
-        }
-
         /* CSS cho trang Posts (LIGHT MODE) */
         .page-content {
             flex-grow: 1; display: flex; justify-content: center;
@@ -199,6 +187,14 @@ function renderComments($post_id, $comments_by_parent, $parent_id = NULL) {
             margin-right: 5px; 
         }
         .comment-text { color: var(--color-text); }
+        .comment-meta {
+            margin-top: 4px;
+            font-size: 0.75em;
+            color: var(--color-text-muted);
+        }
+        .comment-time {
+            display: inline-block;
+        }
         
         /* Bình luận trả lời */
         .comment-actions { margin-top: 3px; }
@@ -298,7 +294,7 @@ function renderComments($post_id, $comments_by_parent, $parent_id = NULL) {
         <?php if (isset($_SESSION['user_id'])): ?>
             <span class="logged-in-user">Xin chào, <?php echo htmlspecialchars($current_username); ?></span>
             <div class="avatar-menu">
-                <?php $avatar = ltrim(($_SESSION['avatar'] ?? 'images/default-avatar.jpg'), '/'); ?>
+                <?php $avatar = ltrim(($_SESSION['avatar'] ?? 'uploads/default-avatar.jpg'), '/'); ?>
                 <img src="../../<?php echo htmlspecialchars($avatar); ?>" alt="avatar" class="avatar-thumb" id="avatarBtn">
                 <div class="avatar-dropdown" id="avatarDropdown">
                     <a href="../profile.php">Chỉnh sửa hồ sơ</a>
@@ -346,7 +342,7 @@ function renderComments($post_id, $comments_by_parent, $parent_id = NULL) {
             
                 <div class="post-card" id="post-<?php echo $post_id; ?>">
                     <div class="post-header">
-                        <img src="<?php echo htmlspecialchars($post['AvatarPath']); ?>" alt="Avatar" class="post-avatar">
+                        <img src="../../<?php echo htmlspecialchars($post['AvatarPath'] ?: 'uploads/default-avatar.jpg'); ?>" alt="Avatar" class="post-avatar">
                         <div class="post-user-info">
                             <span class="post-username"><?php echo htmlspecialchars($post['Username']); ?></span>
                             <span class="post-time"><?php echo date('d/m/Y \lúc H:i', strtotime($post['PostedAt'])); ?></span>
@@ -429,7 +425,7 @@ function renderComments($post_id, $comments_by_parent, $parent_id = NULL) {
                     <div class="comment-section">
                         <?php
                         // Lấy và sắp xếp TẤT CẢ bình luận
-                        $sql_comments = "SELECT c.CommentId, c.Content, c.ParentCommentId, u.Username, u.AvatarPath
+                        $sql_comments = "SELECT c.CommentId, c.Content, c.ParentCommentId, c.CommentedAt, u.Username, u.AvatarPath
                                          FROM comments c
                                          JOIN users u ON c.UserId = u.UserId
                                          WHERE c.PostId = ?
@@ -480,12 +476,10 @@ function renderComments($post_id, $comments_by_parent, $parent_id = NULL) {
     </main>
 
     <script>
-        // TẤT CẢ ĐỀU DÙNG AJAX
-
         // Truyền dữ liệu từ PHP sang JS
         const emotesMap = <?php echo json_encode($emotes_map); ?>;
         const currentUsername = <?php echo json_encode($current_username); ?>;
-        const currentUserAvatar = <?php echo json_encode($current_user_avatar); ?>;
+        const currentUserAvatar = '../../' + <?php echo json_encode($current_user_avatar); ?>;
         
         // Hàm tiện ích để tránh lỗi XSS
         function htmlspecialchars(str) {
@@ -545,8 +539,22 @@ function renderComments($post_id, $comments_by_parent, $parent_id = NULL) {
         }
 
         function createCommentHtml(comment, postId) {
-            const avatar = comment.AvatarPath ? htmlspecialchars(comment.AvatarPath) : htmlspecialchars(currentUserAvatar);
+            const avatarPath = comment.AvatarPath ? htmlspecialchars(comment.AvatarPath) : htmlspecialchars(currentUserAvatar);
+            const avatar = avatarPath.startsWith('../../') ? avatarPath : '../../' + avatarPath;
             const username = comment.Username ? htmlspecialchars(comment.Username) : htmlspecialchars(currentUsername);
+            
+            // Format thời gian: dd/mm/yyyy, hh:mm
+            let commentTime = '';
+            if (comment.CommentedAt) {
+                const date = new Date(comment.CommentedAt);
+                const day = String(date.getDate()).padStart(2, '0');
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const year = date.getFullYear();
+                const hours = String(date.getHours()).padStart(2, '0');
+                const minutes = String(date.getMinutes()).padStart(2, '0');
+                commentTime = `${day}/${month}/${year}, ${hours}:${minutes}`;
+            }
+            
             return `
                 <div class="comment" id="comment-${comment.CommentId}">
                     <img src="${avatar}" alt="Avatar" class="comment-avatar">
@@ -554,6 +562,9 @@ function renderComments($post_id, $comments_by_parent, $parent_id = NULL) {
                         <div class="comment-content">
                             <span class="comment-username">${username}:</span>
                             <span class="comment-text">${htmlspecialchars(comment.Content)}</span>
+                        </div>
+                        <div class="comment-meta">
+                            <span class="comment-time">${commentTime}</span>
                         </div>
                         <div class="comment-actions">
                             <button class="reply-btn" onclick="setReply(${postId}, ${comment.CommentId}, '${username}')">Trả lời</button>
