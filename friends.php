@@ -398,6 +398,35 @@ document.getElementById('unfriendBtn').onclick=()=>{
 loadRequests();
 loadFriends();
 setInterval(loadFriends,5000);
+
+        // Chờ cho toàn bộ trang được tải xong
+        document.addEventListener('DOMContentLoaded', function() {
+            
+            const avatarBtn = document.getElementById('avatarBtn');
+            const avatarDropdown = document.getElementById('avatarDropdown');
+
+            // Kiểm tra xem các phần tử này có tồn tại không
+            // (vì khách truy cập sẽ không thấy chúng)
+            if (avatarBtn && avatarDropdown) {
+                
+                // 1. Khi nhấp vào avatar
+                avatarBtn.addEventListener('click', function(event) {
+                    // Ngăn sự kiện click lan ra ngoài
+                    event.stopPropagation(); 
+                    
+                    // Hiển thị hoặc ẩn dropdown
+                    avatarDropdown.classList.toggle('open');
+                });
+
+                // 2. Khi nhấp ra ngoài (bất cứ đâu trên trang)
+                document.addEventListener('click', function(event) {
+                    // Nếu dropdown đang mở và cú click không nằm trong dropdown
+                    if (avatarDropdown.classList.contains('open') && !avatarDropdown.contains(event.target)) {
+                        avatarDropdown.classList.remove('open');
+                    }
+                });
+            }
+        });
 </script>
 </body>
 </html>
