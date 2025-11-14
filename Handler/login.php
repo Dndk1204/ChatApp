@@ -35,7 +35,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 }
 
                 // --- CẬP NHẬT TRẠNG THÁI ONLINE ---
-                $sql_update = "UPDATE Users SET IsOnline = 1 WHERE UserId = ?";
+                $sql_update = "UPDATE Users SET IsOnline = 1, LastSeen = NOW() WHERE UserId = ?";
                 $stmt_update = $conn->prepare($sql_update);
                 if ($stmt_update) {
                     $stmt_update->bind_param("i", $user['UserId']);

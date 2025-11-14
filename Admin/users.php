@@ -90,6 +90,7 @@ try {
 
 admin_render_head('Admin - Người dùng');
 admin_render_header('users');
+
 ?>
 	<main class="admin-container">
 		<div class="header-bar">
@@ -130,11 +131,18 @@ admin_render_header('users');
 							<td>
 								<div class="action-row">
 									<a class="btn" href="./user_edit.php?id=<?php echo (int)$u['UserId']; ?>">Sửa</a>
-									<form method="post" onsubmit="return confirm('Bạn có chắc chắn muốn xóa người dùng này? Hành động này không thể hoàn tác!');" style="display: inline;">
+									<form method="post" id="delete-form-<?php echo (int)$u['UserId']; ?>" style="display: inline;">
 										<?php admin_csrf_field(); ?>
 										<input type="hidden" name="action" value="delete_user">
 										<input type="hidden" name="user_id" value="<?php echo (int)$u['UserId']; ?>">
-										<button class="btn btn-danger" type="submit">Xóa</button>
+										
+										<button class="btn btn-danger" type="button" 
+												onclick="adminShowConfirm(
+													'Bạn có chắc chắn muốn xóa người dùng \'<?php echo htmlspecialchars($u['Username']); ?>\'? Hành động này sẽ xóa tất cả tin nhắn và bài đăng của họ!', 
+													() => document.getElementById('delete-form-<?php echo (int)$u['UserId']; ?>').submit()
+												)">
+											Xóa
+										</button>
 									</form>
 								</div>
 							</td>
@@ -147,6 +155,10 @@ admin_render_header('users');
 			</div>
 		</section>
 	</main>
+	<?php
+    // In ra HTML, CSS, JS của modal xác nhận
+    admin_render_confirm_modal();
+	?>
 </body>
 </html>
 

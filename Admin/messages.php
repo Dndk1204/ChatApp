@@ -92,12 +92,19 @@ admin_render_header('messages');
 							<td><?php echo htmlspecialchars($m['Content']); ?></td>
 							<td><?php echo htmlspecialchars($m['SentAt']); ?></td>
 							<td>
-								<form method="post" onsubmit="return confirm('Xác nhận xóa tin nhắn?');">
-									<?php admin_csrf_field(); ?>
-									<input type="hidden" name="action" value="delete_message">
-									<input type="hidden" name="message_id" value="<?php echo (int)$m['MessageId']; ?>">
-									<button class="btn btn-danger" type="submit">Xóa</button>
-								</form>
+								<form method="post" id="delete-msg-form-<?php echo (int)$m['MessageId']; ?>" style="display: inline;">
+                                    <?php admin_csrf_field(); ?>
+                                    <input type="hidden" name="action" value="delete_message">
+                                    <input type="hidden" name="message_id" value="<?php echo (int)$m['MessageId']; ?>">
+                                    
+                                    <button class="btn btn-danger" type="button"
+                                            onclick="adminShowConfirm(
+                                                'Bạn có chắc chắn muốn xóa tin nhắn này?', 
+                                                () => document.getElementById('delete-msg-form-<?php echo (int)$m['MessageId']; ?>').submit()
+                                            )">
+                                        Xóa
+                                    </button>
+                                </form>
 							</td>
 						</tr>
 						<?php endforeach; ?>
@@ -108,6 +115,10 @@ admin_render_header('messages');
 			</div>
 		</section>
 	</main>
+	<?php 
+		// Thêm dòng này vào cuối file, ngay trước </body>
+		admin_render_confirm_modal(); 
+	?>
 </body>
 </html>
 

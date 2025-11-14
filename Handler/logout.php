@@ -5,7 +5,7 @@ require_once 'db.php';
 
 if (isset($_SESSION['user_id'])) {
     // --- CẬP NHẬT TRẠNG THÁI OFFLINE ---
-    $sql = "UPDATE Users SET IsOnline = 0 WHERE UserId = ?";
+    $sql = "UPDATE users SET IsOnline = 0, LastSeen = NOW() WHERE UserId = ?";
     
     if ($conn) {
         $stmt = $conn->prepare($sql);

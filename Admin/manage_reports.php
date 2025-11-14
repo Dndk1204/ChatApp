@@ -126,7 +126,7 @@ try {
 
 // Render HTML
 admin_render_head('Admin - Báo xấu');
-admin_render_header('reports'); // 'reports' là tên trang active
+admin_render_header('reports');
 ?>
     <main class="admin-container">
         <div class="header-bar">
@@ -174,19 +174,31 @@ admin_render_header('reports'); // 'reports' là tên trang active
                                     <?php if ($r['PostId']): // Chỉ hiển thị nếu bài đăng còn ?>
                                     <a class="btn" href="../Pages/PostPages/posts.php#post-<?php echo (int)$r['PostId']; ?>" target="_blank">Xem</a>
                                     
-                                    <form method="post" onsubmit="return confirm('Bạn có chắc XÓA BÀI ĐĂNG này? (Báo cáo sẽ tự động bị xóa theo)');" style="display: inline;">
+                                    <form method="post" id="delete-post-form-<?php echo (int)$r['ReportId']; ?>" style="display: inline;">
                                         <?php admin_csrf_field(); ?>
                                         <input type="hidden" name="action" value="delete_post">
                                         <input type="hidden" name="post_id" value="<?php echo (int)$r['PostId']; ?>">
-                                        <button class="btn btn-danger" type="submit">Xóa</button>
+                                        <button class="btn btn-danger" type="button"
+                                                onclick="adminShowConfirm(
+                                                    'Bạn có chắc XÓA BÀI ĐĂNG này? (Báo cáo sẽ tự động bị xóa theo)', 
+                                                    () => document.getElementById('delete-post-form-<?php echo (int)$r['ReportId']; ?>').submit()
+                                                )">
+                                            Xóa
+                                        </button>
                                     </form>
                                     <?php endif; ?>
 
-                                    <form method="post" onsubmit="return confirm('Bạn có chắc DUYỆT (bỏ qua) báo cáo này?');" style="display: inline;">
+                                    <form method="post" id="resolve-report-form-<?php echo (int)$r['ReportId']; ?>" style="display: inline;">
                                         <?php admin_csrf_field(); ?>
                                         <input type="hidden" name="action" value="resolve_report">
                                         <input type="hidden" name="report_id" value="<?php echo (int)$r['ReportId']; ?>">
-                                        <button class="btn btn-primary" type="submit">Duyệt</button>
+                                        <button class="btn btn-primary" type="button"
+                                                onclick="adminShowConfirm(
+                                                    'Bạn có chắc DUYỆT (bỏ qua) báo cáo này?', 
+                                                    () => document.getElementById('resolve-report-form-<?php echo (int)$r['ReportId']; ?>').submit()
+                                                )">
+                                            Duyệt
+                                        </button>
                                     </form>
                                 </div>
                             </td>
@@ -199,5 +211,10 @@ admin_render_header('reports'); // 'reports' là tên trang active
             </div>
         </section>
     </main>
+
+<?php 
+    // Thêm dòng này vào cuối file, ngay trước </body>
+    admin_render_confirm_modal(); 
+?>
 </body>
 </html>
