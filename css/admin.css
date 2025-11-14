@@ -154,7 +154,6 @@ header.admin-header nav a:hover {
   max-width: 1100px;
   margin: 2rem auto;
   background: var(--color-card);
-  border-radius: var(--radius);
   box-shadow: var(--shadow);
   padding: 2rem;
 }
@@ -226,7 +225,6 @@ tbody tr:hover {
   display: inline-block;
   padding: 6px 14px;
   font-size: 0.9rem;
-  border-radius: var(--radius);
   border: 1px solid var(--color-border);
   background-color: var(--color-secondary);
   color: var(--color-text);
@@ -275,7 +273,6 @@ tbody tr:hover {
 .flash-success,
 .flash-error {
   padding: 12px;
-  border-radius: var(--radius);
   margin-bottom: 1.2rem;
   font-weight: 500;
 }
@@ -299,7 +296,7 @@ select {
   padding: 8px 10px;
   margin-top: 4px;
   border: 1px solid var(--color-border);
-  border-radius: var(--radius);
+
   background-color: var(--color-secondary);
   color: var(--color-text);
   transition: border 0.2s ease;
@@ -344,6 +341,62 @@ label {
   color: white;
 }
 
+/* ===== Pagination ===== */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  margin: 1.5rem 0;
+  flex-wrap: wrap;
+}
+
+.pagination-btn {
+  display: inline-block;
+  padding: 8px 12px;
+  min-width: 40px;
+  text-align: center;
+  background-color: var(--color-secondary);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  border-radius: 0;
+}
+
+.pagination-btn:hover {
+  background-color: var(--color-primary);
+  border-color: var(--color-accent);
+  color: var(--color-text);
+}
+
+.pagination-btn.active {
+  background-color: var(--color-accent);
+  color: white;
+  border-color: var(--color-accent);
+  cursor: default;
+}
+
+.pagination-btn.active:hover {
+  background-color: var(--color-accent);
+  border-color: var(--color-accent);
+}
+
+.pagination-ellipsis {
+  padding: 8px 4px;
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+}
+
+.pagination-info {
+  text-align: center;
+  margin-top: 0.5rem;
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+}
+
 /* ===== Responsive ===== */
 @media (max-width: 768px) {
   .admin-container {
@@ -355,6 +408,14 @@ label {
     gap: 0.8rem;
   }
   table {
+    font-size: 0.85rem;
+  }
+  .pagination {
+    gap: 4px;
+  }
+  .pagination-btn {
+    padding: 6px 10px;
+    min-width: 36px;
     font-size: 0.85rem;
   }
 }

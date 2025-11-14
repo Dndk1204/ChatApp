@@ -67,7 +67,6 @@ try {
             width: 100%; max-width: 700px;
             background-color: #2a2a2a; /* Dark card background */
             padding: 25px 30px;
-            border-radius: 8px;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3); /* Darker shadow */
         }
         .form-container h1 {
@@ -89,7 +88,6 @@ try {
             width: 100%;
             padding: 10px;
             border: 1px solid #444; /* Darker border */
-            border-radius: 5px;
             background-color: #333; /* Dark input */
             color: #f0f0f0; /* Light text */
             font-size: 1em;
@@ -113,7 +111,6 @@ try {
             background-color: #ff6666; /* Accent color (hồng) */
             color: #1a1a1a; /* Dark text on accent button */
             border: none;
-            border-radius: 5px;
             font-weight: bold;
             font-size: 1.1em;
             cursor: pointer;
