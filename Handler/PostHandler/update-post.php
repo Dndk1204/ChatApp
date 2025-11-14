@@ -14,9 +14,12 @@ $user_id = $_SESSION['user_id'];
 $post_id = isset($_POST['post_id']) ? (int)$_POST['post_id'] : 0;
 $content = $_POST['content'];
 
+// [THAY ĐỔI 1] Lấy giá trị Privacy mới
+$privacy = (isset($_POST['privacy']) && $_POST['privacy'] === 'public') ? 'public' : 'friends';
+
+
 if ($post_id === 0) {
     $_SESSION['error_message'] = "Bài đăng không hợp lệ.";
-    // SỬA ĐÚNG:
     header("Location: ../../Pages/PostPages/posts.php"); 
     exit();
 }
@@ -31,7 +34,6 @@ try {
 
     if ($result->num_rows != 1) {
         $_SESSION['error_message'] = "Bạn không có quyền sửa bài đăng này.";
-        // SỬA ĐÚNG:
         header("Location: ../../Pages/PostPages/posts.php"); 
         exit();
     }
@@ -65,36 +67,35 @@ try {
                 }
             } else {
                 $_SESSION['error_message'] = "Lỗi khi upload ảnh mới.";
-                // SỬA ĐÚNG:
                 header("Location: ../../Pages/PostPages/edit_post.php?id=" . $post_id); 
                 exit();
             }
         } else {
             $_SESSION['error_message'] = "Định dạng ảnh không hợp lệ.";
-            // SỬA ĐÚNG:
             header("Location: ../../Pages/PostPages/edit_post.php?id=" . $post_id); 
             exit();
         }
     }
 
     // (6) Cập nhật CSDL
-    $sql_update = "UPDATE posts SET Content = ?, ImagePath = ? WHERE PostId = ? AND UserId = ?";
+    // [THAY ĐỔI 2] Thêm `Privacy = ?`
+    $sql_update = "UPDATE posts SET Content = ?, ImagePath = ?, Privacy = ? WHERE PostId = ? AND UserId = ?";
     $stmt_update = $conn->prepare($sql_update);
-    $stmt_update->bind_param("ssii", $content, $new_image_path, $post_id, $user_id);
+    
+    // [THAY ĐỔI 3] Thêm 's' và $privacy (từ 'ssii' thành 'sssii')
+    $stmt_update->bind_param("sssii", $content, $new_image_path, $privacy, $post_id, $user_id);
     $stmt_update->execute();
     
     $stmt_update->close();
     $conn->close();
     
-    // (7) Quay về trang posts (ĐÂY LÀ DÒNG QUAN TRỌNG NHẤT)
-    // SỬA ĐÚNG:
+    // (7) Quay về trang posts
     header("Location: ../../Pages/PostPages/posts.php"); 
     exit();
 
 } catch (Exception $e) {
     $_SESSION['error_message'] = $e->getMessage();
     if ($conn) $conn->close();
-    // SỬA ĐÚNG:
     header("Location: ../../Pages/PostPages/edit_post.php?id=" . $post_id); 
     exit();
 }

@@ -22,7 +22,8 @@ $post_id = (int)$_GET['id'];
 
 // (4) Lấy thông tin bài đăng VÀ kiểm tra quyền sở hữu
 try {
-    $sql = "SELECT Content, ImagePath FROM posts WHERE PostId = ? AND UserId = ?";
+    // [CẬP NHẬT 1] Lấy thêm cột `Privacy`
+    $sql = "SELECT Content, ImagePath, Privacy FROM posts WHERE PostId = ? AND UserId = ?";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("ii", $post_id, $current_user_id);
     $stmt->execute();
@@ -57,20 +58,21 @@ try {
     <title>Chỉnh sửa bài đăng - ChatApp</title>
     <link rel="stylesheet" href="../../css/style.css"> 
 <style>
-        /* CSS cho trang edit post (THEO GIAO DIỆN DARK MODE) */
+        /* [CẬP NHẬT 3] CSS cho trang edit post (ĐÃ DỊCH SANG LIGHT THEME) */
         .page-content {
             flex-grow: 1; display: flex; justify-content: center;
             padding: 50px 20px;
-            background-color: #1a1a1a; /* Dark background */
+            background-color: var(--color-bg); /* Light background */
         }
         .form-container {
             width: 100%; max-width: 700px;
-            background-color: #2a2a2a; /* Dark card background */
+            background-color: var(--color-card); /* Light card background */
             padding: 25px 30px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3); /* Darker shadow */
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); /* Lighter shadow */
+            border: 1px solid var(--color-border);
         }
         .form-container h1 {
-            color: #f0f0f0; /* Light text */
+            color: var(--color-accent); /* Dark text */
             margin-bottom: 20px;
             text-align: center;
         }
@@ -81,16 +83,24 @@ try {
             display: block;
             margin-bottom: 5px;
             font-weight: bold;
-            color: #aaa; /* Muted light text */
+            color: var(--color-text); /* Muted dark text */
         }
         .form-group textarea,
+        .form-group select, /* Thêm select */
         .form-group input[type="file"] {
             width: 100%;
-            padding: 10px;
-            border: 1px solid #444; /* Darker border */
-            background-color: #333; /* Dark input */
-            color: #f0f0f0; /* Light text */
+            padding: 10px 14px;
+            border: 1px solid var(--color-border);
+            background: var(--color-secondary);
             font-size: 1em;
+            color: var(--color-text);
+            transition: border 0.2s ease, box-shadow 0.2s ease;
+        }
+        .form-group textarea:focus,
+        .form-group select:focus {
+             border-color: var(--color-accent);
+            box-shadow: 0 0 5px rgba(69, 123, 157, 0.2);
+            outline: none;
         }
         .form-group textarea {
             min-height: 150px;
@@ -103,13 +113,13 @@ try {
             max-width: 100%;
             max-height: 300px;
             border-radius: 5px;
-            border: 1px solid #444; /* Darker border */
+            border: 1px solid var(--color-border);
         }
         .btn-submit {
             width: 100%;
             padding: 12px;
-            background-color: #ff6666; /* Accent color (hồng) */
-            color: #1a1a1a; /* Dark text on accent button */
+            background-color: var(--color-accent); /* Accent color (xanh) */
+            color: var(--color-card); /* Light text on accent button */
             border: none;
             font-weight: bold;
             font-size: 1.1em;
@@ -117,7 +127,7 @@ try {
             transition: background-color 0.3s ease;
         }
         .btn-submit:hover {
-            background-color: #ff8080; /* Lighter accent on hover */
+            background-color: var(--color-primary-dark); /* Lighter accent on hover */
         }
     </style>
 </head>
@@ -132,10 +142,7 @@ try {
         </div>
         <nav class="main-nav">
             <a href="../../index.php">HOME</a>
-            <a href="../../Pages/PostPages/posts.php">POSTS</a>
-            <a href="../../Pages/ChatPages/chat.php">CHAT</a>
-            <a href="../../Pages/FriendPages/friends.php">FRIENDS</a>
-            <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'Admin'): ?>
+            <a href="posts.php">POSTS</a> <a href="../ChatPages/chat.php">CHAT</a> <a href="../FriendPages/friends.php">FRIENDS</a> <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'Admin'): ?>
                 <a href="../../admin_dashboard.php">ADMIN</a>
             <?php endif; ?>
         </nav>
@@ -146,7 +153,7 @@ try {
                     <?php $avatar = ltrim(($_SESSION['avatar'] ?? 'images/default-avatar.jpg'), '/'); ?>
                     <img src="../../<?php echo htmlspecialchars($avatar); ?>" alt="avatar" class="avatar-thumb" id="avatarBtn">
                     <div class="avatar-dropdown" id="avatarDropdown">
-                        <a href="../../Pages/profile.php">Chỉnh sửa hồ sơ</a>
+                        <a href="../profile.php">Chỉnh sửa hồ sơ</a>
                         <a href="../../Handler/logout.php">Logout</a>
                     </div>
                 </div>
@@ -162,7 +169,7 @@ try {
             <h1>Chỉnh sửa bài đăng</h1>
             
             <?php if (isset($_SESSION['error_message'])): ?>
-                <p style="color: red; text-align: center;"><?php echo $_SESSION['error_message']; unset($_SESSION['error_message']); ?></p>
+                <p class="form-error"><?php echo $_SESSION['error_message']; unset($_SESSION['error_message']); ?></p>
             <?php endif; ?>
 
             <form action="../../Handler/PostHandler/update-post.php" method="POST" enctype="multipart/form-data">
@@ -186,6 +193,17 @@ try {
                     <?php endif; ?>
                 </div>
 
+                <div class="form-group">
+                    <label for="privacy">Ai có thể xem bài này?</label>
+                    <select id="privacy" name="privacy">
+                        <option value="friends" <?php echo ($post['Privacy'] == 'friends') ? 'selected' : ''; ?>>
+                            Chỉ Bạn bè
+                        </option>
+                        <option value="public" <?php echo ($post['Privacy'] == 'public') ? 'selected' : ''; ?>>
+                            Công khai (Mọi người)
+                        </option>
+                    </select>
+                </div>
                 <button type="submit" class="btn-submit">Lưu thay đổi</button>
             </form>
         </div>

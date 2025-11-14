@@ -82,7 +82,7 @@ function renderComments($post_id, $comments_by_parent, $parent_id = NULL) {
         .page-content {
             flex-grow: 1; display: flex; justify-content: center;
             padding: 50px 20px;
-            background-color: var(--color-bg); /* Nền xanh lục nhạt */
+            background-color: var(--color-bg); 
         }
         .post-feed { width: 100%; max-width: 700px; }
         .post-feed-header {
@@ -90,23 +90,24 @@ function renderComments($post_id, $comments_by_parent, $parent_id = NULL) {
             margin-bottom: 25px;
         }
         .post-feed-header h1 { 
-            color: var(--color-text); /* Text đậm */
+            color: var(--color-text);
             letter-spacing: 2px; 
         }
         .btn-create-post {
             padding: 10px 20px;
-            background-color: var(--color-accent); /* Nút màu xanh nhấn */
+            background-color: var(--color-accent); 
             color: var(--color-card);
             text-decoration: none; border-radius: 5px; font-weight: bold;
             transition: background-color 0.3s ease;
+            margin-left: 10px; /* Thêm khoảng cách */
         }
         .btn-create-post:hover { background-color: #4A88B8; }
 
         /* Card bài đăng */
         .post-card {
-            background-color: var(--color-card); /* Nền thẻ màu trắng */
+            background-color: var(--color-card); 
             border-radius: 8px; margin-bottom: 25px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); /* Bóng mờ */
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); 
             overflow: hidden;
             border: 1px solid var(--color-border);
         }
@@ -118,18 +119,53 @@ function renderComments($post_id, $comments_by_parent, $parent_id = NULL) {
         .post-user-info { display: flex; flex-direction: column; flex-grow: 1; }
         .post-username { 
             font-weight: bold; 
-            color: var(--color-accent); /* Tên màu xanh nhấn */
+            color: var(--color-accent); 
             font-size: 1.1em; 
         }
         .post-time { font-size: 0.8em; color: var(--color-text-muted); }
+        
+        .post-privacy-icon {
+            font-size: 0.75em;
+            color: var(--color-text-muted);
+            margin-top: 3px;
+            font-weight: bold;
+        }
+        
         .post-content {
             padding: 0 20px 15px 20px; line-height: 1.6;
             white-space: pre-wrap; word-wrap: break-word;
             color: var(--color-text);
         }
-        .post-image {
-            width: 100%; max-height: 500px; object-fit: cover;
+        
+        /* CSS CHO ALBUM GRID */
+        .post-album-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr); 
+            gap: 5px; 
+            margin: 0 20px 15px 20px; 
+        }
+        .post-album-grid img {
+            width: 100%;
+            height: 250px; 
+            object-fit: cover;
+            border-radius: 5px;
             background-color: #EEE;
+        }
+        /* CSS đặc biệt nếu chỉ có 1 ảnh */
+        .post-album-grid.single-image {
+            grid-template-columns: 1fr; /* 1 cột */
+        }
+        .post-album-grid.single-image img {
+            height: auto; /* Chiều cao tự động */
+            max-height: 500px;
+        }
+        /* CSS đặc biệt nếu có 3 ảnh */
+        .post-album-grid.three-images {
+             grid-template-columns: repeat(2, 1fr);
+        }
+        .post-album-grid.three-images img:first-child {
+            grid-column: 1 / 3; /* Ảnh đầu tiên chiếm 2 cột */
+            height: 300px; /* Cao hơn 1 chút */
         }
 
         /* Tương tác: Reactions (AJAX) */
@@ -139,7 +175,7 @@ function renderComments($post_id, $comments_by_parent, $parent_id = NULL) {
         }
         .reaction-buttons-wrapper { display: flex; gap: 5px; }
         .reaction-btn {
-            background: var(--color-secondary); /* Nền nút xám nhạt */
+            background: var(--color-secondary); 
             border: 1px solid #DDD;
             border-radius: 5px;
             font-size: 1.2em;
@@ -151,7 +187,7 @@ function renderComments($post_id, $comments_by_parent, $parent_id = NULL) {
             transform: scale(1.1);
             background: #DDD;
         }
-        .reaction-btn.active { /* Nút được chọn */
+        .reaction-btn.active { 
             background: #DDD;
             border-color: var(--color-accent);
             transform: scale(1.1);
@@ -164,7 +200,7 @@ function renderComments($post_id, $comments_by_parent, $parent_id = NULL) {
         .comment-section {
             padding: 10px 20px 15px 20px;
             border-top: 1px solid #EEE;
-            background-color: #F9F9F9; /* Nền khu vực bình luận */
+            background-color: #F9F9F9;
         }
         .comments-list { display: flex; flex-direction: column; gap: 10px; }
         .comment { display: flex; gap: 10px; font-size: 0.9em; }
@@ -177,13 +213,13 @@ function renderComments($post_id, $comments_by_parent, $parent_id = NULL) {
             width: 100%;
         }
         .comment-content {
-            background-color: var(--received-bubble-bg); /* Nền bong bóng chat */
+            background-color: var(--received-bubble-bg, #E9E9E9);
             padding: 8px 12px;
             border-radius: 10px; display: inline-block; max-width: fit-content;
         }
         .comment-username { 
             font-weight: bold; 
-            color: var(--color-accent); /* Tên người bình luận (xanh) */
+            color: var(--color-accent);
             margin-right: 5px; 
         }
         .comment-text { color: var(--color-text); }
@@ -220,7 +256,7 @@ function renderComments($post_id, $comments_by_parent, $parent_id = NULL) {
         .comment-form { display: flex; gap: 10px; }
         .comment-input {
             flex-grow: 1; padding: 8px 12px; border-radius: 15px;
-            border: 1px solid #CCC; /* Border cho input */
+            border: 1px solid #CCC; 
             background-color: #FFFFFF; 
             color: var(--color-text);
             font-family: 'Roboto Mono', monospace;
@@ -283,9 +319,9 @@ function renderComments($post_id, $comments_by_parent, $parent_id = NULL) {
     </div>
     <nav class="main-nav">
         <a href="../../index.php">HOME</a>
-        <a href="../../Pages/PostPages/posts.php">POSTS</a>
-        <a href="../../Pages/ChatPages/chat.php">CHAT</a>
-        <a href="../../Pages/FriendPages/friends.php">FRIENDS</a>
+        <a href="posts.php">POSTS</a>
+        <a href="../ChatPages/chat.php">CHAT</a>
+        <a href="../FriendPages/friends.php">FRIENDS</a>
         <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'Admin'): ?>
             <a href="../../admin_dashboard.php">ADMIN</a>
         <?php endif; ?>
@@ -296,10 +332,12 @@ function renderComments($post_id, $comments_by_parent, $parent_id = NULL) {
             <div class="avatar-menu">
                 <?php $avatar = ltrim(($_SESSION['avatar'] ?? 'uploads/default-avatar.jpg'), '/'); ?>
                 <img src="../../<?php echo htmlspecialchars($avatar); ?>" alt="avatar" class="avatar-thumb" id="avatarBtn" onerror="this.src='../../uploads/default-avatar.jpg'">
-                <div class="avatar-dropdown" id="avatarDropdown">
-                    <a href="../profile.php">Chỉnh sửa hồ sơ</a>
-                    <a href="../../Handler/logout.php">Logout</a>
-                </div>
+            <div class="avatar-dropdown" id="avatarDropdown">
+                <a href="../profile.php">Chỉnh sửa hồ sơ</a>
+                <a href="../hidden_list.php">Quản lý Ẩn</a>
+                <a href="../blocked_list.php">Quản lý Chặn</a>
+                <a href="../../Handler/logout.php">Logout</a>
+            </div>
             </div>
         <?php else: ?>
             <a href="Pages/login.php" class="btn-text">Login</a>
@@ -313,13 +351,15 @@ function renderComments($post_id, $comments_by_parent, $parent_id = NULL) {
             
             <div class="post-feed-header">
                 <h1>Nhật ký</h1>
-                <a href="../PostPages/create_post.php" class="btn-create-post">Tạo bài đăng</a>
+                <a href="create_post.php" class="btn-create-post">Đăng Status</a>
+                <a href="create_album.php" class="btn-create-post" style="background-color: #555;">Tạo Album</a>
             </div>
 
             <?php
             
-            // [CẬP NHẬT] Lấy tất cả bài đăng, LỌC RA người bị ẩn và người đã chặn
-            $sql_posts = "SELECT p.PostId, p.UserId, p.Content, p.ImagePath, p.PostedAt, 
+            // Lọc theo Ẩn, Chặn, VÀ QUYỀN RIÊNG TƯ
+            $sql_posts = "SELECT p.PostId, p.UserId, p.Content, p.Title, p.PostType, p.PostedAt, 
+                                 p.Privacy, 
                                  u.Username, u.AvatarPath 
                           FROM posts p
                           JOIN users u ON p.UserId = u.UserId
@@ -327,11 +367,33 @@ function renderComments($post_id, $comments_by_parent, $parent_id = NULL) {
                               p.UserId NOT IN (SELECT HiddenId FROM hidden_feeds WHERE HiderId = ?)
                               AND
                               p.UserId NOT IN (SELECT BlockerId FROM blocked_users WHERE BlockedId = ?)
+                              AND
+                              (
+                                  p.Privacy = 'public' 
+                                  OR
+                                  ( 
+                                      p.Privacy = 'friends' 
+                                      AND 
+                                      (
+                                          p.UserId = ? 
+                                          OR
+                                          EXISTS ( 
+                                              SELECT 1
+                                              FROM friends f
+                                              WHERE f.IsConfirmed = 1
+                                              AND (
+                                                  (f.UserId = ? AND f.FriendUserId = p.UserId)
+                                                  OR
+                                                  (f.UserId = p.UserId AND f.FriendUserId = ?)
+                                              )
+                                          )
+                                      )
+                                  )
+                              )
                           ORDER BY p.PostedAt DESC";
             
             $stmt_posts = $conn->prepare($sql_posts);
-            // Bind 2 ID của user hiện tại vào 2 câu sub-query
-            $stmt_posts->bind_param("ii", $current_user_id, $current_user_id);
+            $stmt_posts->bind_param("iiiii", $current_user_id, $current_user_id, $current_user_id, $current_user_id, $current_user_id);
             $stmt_posts->execute();
             $result_posts = $stmt_posts->get_result();
             
@@ -340,22 +402,27 @@ function renderComments($post_id, $comments_by_parent, $parent_id = NULL) {
                     $post_id = $post['PostId'];
             ?>
             
-                <div class="post-card" id="post-<?php echo $post_id; ?>">
+                <div class="post-card" id="post-<?php echo $post_id; ?>" data-user-id="<?php echo $post['UserId']; ?>">
                     <div class="post-header">
                         <img src="../../<?php echo htmlspecialchars($post['AvatarPath'] ?: 'uploads/default-avatar.jpg'); ?>" alt="Avatar" class="post-avatar">
                         <div class="post-user-info">
                             <span class="post-username"><?php echo htmlspecialchars($post['Username']); ?></span>
                             <span class="post-time"><?php echo date('d/m/Y \lúc H:i', strtotime($post['PostedAt'])); ?></span>
+                            <span class="post-privacy-icon">
+                                <?php echo ($post['Privacy'] == 'public') ? '🌍 Công khai' : '👥 Bạn bè'; ?>
+                            </span>
                         </div>
                         
                         <div class="post-options">
                             <button class="options-btn" onclick="toggleOptions(<?php echo $post_id; ?>)">&#8942;</button>
                             <div class="options-dropdown" id="options-<?php echo $post_id; ?>">
                                 <?php if ($post['UserId'] == $current_user_id): // Nếu là bài của TÔI ?>
-                                    <a href="edit_post.php?id=<?php echo $post_id; ?>">Chỉnh sửa</a>
+                                    <?php if ($post['PostType'] == 'status'): ?>
+                                        <a href="edit_post.php?id=<?php echo $post_id; ?>">Chỉnh sửa</a>
+                                    <?php endif; ?>
                                     <button class="delete-btn" onclick="deletePost(<?php echo $post_id; ?>)">Xóa bài đăng</button>
                                 <?php else: // Nếu là bài của NGƯỜI KHÁC ?>
-                                    <button onclick="hideFeed(<?php echo $post['UserId']; ?>, <?php echo $post_id; ?>)">Ẩn nhật ký của <?php echo htmlspecialchars($post['Username']); ?></button>
+                                    <button onclick="hideFeed(<?php echo $post['UserId']; ?>)">Ẩn nhật ký của <?php echo htmlspecialchars($post['Username']); ?></button>
                                     <button onclick="blockUser(<?php echo $post['UserId']; ?>)">Chặn <?php echo htmlspecialchars($post['Username']); ?> xem nhật ký</button>
                                     <button class="report-btn" onclick="reportPost(<?php echo $post_id; ?>)">Báo xấu</button>
                                     <button class="unfriend-btn" onclick="unfriendUser(<?php echo $post['UserId']; ?>)">Xóa bạn</button>
@@ -365,18 +432,56 @@ function renderComments($post_id, $comments_by_parent, $parent_id = NULL) {
                         
                     </div>
                     
+                    <?php if ($post['PostType'] == 'album' && !empty($post['Title'])): ?>
+                        <h3 class="post-content" style="font-weight:bold;"><?php echo htmlspecialchars($post['Title']); ?></h3>
+                    <?php endif; ?>
+                    
+                    <?php if (!empty($post['Content'])): ?>
                     <div class="post-content">
                         <?php echo nl2br(htmlspecialchars($post['Content'])); ?>
                     </div>
-                    
-                    <?php if ($post['ImagePath']): ?>
-                        <img src="../../<?php echo htmlspecialchars($post[ 'ImagePath']); ?>" alt="Ảnh bài đăng" class="post-image">
                     <?php endif; ?>
+                    
+                    
+                    <?php
+                    // Chuẩn bị câu lệnh con để lấy ảnh
+                    $sql_images = "SELECT ImagePath FROM post_images WHERE PostId = ? ORDER BY ImageId ASC";
+                    $stmt_images = $conn->prepare($sql_images);
+                    $stmt_images->bind_param("i", $post_id);
+                    $stmt_images->execute();
+                    $result_images = $stmt_images->get_result();
+                    
+                    $images = [];
+                    while ($img = $result_images->fetch_assoc()) {
+                        $images[] = $img['ImagePath'];
+                    }
+                    $stmt_images->close();
+                    
+                    $image_count = count($images);
 
+                    if ($image_count > 0):
+                        $grid_class = '';
+                        if ($image_count == 1) {
+                            $grid_class = 'single-image';
+                        } elseif ($image_count == 3) {
+                            $grid_class = 'three-images';
+                        }
+                    ?>
+                        <div class="post-album-grid <?php echo $grid_class; ?>">
+                            <?php
+                            foreach ($images as $image_path):
+                            ?>
+                                <img src="../../<?php echo htmlspecialchars($image_path); ?>" alt="Ảnh bài đăng">
+                            <?php
+                            endforeach;
+                            ?>
+                        </div>
+                    <?php 
+                    endif; 
+                    ?>
                     <div class="post-interactions">
                         <div class="reaction-buttons-wrapper" id="reaction-wrapper-<?php echo $post_id; ?>">
                             <?php
-                            // Lấy reaction của user HIỆN TẠI
                             $sql_user_emote = "SELECT EmoteId FROM postemotes WHERE PostId = ? AND UserId = ?";
                             $stmt_user_emote = $conn->prepare($sql_user_emote);
                             $stmt_user_emote->bind_param("ii", $post_id, $current_user_id);
@@ -385,7 +490,6 @@ function renderComments($post_id, $comments_by_parent, $parent_id = NULL) {
                             $user_emote_id = ($user_emote_result->num_rows > 0) ? $user_emote_result->fetch_assoc()['EmoteId'] : 0;
                             $stmt_user_emote->close();
                             
-                            // Hiển thị 5 nút
                             foreach ($emotes_map as $emote_id => $emote):
                                 $is_active = ($user_emote_id == $emote_id) ? 'active' : '';
                             ?>
@@ -399,7 +503,6 @@ function renderComments($post_id, $comments_by_parent, $parent_id = NULL) {
                         
                         <div class="post-stats" id="post-stats-<?php echo $post_id; ?>">
                             <?php
-                            // Lấy tổng count và top emotes
                             $sql_stats = "SELECT EmoteId, COUNT(*) as Count 
                                           FROM postemotes 
                                           WHERE PostId = ? 
@@ -435,7 +538,6 @@ function renderComments($post_id, $comments_by_parent, $parent_id = NULL) {
                         $stmt_comments->execute();
                         $result_comments = $stmt_comments->get_result();
                         
-                        // Sắp xếp vào mảng cây
                         $comments_by_parent = [];
                         while($comment = $result_comments->fetch_assoc()) {
                             $comments_by_parent[$comment['ParentCommentId']][] = $comment;
@@ -465,7 +567,7 @@ function renderComments($post_id, $comments_by_parent, $parent_id = NULL) {
                 <?php
                 endwhile;
             else:
-                echo "<p style='text-align: center; color: #aaa;'>Chưa có bài đăng nào.</p>";
+                echo "<p style='text-align: center; color: #aaa;'>Không tìm thấy bài đăng nào. Chỉ bạn bè mới có thể xem nhật ký của nhau.</p>";
             endif;
             
             // Đóng kết nối cuối cùng
@@ -476,12 +578,32 @@ function renderComments($post_id, $comments_by_parent, $parent_id = NULL) {
     </main>
 
     <script>
+        // Script cho Avatar Dropdown
+        document.addEventListener('DOMContentLoaded', function() {
+            const avatarBtn = document.getElementById('avatarBtn');
+            const avatarDropdown = document.getElementById('avatarDropdown');
+            if (avatarBtn && avatarDropdown) {
+                avatarBtn.addEventListener('click', function(event) {
+                    event.stopPropagation(); 
+                    avatarDropdown.classList.toggle('open');
+                });
+                document.addEventListener('click', function(event) {
+                    if (avatarDropdown.classList.contains('open') && !avatarDropdown.contains(event.target)) {
+                        avatarDropdown.classList.remove('open');
+                    }
+                });
+            }
+        });
+    </script>
+    
+    <script>
+        // Script riêng của trang POSTS (cho like, comment, v.v.)
+        
         // Truyền dữ liệu từ PHP sang JS
         const emotesMap = <?php echo json_encode($emotes_map); ?>;
         const currentUsername = <?php echo json_encode($current_username); ?>;
         const currentUserAvatar = '../../' + <?php echo json_encode($current_user_avatar); ?>;
         
-        // Hàm tiện ích để tránh lỗi XSS
         function htmlspecialchars(str) {
             if (typeof str !== 'string') return '';
             return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
@@ -543,7 +665,6 @@ function renderComments($post_id, $comments_by_parent, $parent_id = NULL) {
             const avatar = avatarPath.startsWith('../../') ? avatarPath : '../../' + avatarPath;
             const username = comment.Username ? htmlspecialchars(comment.Username) : htmlspecialchars(currentUsername);
             
-            // Format thời gian: dd/mm/yyyy, hh:mm
             let commentTime = '';
             if (comment.CommentedAt) {
                 const date = new Date(comment.CommentedAt);
@@ -667,7 +788,7 @@ function renderComments($post_id, $comments_by_parent, $parent_id = NULL) {
         }
         
         // -----------------------
-        // [MỚI] 4 HÀM CHO CÁC TÍNH NĂNG MỚI
+        // 4 HÀM CHO CÁC TÍNH NĂNG MỚI
         // -----------------------
 
         function unfriendUser(userId) {
@@ -679,7 +800,7 @@ function renderComments($post_id, $comments_by_parent, $parent_id = NULL) {
             })
             .then(response => response.json())
             .then(data => {
-                alert(data.message); // Thông báo thành công hoặc lỗi
+                alert(data.message); 
             })
             .catch(error => console.error('Lỗi khi hủy kết bạn:', error));
         }
@@ -695,11 +816,7 @@ function renderComments($post_id, $comments_by_parent, $parent_id = NULL) {
             .then(data => {
                 alert(data.message);
                 if (data.status === 'success') {
-                    // Ẩn tất cả bài đăng của user này khỏi DOM
                     document.querySelectorAll(`.post-card[data-user-id="${userId}"]`).forEach(post => post.remove());
-                    // Lưu ý: Cần thêm `data-user-id` vào thẻ `.post-card`
-                    // Hoặc đơn giản là tải lại trang:
-                    location.reload(); 
                 }
             })
             .catch(error => console.error('Lỗi khi ẩn feed:', error));
@@ -707,7 +824,7 @@ function renderComments($post_id, $comments_by_parent, $parent_id = NULL) {
 
         function blockUser(userId) {
             if (!confirm('Người này sẽ không thấy bài đăng của bạn nữa. Bạn chắc chứ?')) { return; }
-            fetch('./../../Handler/Post/php-block-user.php', {
+            fetch('./../../Handler/PostHandler/block-user.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: `user_id=${userId}`
@@ -732,35 +849,6 @@ function renderComments($post_id, $comments_by_parent, $parent_id = NULL) {
             })
             .catch(error => console.error('Lỗi khi báo xấu:', error));
         }
-
-                // Chờ cho toàn bộ trang được tải xong
-        document.addEventListener('DOMContentLoaded', function() {
-            
-            const avatarBtn = document.getElementById('avatarBtn');
-            const avatarDropdown = document.getElementById('avatarDropdown');
-
-            // Kiểm tra xem các phần tử này có tồn tại không
-            // (vì khách truy cập sẽ không thấy chúng)
-            if (avatarBtn && avatarDropdown) {
-                
-                // 1. Khi nhấp vào avatar
-                avatarBtn.addEventListener('click', function(event) {
-                    // Ngăn sự kiện click lan ra ngoài
-                    event.stopPropagation(); 
-                    
-                    // Hiển thị hoặc ẩn dropdown
-                    avatarDropdown.classList.toggle('open');
-                });
-
-                // 2. Khi nhấp ra ngoài (bất cứ đâu trên trang)
-                document.addEventListener('click', function(event) {
-                    // Nếu dropdown đang mở và cú click không nằm trong dropdown
-                    if (avatarDropdown.classList.contains('open') && !avatarDropdown.contains(event.target)) {
-                        avatarDropdown.classList.remove('open');
-                    }
-                });
-            }
-        });
     </script>
 
 </body>

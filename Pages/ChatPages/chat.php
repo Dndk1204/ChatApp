@@ -433,10 +433,12 @@ if ($conn) {
             <div class="avatar-menu">
                 <?php $avatar = ltrim(($_SESSION['avatar'] ?? 'uploads/default-avatar.jpg'), '/'); ?>
                 <img src="../../<?php echo htmlspecialchars($avatar); ?>" alt="avatar" class="avatar-thumb" id="avatarBtn" onerror="this.src='../../uploads/default-avatar.jpg'">
-                <div class="avatar-dropdown" id="avatarDropdown">
-                    <a href="../profile.php">Chỉnh sửa hồ sơ</a>
-                    <a href="../../Handler/logout.php">Logout</a>
-                </div>
+            <div class="avatar-dropdown" id="avatarDropdown">
+                <a href="../profile.php">Chỉnh sửa hồ sơ</a>
+                <a href="../hidden_list.php">Quản lý Ẩn</a>
+                <a href="../blocked_list.php">Quản lý Chặn</a>
+                <a href="../../Handler/logout.php">Logout</a>
+            </div>
             </div>
         <?php else: ?>
             <a href="Pages/login.php" class="btn-text">Login</a>
