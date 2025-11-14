@@ -129,6 +129,44 @@ try {
         .btn-submit:hover {
             background-color: var(--color-primary-dark); /* Lighter accent on hover */
         }
+
+        /* ↓↓↓ THÊM CSS CHO NÚT QUAY LẠI ↓↓↓ */
+        .back-to-posts {
+            display: inline-block;
+            margin-bottom: 15px;
+            font-size: 14px;
+            color: var(--color-accent);
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .back-to-posts:hover {
+            text-decoration: underline;
+            color: var(--color-primary-dark);
+        }
+
+        /* ↓↓↓ CSS MỚI CHO TIÊU ĐỀ FLEX ↓↓↓ */
+        .form-header-flex {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px; /* Bù cho margin của h1 */
+        }
+        .form-header-flex h1 {
+            margin: 0; /* Xóa margin mặc định */
+            flex: 1; /* Đẩy nút về bên trái */
+            text-align: center; /* Căn giữa tiêu đề (tùy chọn) */
+            padding-right: 30px; /* Đảm bảo tiêu đề vẫn ở giữa */
+        }
+        .back-to-posts-icon {
+            display: inline-block;
+            font-size: 26px;
+            font-weight: bold;
+            color: var(--color-accent);
+            text-decoration: none;
+            line-height: 1;
+        }
+        .back-to-posts-icon:hover {
+            color: var(--color-primary-dark);
+        }
     </style>
 </head>
 <body>
@@ -166,7 +204,10 @@ try {
 
     <main class="page-content">
         <div class="form-container">
-            <h1>Chỉnh sửa bài đăng</h1>
+            <div class="form-header-flex">
+                <a href="posts.php" class="back-to-posts-icon">←</a>
+                <h1>Chỉnh sửa bài đăng</h1>
+            </div>
             
             <?php if (isset($_SESSION['error_message'])): ?>
                 <p class="form-error"><?php echo $_SESSION['error_message']; unset($_SESSION['error_message']); ?></p>

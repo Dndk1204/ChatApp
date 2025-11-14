@@ -24,7 +24,11 @@ function admin_render_header($active = '') {
     $stats_active = ($active === 'stats') ? 'class="active"' : '';
     $users_active = ($active === 'users') ? 'class="active"' : '';
     $messages_active = ($active === 'messages') ? 'class="active"' : '';
-    $reports_active = ($active === 'reports') ? 'class="active"' : ''; // Dòng mới
+    $reports_active = ($active === 'reports') ? 'class="active"' : '';
+
+    // Lấy avatar (giống như code public, nhưng thêm ../)
+    $avatar_path = ltrim(($_SESSION['avatar'] ?? 'uploads/default-avatar.jpg'), '/');
+    $avatar_src = '../' . htmlspecialchars($avatar_path); // Thêm ../ để quay lại thư mục gốc
 
     echo '
     <header class="navbar">
@@ -36,14 +40,26 @@ function admin_render_header($active = '') {
         </div>
         <nav class="main-nav">
             <a href="../index.php">HOME</a>
-            <a href="./index.php" ' . $stats_active . '>THỐNG KÊ</a>
+            <a href="./index.php" ' . $stats_active . '>STATISTICS</a>
             <a href="./users.php" ' . $users_active . '>USERS</a>
             <a href="./messages.php" ' . $messages_active . '>MESSAGES</a>
-            <a href="./manage_reports.php" ' . $reports_active . '>BÁO CÁO</a> </nav>
+            <a href="./manage_reports.php" ' . $reports_active . '>REPORT</a> 
+        </nav>
+        
         <div class="auth-buttons">
             <span class="logged-in-user">Admin: ' . $username . '</span>
-            <a href="../Handler/logout.php" class="btn-text">Logout</a>
-        </div>
+            
+            <div class="avatar-menu">
+                <img src="' . $avatar_src . '" alt="avatar" class="avatar-thumb" id="adminAvatarBtn" onerror="this.src=\'../uploads/default-avatar.jpg\'">
+                
+                <div class="avatar-dropdown" id="adminAvatarDropdown">
+                    <a href="../Pages/profile.php">Chỉnh sửa hồ sơ</a>
+					<a href="../Pages/hidden_list.php">Quản lý Ẩn</a>
+                	<a href="../Pages/blocked_list.php">Quản lý Chặn</a>
+                    <a href="../Handler/logout.php">Logout</a>
+                </div>
+            </div>
+            </div>
     </header>';
 }
 
@@ -84,15 +100,38 @@ function admin_get_stats($conn, $hasCreatedAt) {
  * Render HTML head section cho admin pages
  */
 function admin_render_head($title) {
-	echo '<!DOCTYPE html>
+    echo '<!DOCTYPE html>
 <html lang="vi">
 <head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>' . htmlspecialchars($title) . '</title>
-	<link rel="stylesheet" href="../css/admin.css">
-	<link href="https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap" rel="stylesheet">
-</head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>' . htmlspecialchars($title) . '</title>
+    <link rel="stylesheet" href="../css/admin.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap" rel="stylesheet">
+
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Lấy đúng ID mà chúng ta đã đặt trong admin_render_header
+        const avatarBtn = document.getElementById("adminAvatarBtn"); 
+        const avatarDropdown = document.getElementById("adminAvatarDropdown");
+
+        if (avatarBtn && avatarDropdown) {
+            // 1. Khi bấm vào avatar
+            avatarBtn.addEventListener("click", function(event) {
+                event.stopPropagation(); // Ngăn sự kiện lan ra ngoài
+                avatarDropdown.classList.toggle("open");
+            });
+            
+            // 2. Khi bấm ra ngoài
+            document.addEventListener("click", function(event) {
+                if (avatarDropdown.classList.contains("open") && !avatarDropdown.contains(event.target)) {
+                    avatarDropdown.classList.remove("open"); // Tắt menu
+                }
+            });
+        }
+    });
+    </script>
+    </head>
 <body>';
 }
 

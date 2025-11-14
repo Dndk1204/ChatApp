@@ -209,7 +209,7 @@ $current_username = $_SESSION['username'] ?? 'Guest';
               ${buttonHtml}
           </div>
         </div>`;
-      }, 'Không tìm thấy người dùng nào');
+      }, '<p style="padding: 12px 6px; border-radius: 5px;">Không tìm thấy người dùng nào</p>');
       
       searchResults.style.display = 'block';
       
@@ -390,11 +390,11 @@ async function loadRequests() {
   });
 </script>
 <?php 
-        render_global_profile_modal(
-            '/ChatApp/Handler/FriendHandler/friend-handler.php',
-            '/ChatApp/uploads/default-avatar.jpg',
-            '/ChatApp'
-        ); 
-    ?>
+  render_global_profile_modal(
+      '/ChatApp/Handler/FriendHandler/friend-handler.php',
+      '/ChatApp/uploads/default-avatar.jpg',
+      '/ChatApp'
+  ); 
+?>
 </body>
 </html>

@@ -53,6 +53,30 @@ $current_username = $_SESSION['username'] ?? 'Guest';
             box-shadow: 0 0 5px rgba(69, 123, 157, 0.2);
             outline: none;
         }
+
+        /* ↓↓↓ CSS MỚI CHO TIÊU ĐỀ FLEX ↓↓↓ */
+        .form-header-flex {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px; /* Bù cho margin của h2 */
+        }
+        .form-header-flex .form-title { /* Sửa lại h2 */
+            margin: 0; /* Xóa margin mặc định */
+            flex: 1; /* Đẩy nút về bên trái */
+            text-align: center; /* Căn giữa tiêu đề (tùy chọn) */
+            padding-right: 30px; /* Đảm bảo tiêu đề vẫn ở giữa */
+        }
+        .back-to-posts-icon {
+            display: inline-block;
+            font-size: 26px;
+            font-weight: bold;
+            color: var(--color-accent);
+            text-decoration: none;
+            line-height: 1;
+        }
+        .back-to-posts-icon:hover {
+            color: var(--color-primary-dark);
+        }
     </style>
 </head>
 <body>
@@ -93,7 +117,10 @@ $current_username = $_SESSION['username'] ?? 'Guest';
 
     <main class="form-page-content">
         <div class="form-container">
-            <h2 class="form-title">Tạo bài đăng mới</h2>
+            <div class="form-header-flex">
+                <a href="posts.php" class="back-to-posts-icon">←</a>
+                <h2 class="form-title">Tạo bài đăng mới</h2>
+            </div>
 
             <?php
                 if (isset($_SESSION['error_message'])) {
