@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 13, 2025 at 02:50 PM
+-- Generation Time: Nov 14, 2025 at 06:06 AM
 -- Server version: 10.4.32-MariaDB
--- PHP Version: 8.2.12
+-- PHP Version: 8.0.30
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -118,7 +118,9 @@ INSERT INTO `friends` (`FriendId`, `UserId`, `FriendUserId`, `IsConfirmed`) VALU
 (2, 11, 10, 1),
 (3, 20, 14, 0),
 (4, 20, 11, 1),
-(5, 20, 10, 1);
+(5, 20, 10, 1),
+(6, 24, 10, 1),
+(7, 10, 13, 0);
 
 -- --------------------------------------------------------
 
@@ -184,7 +186,12 @@ INSERT INTO `messages` (`MessageId`, `SenderId`, `ReceiverId`, `GroupId`, `Conte
 (9, 11, 13, NULL, '[IMG]uploads/messages/u_11/img_6915806a1c60b.jpg', '2025-11-13 13:53:30', 'text', 0, 0, 0),
 (10, 11, 13, NULL, 'hello', '2025-11-13 13:53:45', 'text', 0, 0, 0),
 (11, 11, 13, NULL, '[IMG]uploads/messages/u_11/img_691594bc8d44f.jpg', '2025-11-13 15:20:12', 'text', 0, 0, 0),
-(12, 11, 13, NULL, '[IMG]uploads/messages/u_11/img_6915954867eac.jpg', '2025-11-13 15:22:32', 'text', 0, 0, 0);
+(12, 11, 13, NULL, '[IMG]uploads/messages/u_11/img_6915954867eac.jpg', '2025-11-13 15:22:32', 'text', 0, 0, 0),
+(13, 24, 13, NULL, 'alo', '2025-11-14 11:22:52', 'text', 0, 0, 0),
+(14, 24, 13, NULL, 'call me a king', '2025-11-14 11:22:55', 'text', 0, 0, 0),
+(15, 24, 13, NULL, 'call me a demon', '2025-11-14 11:23:00', 'text', 0, 0, 0),
+(16, 13, 24, NULL, '[IMG]uploads/messages/u_13/img_6916aee687c03.jpg', '2025-11-14 11:24:06', 'text', 0, 0, 0),
+(17, 13, 24, NULL, 'whoareu', '2025-11-14 11:24:21', 'text', 0, 0, 0);
 
 -- --------------------------------------------------------
 
@@ -247,7 +254,7 @@ CREATE TABLE `users` (
   `Address` varchar(200) DEFAULT NULL,
   `DateOfBirth` date DEFAULT NULL,
   `Gender` varchar(10) DEFAULT NULL,
-  `AvatarPath` varchar(255) NOT NULL DEFAULT '/images/default-avatar.jpg',
+  `AvatarPath` varchar(255) NOT NULL DEFAULT '/uploads/default-avatar.jpg',
   `CreatedAt` datetime NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -258,13 +265,14 @@ CREATE TABLE `users` (
 INSERT INTO `users` (`UserId`, `Username`, `Password`, `Email`, `IsOnline`, `LastSeen`, `Role`, `FullName`, `PhoneNumber`, `Address`, `DateOfBirth`, `Gender`, `AvatarPath`, `CreatedAt`) VALUES
 (9, 'admin', '$2y$10$pWGlzpGyj2cW15NBExjNpORdGqgxchX.nC81BcoGlAZhrJ2bGqF5a', 'admin@gmail.com', 0, '2025-11-13 10:07:48', 'Admin', NULL, NULL, NULL, NULL, NULL, 'uploads/default-avatar.jpg', '2025-11-11 20:17:38'),
 (10, 'khoa', '$2y$10$2qjB9c1d9l5a/vwYjy.eVuhQXX/nQ3huUqYhAsNgMIAn8tHFL.xB6', 'deadordie159@gmail.com', 0, '2025-11-13 10:07:48', 'User', '', NULL, NULL, NULL, NULL, 'uploads/avatars/u_10/avatar_01.jpg', '2025-11-11 20:17:38'),
-(11, 'Khoa1234', '$2y$10$IplhDQCsA859gdWupvBjnuZzJdGVIMxOTHRpZ3WEKPmcLxGtpgF4C', 'deadordie1204@gmail.com', 1, '2025-11-13 10:07:48', 'Admin', 'Đặng Nguyễn Đăng Khoa', NULL, NULL, NULL, 'Khác', 'uploads/avatars/u_11/avatar_07.jpg', '2025-11-11 20:17:38'),
-(13, '64131003', '$2y$10$bSmsuAINZRyOfwbSGMcwcuSTZE8/n4HQXTQUptql4oLcNa2.jwaba', 'a@gmail.com', 1, '2025-11-13 10:07:48', 'User', '', NULL, NULL, NULL, NULL, 'uploads/default-avatar.jpg', '2025-11-11 20:17:38'),
+(11, 'Khoa1234', '$2y$10$IplhDQCsA859gdWupvBjnuZzJdGVIMxOTHRpZ3WEKPmcLxGtpgF4C', 'deadordie1204@gmail.com', 0, '2025-11-13 10:07:48', 'Admin', 'Đặng Nguyễn Đăng Khoa', NULL, NULL, NULL, 'Khác', 'uploads/avatars/u_11/avatar_07.jpg', '2025-11-11 20:17:38'),
+(13, '64131003', '$2y$10$bSmsuAINZRyOfwbSGMcwcuSTZE8/n4HQXTQUptql4oLcNa2.jwaba', 'a@gmail.com', 0, '2025-11-13 10:07:48', 'User', 'HieKoa', '0973318260', 'nha trang', '2004-04-12', 'Nam', 'uploads/avatars/u_13/avatar_01.jpg', '2025-11-11 20:17:38'),
 (14, 'phannhuthao', '$2y$10$3tBJeNsp6R1DcllLaINrd.kS6dPRRInt/1GypSc3lwfB/nMHQ9hR2', 'hao@gmail.com', 0, '2025-11-13 17:18:13', 'User', NULL, NULL, NULL, NULL, NULL, 'uploads/default-avatar.jpg', '2025-11-13 17:18:13'),
 (16, 'yasuo', '$2y$10$BEjIVvCsWfyifRT81wthYuxem8AusqQmMIZLFz60wES.vd4.XS2KK', 'ys@gmail.com', 0, '2025-11-13 17:22:28', 'User', NULL, NULL, NULL, NULL, NULL, 'uploads/default-avatar.jpg', '2025-11-13 17:22:28'),
 (18, 'hao544', '$2y$10$k4wqCjZ9uXwaMb2AqtFipOC509v2ZH6V.TO.UgAq7nkYw/zKIDs2S', 'hao544@gmail.com', 0, '2025-11-13 17:27:30', 'User', NULL, NULL, NULL, NULL, NULL, 'uploads/default-avatar.jpg', '2025-11-13 17:27:30'),
 (20, 'pnhao1234', '$2y$10$a0Noy30P2R1ypWuwxDcPWeWdg93J0l9W7UbAGlKygRvt0gqT.Rt8C', 'pnhao@gmail.com', 0, '2025-11-13 18:54:23', 'Admin', '', NULL, NULL, NULL, NULL, 'uploads/avatars/u_20/avatar_01.jpg', '2025-11-13 18:54:23'),
-(21, 'pnhao123', '$2y$10$ZAp82wJkNniJuOQ5uKXZPua397FphNyfZ6a7ATgi1O4PcuRC0mSp6', 'hao090@gmail.com', 0, '2025-11-13 20:15:02', 'User', NULL, NULL, NULL, NULL, NULL, '/images/default-avatar.jpg', '2025-11-13 20:15:02');
+(21, 'pnhao123', '$2y$10$ZAp82wJkNniJuOQ5uKXZPua397FphNyfZ6a7ATgi1O4PcuRC0mSp6', 'hao090@gmail.com', 0, '2025-11-13 20:15:02', 'User', NULL, NULL, NULL, NULL, NULL, '/images/default-avatar.jpg', '2025-11-13 20:15:02'),
+(24, 'accmoicuatne', '$2y$10$SPY/SCJR8sJipb5hAm2WLujLS27cbk4wXxjD3lhqSoMbUpSfqFTqm', '123456@gmail.com', 1, '2025-11-14 11:18:47', 'Admin', NULL, NULL, NULL, NULL, NULL, 'uploads/default-avatar.jpg', '2025-11-14 11:18:47');
 
 --
 -- Indexes for dumped tables
@@ -412,7 +420,7 @@ ALTER TABLE `emotes`
 -- AUTO_INCREMENT for table `friends`
 --
 ALTER TABLE `friends`
-  MODIFY `FriendId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `FriendId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `groups`
@@ -436,7 +444,7 @@ ALTER TABLE `messageemotes`
 -- AUTO_INCREMENT for table `messages`
 --
 ALTER TABLE `messages`
-  MODIFY `MessageId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `MessageId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
 
 --
 -- AUTO_INCREMENT for table `postemotes`
@@ -460,7 +468,7 @@ ALTER TABLE `reports`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `UserId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
+  MODIFY `UserId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
 
 --
 -- Constraints for dumped tables
@@ -544,6 +552,3 @@ COMMIT;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
-
-ALTER TABLE `users`
-MODIFY `AvatarPath` VARCHAR(255) NOT NULL DEFAULT '/images/default-avatar.jpg';
