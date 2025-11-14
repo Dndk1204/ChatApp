@@ -284,12 +284,12 @@ function toggleOverlay(show, data={}) {
   if (show) {
     selectedFriendId = data.id;
     document.getElementById('overlayName').textContent = data.name;
-    // Đảm bảo avatar hợp lệ
+    // Đảm bảo avatar hợp lệ và thêm timestamp để force reload
     const validAvatar = (data.avatar && data.avatar !== 'null' && data.avatar !== 'undefined' && data.avatar.trim() !== '') 
-      ? '../../' + data.avatar 
+      ? data.avatar 
       : '../../uploads/default-avatar.jpg';
     const overlayAvatarEl = document.getElementById('overlayAvatar');
-    overlayAvatarEl.src = validAvatar;
+    overlayAvatarEl.src = validAvatar + (validAvatar.includes('?') ? '&' : '?') + 't=' + Date.now();
     overlayAvatarEl.onerror = function() {
       this.src = '../../uploads/default-avatar.jpg';
     };
@@ -309,15 +309,31 @@ async function loadFriends() {
     const friends = await fetchPost({action:'fetch_friends'});
     if (JSON.stringify(friends) === JSON.stringify(cachedFriends)) return;
     cachedFriends = friends;
+    
+    // Cập nhật overlay nếu đang mở cho một bạn bè
+    if (selectedFriendId && overlay.style.display === 'flex') {
+      const currentFriend = friends.find(f => f.UserId == selectedFriendId);
+      if (currentFriend) {
+        const avatar = (currentFriend.AvatarPath ? '../../' + currentFriend.AvatarPath : '../../uploads/default-avatar.jpg');
+        const displayName = currentFriend.Username || 'Unknown';
+        const overlayAvatarEl = document.getElementById('overlayAvatar');
+        overlayAvatarEl.src = avatar + '?t=' + Date.now(); // Thêm timestamp để force reload
+        overlayAvatarEl.onerror = function() {
+          this.src = '../../uploads/default-avatar.jpg';
+        };
+        document.getElementById('overlayName').textContent = displayName;
+      }
+    }
+    
     renderList('#friends-list', friends, f => {
       const color = f.IsOnline ? '#43A047' : '#888';
       const status = f.IsOnline ? 'Online' : (f.LastSeen ? timeAgo(f.LastSeen) : 'Offline');
       const avatar = (f.AvatarPath ? '../../' + f.AvatarPath : '../../uploads/default-avatar.jpg');
-      const displayName = (f.FullName || f.Username || 'Unknown').replace(/'/g, "\\'");
+      const displayName = (f.Username || 'Unknown').replace(/'/g, "\\'");
       const escapedAvatar = avatar.replace(/'/g, "\\'");
       return `
       <div class="friend-item" onclick="toggleOverlay(true, {id:${f.UserId}, name:'${displayName}', avatar:'${escapedAvatar}'})" style="cursor: pointer;">
-        <img src="${avatar}" class="avatar-img" onerror="this.src='../../uploads/default-avatar.jpg'">
+        <img src="${avatar}?t=${Date.now()}" class="avatar-img" onerror="this.src='../../uploads/default-avatar.jpg'">
         <div class="friend-info">
           <strong>${displayName}</strong>
           <small>${status}</small>

@@ -443,7 +443,6 @@ header.navbar .auth-buttons a:hover {
 .form-container {
     background: var(--color-card);
     padding: 40px;
-    border-radius: 12px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
     width: 100%;
     max-width: 420px;
@@ -473,7 +472,7 @@ header.navbar .auth-buttons a:hover {
     width: 100%;
     padding: 10px 14px;
     border: 1px solid var(--color-border);
-    border-radius: 8px;
+
     background: var(--color-secondary);
     font-size: 1em;
     color: var(--color-text);
@@ -492,7 +491,6 @@ header.navbar .auth-buttons a:hover {
     background: var(--color-accent);
     color: #fff;
     border: none;
-    border-radius: 8px;
     font-size: 1em;
     font-weight: bold;
     cursor: pointer;
@@ -507,7 +505,6 @@ header.navbar .auth-buttons a:hover {
     color: var(--color-error);
     background: rgba(229, 115, 115, 0.1);
     border: 1px solid var(--color-error);
-    border-radius: 6px;
     padding: 8px 12px;
     margin-bottom: 15px;
     text-align: center;

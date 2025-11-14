@@ -25,7 +25,6 @@ $current_username = $_SESSION['username'] ?? 'Guest';
             padding: 12px 15px;
             background-color: #333333;
             border: 1px solid #555555;
-            border-radius: 5px;
             color: #f0f0f0;
             font-family: 'Roboto Mono', monospace;
             font-size: 1em;
