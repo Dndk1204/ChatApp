@@ -206,7 +206,7 @@ $avatar = ltrim($avatar, '/');
 				<div class="form-group">
 					<label>Ảnh đại diện hiện tại</label>
 					<div style="display:flex;align-items:center;gap:12px;">
-						<img src="../<?php echo htmlspecialchars($avatar); ?>" alt="avatar" style="width:64px;height:64px;border-radius:50%;object-fit:cover;border:1px solid #444;">
+						<img src="../<?php echo htmlspecialchars($avatar); ?>" alt="avatar" style="width:64px;height:64px;border-radius:50%;object-fit:cover;border:1px solid #444;" onerror="this.src='../uploads/default-avatar.jpg'">
 						<input type="file" name="avatar" accept="image/*">
 					</div>
 				</div>
