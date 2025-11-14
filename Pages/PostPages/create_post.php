@@ -23,24 +23,35 @@ $current_username = $_SESSION['username'] ?? 'Guest';
         .form-group textarea {
             width: 100%;
             padding: 12px 15px;
-            background-color: #333333;
-            border: 1px solid #555555;
-            color: #f0f0f0;
-            font-family: 'Roboto Mono', monospace;
+            /* Lấy style từ .form-group input trong style.css */
+            border: 1px solid var(--color-border);
+            background: var(--color-secondary);
             font-size: 1em;
+            color: var(--color-text);
             box-sizing: border-box;
-            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            transition: border 0.2s ease, box-shadow 0.2s ease;
             resize: vertical; /* Cho phép thay đổi kích thước theo chiều dọc */
             min-height: 120px;
         }
         .form-group textarea:focus {
-            border-color: #ff6666;
-            box-shadow: 0 0 5px rgba(255, 102, 102, 0.3);
+            border-color: var(--color-accent);
+            box-shadow: 0 0 5px rgba(69, 123, 157, 0.2);
             outline: none;
         }
-        /* Input file */
-        .form-group input[type="file"] {
-            color: #f0f0f0;
+        /* [MỚI] Style cho ô select */
+        .form-group select {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid var(--color-border);
+            background: var(--color-secondary);
+            font-size: 1em;
+            color: var(--color-text);
+            transition: border 0.2s ease, box-shadow 0.2s ease;
+        }
+        .form-group select:focus {
+            border-color: var(--color-accent);
+            box-shadow: 0 0 5px rgba(69, 123, 157, 0.2);
+            outline: none;
         }
     </style>
 </head>
@@ -103,40 +114,47 @@ $current_username = $_SESSION['username'] ?? 'Guest';
                     <input type="file" id="post-image" name="image" accept="image/png, image/jpeg, image/gif">
                 </div>
                 
+                <div class="form-group">
+                    <label for="privacy">Ai có thể xem bài này?</label>
+                    <select id="privacy" name="privacy">
+                        <option value="friends" selected>Chỉ Bạn bè</option>
+                        <option value="public">Công khai (Mọi người)</option>
+                    </select>
+                </div>
                 <button type="submit" class="btn-submit">Đăng</button>
             </form>
         </div>
     </main>
 
     <script>
-                // Chờ cho toàn bộ trang được tải xong
-        document.addEventListener('DOMContentLoaded', function() {
+            // Chờ cho toàn bộ trang được tải xong
+    document.addEventListener('DOMContentLoaded', function() {
+        
+        const avatarBtn = document.getElementById('avatarBtn');
+        const avatarDropdown = document.getElementById('avatarDropdown');
+
+        // Kiểm tra xem các phần tử này có tồn tại không
+        // (vì khách truy cập sẽ không thấy chúng)
+        if (avatarBtn && avatarDropdown) {
             
-            const avatarBtn = document.getElementById('avatarBtn');
-            const avatarDropdown = document.getElementById('avatarDropdown');
-
-            // Kiểm tra xem các phần tử này có tồn tại không
-            // (vì khách truy cập sẽ không thấy chúng)
-            if (avatarBtn && avatarDropdown) {
+            // 1. Khi nhấp vào avatar
+            avatarBtn.addEventListener('click', function(event) {
+                // Ngăn sự kiện click lan ra ngoài
+                event.stopPropagation(); 
                 
-                // 1. Khi nhấp vào avatar
-                avatarBtn.addEventListener('click', function(event) {
-                    // Ngăn sự kiện click lan ra ngoài
-                    event.stopPropagation(); 
-                    
-                    // Hiển thị hoặc ẩn dropdown
-                    avatarDropdown.classList.toggle('open');
-                });
+                // Hiển thị hoặc ẩn dropdown
+                avatarDropdown.classList.toggle('open');
+            });
 
-                // 2. Khi nhấp ra ngoài (bất cứ đâu trên trang)
-                document.addEventListener('click', function(event) {
-                    // Nếu dropdown đang mở và cú click không nằm trong dropdown
-                    if (avatarDropdown.classList.contains('open') && !avatarDropdown.contains(event.target)) {
-                        avatarDropdown.classList.remove('open');
-                    }
-                });
-            }
-        });
-        </script>
+            // 2. Khi nhấp ra ngoài (bất cứ đâu trên trang)
+            document.addEventListener('click', function(event) {
+                // Nếu dropdown đang mở và cú click không nằm trong dropdown
+                if (avatarDropdown.classList.contains('open') && !avatarDropdown.contains(event.target)) {
+                    avatarDropdown.classList.remove('open');
+                }
+            });
+        }
+    });
+    </script>
 </body>
 </html>
