@@ -15,18 +15,31 @@ $search_query = isset($_GET['search']) ? trim($_GET['search']) : '';
 $users = [];
 
 try {
-    $sql = "SELECT UserId, Username, IsOnline FROM Users WHERE UserId != ?";
-    $params = [$current_user_id];
-    $types = "i";
+    // Query mới: Chỉ lấy những người đã là bạn (IsConfirmed = 1)
+    $sql = "
+        SELECT u.UserId, u.Username, u.IsOnline
+        FROM users u
+        WHERE u.UserId IN (
+            -- Lấy những người mà BẠN đã gửi yêu cầu VÀ đã được chấp nhận
+            SELECT FriendUserId FROM friends WHERE UserId = ? AND IsConfirmed = 1
+            UNION
+            -- Lấy những người đã gửi yêu cầu cho BẠN VÀ bạn đã chấp nhận
+            SELECT UserId FROM friends WHERE FriendUserId = ? AND IsConfirmed = 1
+        )
+    ";
+    
+    // Gán 2 tham số ID của bạn vào
+    $params = [$current_user_id, $current_user_id];
+    $types = "ii";
 
+    // Thêm điều kiện tìm kiếm (nếu có)
     if (!empty($search_query)) {
-        // Tìm kiếm theo Username chứa chuỗi tìm kiếm
-        $sql .= " AND Username LIKE ?";
+        $sql .= " AND u.Username LIKE ?";
         $params[] = "%" . $search_query . "%";
         $types .= "s";
     }
 
-    $sql .= " ORDER BY IsOnline DESC, Username ASC"; // Ưu tiên hiển thị online lên trên
+    $sql .= " ORDER BY u.IsOnline DESC, u.Username ASC";
 
     $stmt = $conn->prepare($sql);
 

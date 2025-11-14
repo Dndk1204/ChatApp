@@ -276,7 +276,7 @@ function renderComments($post_id, $comments_by_parent, $parent_id = NULL) {
 <body>
     <header class="navbar">
     <div class="logo">
-        <a href="index.php">
+        <a href="../../index.php">
             <div class="logo-circle"></div>
             <span>ChatApp</span>
         </a>

@@ -182,4 +182,112 @@ function admin_handle_post($callback) {
 	return ['success' => $flash_success, 'error' => $flash_error];
 }
 
+function admin_render_confirm_modal() {
+    
+    // 1. CSS cho modal
+    echo '
+<style>
+#admin-confirm-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.5);
+    display: none; /* Ẩn ban đầu */
+    justify-content: center;
+    align-items: center;
+    z-index: 10001; /* Nằm trên mọi thứ */
+    font-family: Arial, sans-serif;
+}
+.admin-confirm-box {
+    background: #fff;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,.2);
+    width: 360px;
+    text-align: center;
+}
+.admin-confirm-box p {
+    margin: 0 0 20px 0;
+    font-size: 16px;
+    color: #333;
+    line-height: 1.5;
+}
+.admin-confirm-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+.admin-confirm-actions button {
+    padding: 10px 20px;
+    font-size: 14px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+}
+/* Sử dụng lại class .btn từ admin.css của bạn */
+.admin-confirm-actions .btn-secondary {
+    background: #6F9DE1; color: #fff;
+}
+.admin-confirm-actions .btn-danger {
+    background: #dc3545; color: #fff;
+}
+</style>';
+    
+    // 2. HTML cho modal
+    echo '
+<div id="admin-confirm-overlay" onclick="adminHideConfirm()">
+    <div class="admin-confirm-box" onclick="event.stopPropagation()">
+        <p id="admin-confirm-message">Bạn có chắc chắn?</p>
+        <div class="admin-confirm-actions">
+            <button id="admin-confirm-btn-cancel" class="btn btn-danger">Hủy</button>
+            <button id="admin-confirm-btn-ok" class="btn btn-secondary">Xác nhận</button>
+        </div>
+    </div>
+</div>';
+    
+    // 3. JavaScript cho modal
+    echo '
+<script>
+// Lấy các phần tử DOM
+const ADMIN_CONFIRM_OVERLAY = document.getElementById("admin-confirm-overlay");
+const ADMIN_CONFIRM_MESSAGE = document.getElementById("admin-confirm-message");
+const ADMIN_CONFIRM_BTN_OK = document.getElementById("admin-confirm-btn-ok");
+const ADMIN_CONFIRM_BTN_CANCEL = document.getElementById("admin-confirm-btn-cancel");
 
+// Biến toàn cục để lưu hành động (callback)
+let admin_confirmCallback = null;
+
+/**
+ * Hiển thị popup với một tin nhắn và một hành động
+ * @param {string} message Tin nhắn cần hiển thị
+ * @param {function} onConfirm Hàm sẽ chạy khi bấm "Xác nhận"
+ */
+function adminShowConfirm(message, onConfirm) {
+    if (!ADMIN_CONFIRM_OVERLAY) return;
+    ADMIN_CONFIRM_MESSAGE.textContent = message;
+    admin_confirmCallback = onConfirm; // Lưu lại hành động
+    ADMIN_CONFIRM_OVERLAY.style.display = "flex";
+}
+
+/**
+ * Ẩn popup
+ */
+function adminHideConfirm() {
+    if (!ADMIN_CONFIRM_OVERLAY) return;
+    ADMIN_CONFIRM_OVERLAY.style.display = "none";
+    admin_confirmCallback = null; // Xóa hành động
+}
+
+// Gán sự kiện cho các nút
+if (ADMIN_CONFIRM_BTN_CANCEL) {
+    ADMIN_CONFIRM_BTN_CANCEL.onclick = adminHideConfirm;
+}
+if (ADMIN_CONFIRM_BTN_OK) {
+    ADMIN_CONFIRM_BTN_OK.onclick = () => {
+        if (typeof admin_confirmCallback === "function") {
+            admin_confirmCallback(); // Chạy hành động
+        }
+        adminHideConfirm(); // Ẩn popup
+    };
+}
+</script>';
+}

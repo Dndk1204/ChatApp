@@ -51,7 +51,6 @@ if ($conn) {
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
         }
 
-        /* === DANH SÁCH NGƯỜI DÙNG === */
         .user-list {
             width: 30%;
             min-width: 250px;
@@ -222,285 +221,199 @@ if ($conn) {
             font-weight: bold;
         }
 
-        /* ========================================= */
-            /* NAVBAR + AVATAR DROPDOWN                  */
-            /* ========================================= */
-            header.navbar {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                background: var(--color-primary);
-                padding: 12px 24px;
-                border-bottom: 2px solid var(--color-border);
-                box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-                position: relative;
-            }
+        /* === NHẬP TIN NHẮN === */
+        .message-input-area {
+            padding: 10px 15px;
+            background-color: var(--color-primary);
+            border-top: 1px solid var(--color-border);
+            display: flex;
+            align-items: center;
+            flex-shrink: 0;
+            position: relative; 
+        }
 
-            header.navbar .logo a {
-                text-decoration: none;
-                color: var(--color-text);
-                font-weight: bold;
-                font-size: 1.2em;
-            }
+        #emoji-picker {
+            display: none; /* 1. Ẩn ban đầu */
+            position: absolute;
+            bottom: 100%; /* 2. Hiển thị ngay trên thanh input */
+            left: 0;
+            
+            width: 300px; /* Độ rộng của bảng */
+            background: #ffffff;
+            border: 1px solid #D0E2E2; /* Dùng màu border của bạn */
+            border-radius: 8px;
+            padding: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 10;
+            margin-bottom: 5px; /* Khoảng cách đến thanh input */
+        }
 
-            header.navbar .main-nav a,
-            header.navbar .auth-buttons a {
-                color: var(--color-text);
-                text-decoration: none;
-                margin-left: 20px;
-                font-size: 0.9em;
-                transition: color 0.2s ease;
-                font-weight: bold;
-            }
+        #emoji-picker.open {
+            display: flex; /* 3. Hiện ra khi có class 'open' */
+            flex-wrap: wrap; /* Cho phép các emoji xuống dòng */
+            gap: 5px; /* Khoảng cách giữa các emoji */
+        }
 
-            header.navbar .main-nav a:hover,
-            header.navbar .auth-buttons a:hover {
-                color: var(--color-accent);
-            }
+        .emoji-item {
+            font-size: 1.5rem; /* Kích cỡ emoji */
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+            transition: background 0.1s;
+        }
 
-            /* Avatar + Username */
-            .auth-buttons {
-                display: flex;
-                align-items: center;
-                gap: 8px;
-                position: relative;
-            }
+        .emoji-item:hover {
+            background: #f0f0f0; /* Màu khi di chuột qua */
+        }
+        
+        .input-group {
+            display: flex;
+            flex-grow: 1;
+            border-radius: 20px;
+            background-color: var(--color-secondary);
+            margin-right: 10px;
+        }
 
-            .avatar-menu {
-                position: relative;
-            }
+        .message-input-area input[type="text"] {
+            flex-grow: 1;
+            padding: 10px 15px;
+            border-radius: 20px;
+            border: none;
+            background-color: transparent;
+            color: var(--color-text);
+            font-family: 'Roboto Mono', monospace;
+            font-size: 1em;
+            outline: none;
+        }
+        .input-button {
+            background: none;
+            border: none;
+            color: var(--color-accent);
+            font-size: 1.5em;
+            cursor: pointer;
+            padding: 0 10px;
+            transition: color 0.2s;
+            line-height: 1;
+        }
 
-            .avatar-thumb {
-                width: 40px;
-                height: 40px;
-                border-radius: 50%;
-                object-fit: cover;
-                border: 2px solid var(--color-primary-dark);
-                cursor: pointer;
-                transition: transform 0.2s ease, box-shadow 0.2s ease;
-            }
+        .input-button:hover { color: var(--color-text); }
 
-            .avatar-thumb:hover {
-                transform: scale(1.05);
-                box-shadow: 0 0 10px rgba(69,123,157,0.3);
-            }
+        #send-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 20px;
+            background-color: var(--color-accent);
+            color: var(--color-card);
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            font-family: 'Roboto Mono', monospace;
+        }
 
-            /* Dropdown */
-            .avatar-dropdown {
-                position: absolute;
-                right: 0;
-                top: 50px; /* cách avatar */
-                background: var(--color-card);
-                border: 1px solid var(--color-border);
-                border-radius: 8px;
-                min-width: 180px;
-                box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-                display: none;
-                z-index: 50;
+        #send-btn:disabled { background-color: var(--color-text-muted); cursor: not-allowed; }
+        #send-btn:hover:not(:disabled) { background-color: var(--color-primary-dark); }
+
+        /* === EMOJI PICKER === */
+        #emoji-picker {
+            position: absolute;
+            bottom: 100%;
+            left: 0;
+            background: #1f1f1f;
+            border: 1px solid #444;
+            border-radius: 8px 8px 0 0;
+            padding: 10px;
+            display: none;
+            z-index: 10;
+            max-width: 300px;
+        }
+        #emoji-picker.open { display: block; }
+        .emoji-item {
+            cursor: pointer;
+            font-size: 1.5em;
+            padding: 5px;
+            display: inline-block;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+        .emoji-item:hover { background: #333; }
+
+        /* === MEDIA VIEWER === */
+        #media-viewer {
+            width: 30%;
+            min-width: 200px;
+            background-color: #F7F7F7FF;
+            border-left: 1px solid #444;
+            display: none;
+            flex-direction: column;
+            padding: 15px;
+            overflow-y: auto;
+            flex-shrink: 0;
+        }
+        #media-viewer.open { display: flex; }
+        .media-viewer-title {
+            color: #282525FF;
+            font-size: 1.1em;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #444;
+            text-align: center;
+        }
+        .media-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .media-item {
+            width: calc(50% - 5px);
+            height: 100px;
+            overflow: hidden;
+            border-radius: 4px;
+            cursor: pointer;
+            border: 1px solid #444;
+        }
+        .media-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* === RESPONSIVE === */
+        @media (max-width: 768px) {
+            .chat-container {
                 flex-direction: column;
-                overflow: hidden;
+                height: calc(100vh - 55px);
             }
-
-            .avatar-dropdown.open {
-                display: flex;
+            .user-list {
+                width: 100%;
+                max-width: 100%;
+                height: 200px;
+                min-height: 150px;
+                border-right: none;
+                border-bottom: 1px solid #444;
             }
-
-            .avatar-dropdown a {
-                display: block;
-                padding: 10px 12px;
-                color: var(--color-text);
-                text-decoration: none;
-                border-bottom: 1px solid var(--color-border);
-                font-weight: 500;
-                transition: background 0.2s ease;
+            .chat-area-wrapper { flex-direction: column; }
+            .chat-area, .chat-area.with-media-viewer { width: 100%; }
+            #media-viewer {
+                width: 100%;
+                height: 200px;
+                border-left: none;
+                border-top: 1px solid #444;
             }
+            .navbar { padding: 10px 20px; }
+            .main-nav { display: none; }
+        }
 
-            .avatar-dropdown a:last-child {
-                border-bottom: none;
-            }
-
-            .avatar-dropdown a:hover {
-                background: var(--color-secondary);
-            }
-
-            /* RESPONSIVE */
-            @media (max-width: 768px) {
-                header.navbar {
-                    flex-direction: column;
-                    align-items: flex-start;
-                    padding: 12px 15px;
-                    gap: 8px;
-                }
-                .auth-buttons {
-                    width: 100%;
-                    justify-content: space-between;
-                }
-                .avatar-dropdown {
-                    top: 45px;
-                    right: 0;
-                    min-width: 150px;
-                }
-            }
-
-
-                    /* === NHẬP TIN NHẮN === */
-                    .message-input-area {
-                        padding: 10px 15px;
-                        background-color: var(--color-primary);
-                        border-top: 1px solid var(--color-border);
-                        display: flex;
-                        align-items: center;
-                        flex-shrink: 0;
-                    }
-                    .input-group {
-                        display: flex;
-                        flex-grow: 1;
-                        border-radius: 20px;
-                        background-color: var(--color-secondary);
-                        margin-right: 10px;
-                    }
-
-                    .message-input-area input[type="text"] {
-                        flex-grow: 1;
-                        padding: 10px 15px;
-                        border-radius: 20px;
-                        border: none;
-                        background-color: transparent;
-                        color: var(--color-text);
-                        font-family: 'Roboto Mono', monospace;
-                        font-size: 1em;
-                        outline: none;
-                    }
-                    .input-button {
-                        background: none;
-                        border: none;
-                        color: var(--color-accent);
-                        font-size: 1.5em;
-                        cursor: pointer;
-                        padding: 0 10px;
-                        transition: color 0.2s;
-                        line-height: 1;
-                    }
-
-                    .input-button:hover { color: var(--color-text); }
-
-                    #send-btn {
-                        padding: 10px 20px;
-                        border: none;
-                        border-radius: 20px;
-                        background-color: var(--color-accent);
-                        color: var(--color-card);
-                        font-weight: bold;
-                        cursor: pointer;
-                        transition: background-color 0.2s;
-                        font-family: 'Roboto Mono', monospace;
-                    }
-
-                    #send-btn:disabled { background-color: var(--color-text-muted); cursor: not-allowed; }
-                    #send-btn:hover:not(:disabled) { background-color: var(--color-primary-dark); }
-
-                    /* === EMOJI PICKER === */
-                    #emoji-picker {
-                        position: absolute;
-                        bottom: 100%;
-                        left: 0;
-                        background: #1f1f1f;
-                        border: 1px solid #444;
-                        border-radius: 8px 8px 0 0;
-                        padding: 10px;
-                        display: none;
-                        z-index: 10;
-                        max-width: 300px;
-                    }
-                    #emoji-picker.open { display: block; }
-                    .emoji-item {
-                        cursor: pointer;
-                        font-size: 1.5em;
-                        padding: 5px;
-                        display: inline-block;
-                        border-radius: 4px;
-                        transition: background 0.2s;
-                    }
-                    .emoji-item:hover { background: #333; }
-
-                    /* === MEDIA VIEWER === */
-                    #media-viewer {
-                        width: 30%;
-                        min-width: 200px;
-                        background-color: #F7F7F7FF;
-                        border-left: 1px solid #444;
-                        display: none;
-                        flex-direction: column;
-                        padding: 15px;
-                        overflow-y: auto;
-                        flex-shrink: 0;
-                    }
-                    #media-viewer.open { display: flex; }
-                    .media-viewer-title {
-                        color: #282525FF;
-                        font-size: 1.1em;
-                        margin-bottom: 15px;
-                        padding-bottom: 10px;
-                        border-bottom: 1px solid #444;
-                        text-align: center;
-                    }
-                    .media-grid {
-                        display: flex;
-                        flex-wrap: wrap;
-                        gap: 10px;
-                    }
-                    .media-item {
-                        width: calc(50% - 5px);
-                        height: 100px;
-                        overflow: hidden;
-                        border-radius: 4px;
-                        cursor: pointer;
-                        border: 1px solid #444;
-                    }
-                    .media-item img {
-                        width: 100%;
-                        height: 100%;
-                        object-fit: cover;
-                    }
-
-                    /* === RESPONSIVE === */
-                    @media (max-width: 768px) {
-                        .chat-container {
-                            flex-direction: column;
-                            height: calc(100vh - 55px);
-                        }
-                        .user-list {
-                            width: 100%;
-                            max-width: 100%;
-                            height: 200px;
-                            min-height: 150px;
-                            border-right: none;
-                            border-bottom: 1px solid #444;
-                        }
-                        .chat-area-wrapper { flex-direction: column; }
-                        .chat-area, .chat-area.with-media-viewer { width: 100%; }
-                        #media-viewer {
-                            width: 100%;
-                            height: 200px;
-                            border-left: none;
-                            border-top: 1px solid #444;
-                        }
-                        .navbar { padding: 10px 20px; }
-                        .main-nav { display: none; }
-                    }
-
-                    p {
-                        padding: 0;
-                        margin: 0;
-                    }
+        p {
+            padding: 0;
+            margin: 0;
+        }
 
     </style>
 </head>
 <body>
-
     <header class="navbar">
     <div class="logo">
-        <a href="index.php">
+        <a href="../../index.php">
             <div class="logo-circle"></div>
             <span>ChatApp</span>
         </a>
