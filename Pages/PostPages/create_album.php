@@ -15,11 +15,87 @@ $current_username = $_SESSION['username'] ?? 'Guest';
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tạo Album mới - ChatApp</title>
     <link rel="stylesheet" href="./../../css/style.css">
-    </head>
+    <style>
+        .form-header-flex {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px; /* Bù cho margin của h2 */
+        }
+        .form-header-flex .form-title { /* Sửa lại h2 */
+            margin: 0; /* Xóa margin mặc định */
+            flex: 1; /* Đẩy nút về bên trái */
+            text-align: center; /* Căn giữa tiêu đề (tùy chọn) */
+            padding-right: 30px; /* Đảm bảo tiêu đề vẫn ở giữa */
+        }
+        .back-to-posts-icon {
+            display: inline-block;
+            font-size: 26px;
+            font-weight: bold;
+            color: var(--color-accent);
+            text-decoration: none;
+            line-height: 1;
+        }
+        .back-to-posts-icon:hover {
+            color: var(--color-primary-dark);
+        }
+        
+        /* Style cho các form trong file này (lấy từ create_post.php) */
+         .form-group textarea, .form-group select {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid var(--color-border);
+            background: var(--color-secondary);
+            font-size: 1em;
+            color: var(--color-text);
+            transition: border 0.2s ease, box-shadow 0.2s ease;
+        }
+         .form-group textarea {
+            min-height: 120px;
+            resize: vertical;
+         }
+    </style>
+</head>
 <body>
+    <header class="navbar">
+        <div class="logo">
+            <a href="index.php">
+                <div class="logo-circle"></div>
+                <span>ChatApp</span>
+            </a>
+        </div>
+        <nav class="main-nav">
+            <a href="../../index.php">HOME</a>
+            <a href="../../Pages/PostPages/posts.php">POSTS</a>
+            <a href="../../Pages/ChatPages/chat.php">CHAT</a>
+            <a href="../../Pages/FriendPages/friends.php">FRIENDS</a>
+            <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'Admin'): ?>
+                <a href="../../admin_dashboard.php">ADMIN</a>
+            <?php endif; ?>
+        </nav>
+        <div class="auth-buttons">
+            <?php if (isset($_SESSION['user_id'])): ?>
+                <span class="logged-in-user">Xin chào, <?php echo htmlspecialchars($current_username); ?></span>
+                <div class="avatar-menu">
+                    <?php $avatar = ltrim(($_SESSION['avatar'] ?? 'uploads/default-avatar.jpg'), '/'); ?>
+                    <img src="../../<?php echo htmlspecialchars($avatar); ?>" alt="avatar" class="avatar-thumb" id="avatarBtn">
+                    <div class="avatar-dropdown" id="avatarDropdown">
+                        <a href="../profile.php">Chỉnh sửa hồ sơ</a>
+                        <a href="../../Handler/logout.php">Logout</a>
+                    </div>
+                </div>
+            <?php else: ?>
+                <a href="Pages/login.php" class="btn-text">Login</a>
+                <a href="Pages/register.php" class="btn-text">Register</a>
+            <?php endif; ?>
+        </div>
+    </header>
+
     <main class="form-page-content">
         <div class="form-container">
-            <h2 class="form-title">Tạo Album Mới</h2>
+            <div class="form-header-flex">
+                <a href="posts.php" class="back-to-posts-icon">←</a>
+                <h2 class="form-title">Tạo Album Mới</h2>
+            </div>
 
             <?php
                 if (isset($_SESSION['error_message'])) {

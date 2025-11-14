@@ -109,8 +109,8 @@ $current_username = $_SESSION['username'] ?? 'Guest';
                 <img src="<?php echo htmlspecialchars($avatar); ?>" alt="avatar" class="avatar-thumb" id="avatarBtn">
             <div class="avatar-dropdown" id="avatarDropdown">
                 <a href="Pages/profile.php">Chỉnh sửa hồ sơ</a>
-                <a href="Pages/PostPages/hidden_list.php">Quản lý Ẩn</a> 
-                <a href="blocked_list.php">Quản lý Chặn</a>
+                <a href="Pages/hidden_list.php">Quản lý Ẩn</a> 
+                <a href="Pages/blocked_list.php">Quản lý Chặn</a>
                 <a href="Handler/logout.php">Logout</a>
             </div>
             </div>

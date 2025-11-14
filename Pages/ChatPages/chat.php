@@ -737,7 +737,7 @@ if ($conn) {
                         const imagePath = msg.FilePath.startsWith('/') ? msg.FilePath.substring(1) : msg.FilePath;
                         const mediaItem = document.createElement('div');
                         mediaItem.className = 'media-item';
-                        mediaItem.innerHTML = `<img src="${htmlspecialchars(imagePath)}" alt="Shared Image" onclick="viewImage(this.src)">`;
+                        mediaItem.innerHTML = `<img src="./../../${htmlspecialchars(imagePath)}" alt="Shared Image" onclick="viewImage(this.src)">`;
                         mediaGrid.appendChild(mediaItem);
                         mediaCount++;
                     }

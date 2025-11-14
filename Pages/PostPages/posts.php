@@ -1,6 +1,7 @@
 <?php
 session_start();
 require_once '../../Handler/db.php';
+require_once '../../Handler/FriendHandler/friend_helpers.php';
 
 if (!isset($_SESSION['user_id'])) {
     header("Location: ../login.php");
@@ -48,7 +49,7 @@ function renderComments($post_id, $comments_by_parent, $parent_id = NULL) {
                     <span class="comment-text"><?php echo htmlspecialchars($comment['Content']); ?></span>
                 </div>
                 <div class="comment-meta">
-                    <span class="comment-time"><?php echo isset($comment['CommentedAt']) ? date('d/m/Y \lúc H:i', strtotime($comment['CommentedAt'])) : ''; ?></span>
+                    <span class="comment-time"><?php echo isset($comment['CommentedAt']) ? date('H:i, d/m/Y', strtotime($comment['CommentedAt'])) : ''; ?></span>
                 </div>
                 <div class="comment-actions">
                     <button class="reply-btn" onclick="setReply(<?php echo $post_id; ?>, <?php echo $comment_id; ?>, '<?php echo htmlspecialchars($comment['Username']); ?>')">
@@ -291,6 +292,7 @@ function renderComments($post_id, $comments_by_parent, $parent_id = NULL) {
             box-shadow: 0 2px 10px rgba(0,0,0,0.2);
             overflow: hidden; z-index: 10;
             border: 1px solid #EEE;
+            width: 150px;
         }
         .options-dropdown a, .options-dropdown button {
             display: block; padding: 10px 15px; color: var(--color-text);
@@ -298,13 +300,14 @@ function renderComments($post_id, $comments_by_parent, $parent_id = NULL) {
             border: none; width: 100%; text-align: left; cursor: pointer;
         }
         .options-dropdown a:hover, .options-dropdown button:hover { 
-            background-color: var(--color-secondary); 
+            background-color: var(--color-bg); 
+            color: black;
         }
         .options-dropdown .delete-btn:hover,
         .options-dropdown .unfriend-btn:hover,
         .options-dropdown .report-btn:hover {
-            background-color: var(--color-danger); /* Giữ màu đỏ */
-            color: #FFFFFF;
+            background-color: var(--color-bg); /* Giữ màu đỏ */
+            color: black;
         }
         .options-dropdown.show { display: block; }
     </style>
@@ -407,7 +410,7 @@ function renderComments($post_id, $comments_by_parent, $parent_id = NULL) {
                         <img src="../../<?php echo htmlspecialchars($post['AvatarPath'] ?: 'uploads/default-avatar.jpg'); ?>" alt="Avatar" class="post-avatar">
                         <div class="post-user-info">
                             <span class="post-username"><?php echo htmlspecialchars($post['Username']); ?></span>
-                            <span class="post-time"><?php echo date('d/m/Y \lúc H:i', strtotime($post['PostedAt'])); ?></span>
+                            <span class="post-time"><?php echo date('H:i, d/m/Y', strtotime($post['PostedAt'])); ?></span>
                             <span class="post-privacy-icon">
                                 <?php echo ($post['Privacy'] == 'public') ? '🌍 Công khai' : '👥 Bạn bè'; ?>
                             </span>
@@ -597,179 +600,190 @@ function renderComments($post_id, $comments_by_parent, $parent_id = NULL) {
     </script>
     
     <script>
-        // Script riêng của trang POSTS (cho like, comment, v.v.)
-        
-        // Truyền dữ liệu từ PHP sang JS
-        const emotesMap = <?php echo json_encode($emotes_map); ?>;
-        const currentUsername = <?php echo json_encode($current_username); ?>;
-        const currentUserAvatar = '../../' + <?php echo json_encode($current_user_avatar); ?>;
-        
-        function htmlspecialchars(str) {
-            if (typeof str !== 'string') return '';
-            return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
-        }
+    // Script riêng của trang POSTS (cho like, comment, v.v.)
+    
+    // Truyền dữ liệu từ PHP sang JS
+    const emotesMap = <?php echo json_encode($emotes_map); ?>;
+    const currentUsername = <?php echo json_encode($current_username); ?>;
+    const currentUserAvatar = '../../' + <?php echo json_encode($current_user_avatar); ?>;
+    
+    function htmlspecialchars(str) {
+        if (typeof str !== 'string') return '';
+        return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+    }
 
-        // -----------------------------
-        // XỬ LÝ REACTION (AJAX)
-        // -----------------------------
-        function handleReaction(postId, emoteId) {
-            const statsContainer = document.getElementById(`post-stats-${postId}`);
-            const topEmotesSpan = statsContainer.querySelector('.top-emotes-display');
-            const totalCountSpan = statsContainer.querySelector('.total-reactions-count');
-            const buttonWrapper = document.getElementById(`reaction-wrapper-${postId}`);
-            const allButtons = buttonWrapper.querySelectorAll('.reaction-btn');
+    // -----------------------------
+    // XỬ LÝ REACTION (AJAX)
+    // -----------------------------
+    function handleReaction(postId, emoteId) {
+        // ... (Code này giữ nguyên) ...
+        const statsContainer = document.getElementById(`post-stats-${postId}`);
+        const topEmotesSpan = statsContainer.querySelector('.top-emotes-display');
+        const totalCountSpan = statsContainer.querySelector('.total-reactions-count');
+        const buttonWrapper = document.getElementById(`reaction-wrapper-${postId}`);
+        const allButtons = buttonWrapper.querySelectorAll('.reaction-btn');
 
-            fetch('./../../Handler/PostHandler/handle-reaction.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: `post_id=${postId}&emote_id=${emoteId}`
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    totalCountSpan.textContent = data.reactionCount > 0 ? data.reactionCount : '';
-                    let topHtml = '';
-                    data.topEmotes.forEach(id => {
-                        topHtml += emotesMap[id]['unicode'];
-                    });
-                    topEmotesSpan.textContent = topHtml;
-                    allButtons.forEach(btn => btn.classList.remove('active'));
-                    if (data.currentUserEmote > 0) {
-                        const activeButton = buttonWrapper.querySelector(`.reaction-btn[data-emote-id="${data.currentUserEmote}"]`);
-                        if(activeButton) activeButton.classList.add('active');
-                    }
-                } else {
-                    alert('Lỗi Reaction: ' + data.message);
+        fetch('./../../Handler/PostHandler/handle-reaction.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: `post_id=${postId}&emote_id=${emoteId}`
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                totalCountSpan.textContent = data.reactionCount > 0 ? data.reactionCount : '';
+                let topHtml = '';
+                data.topEmotes.forEach(id => {
+                    topHtml += emotesMap[id]['unicode'];
+                });
+                topEmotesSpan.textContent = topHtml;
+                allButtons.forEach(btn => btn.classList.remove('active'));
+                if (data.currentUserEmote > 0) {
+                    const activeButton = buttonWrapper.querySelector(`.reaction-btn[data-emote-id="${data.currentUserEmote}"]`);
+                    if(activeButton) activeButton.classList.add('active');
                 }
-            })
-            .catch(error => console.error('Lỗi khi reaction:', error));
-        }
-
-        // -----------------------
-        // XỬ LÝ COMMENT (AJAX)
-        // -----------------------
-        function setReply(postId, commentId, username) {
-            document.getElementById(`parent-id-input-${postId}`).value = commentId;
-            document.getElementById(`reply-username-${postId}`).textContent = username;
-            document.getElementById(`reply-info-${postId}`).style.display = 'block';
-            document.getElementById(`comment-input-${postId}`).focus();
-        }
-
-        function cancelReply(postId) {
-            document.getElementById(`parent-id-input-${postId}`).value = '0';
-            document.getElementById(`reply-info-${postId}`).style.display = 'none';
-        }
-
-        function createCommentHtml(comment, postId) {
-            const avatarPath = comment.AvatarPath ? htmlspecialchars(comment.AvatarPath) : htmlspecialchars(currentUserAvatar);
-            const avatar = avatarPath.startsWith('../../') ? avatarPath : '../../' + avatarPath;
-            const username = comment.Username ? htmlspecialchars(comment.Username) : htmlspecialchars(currentUsername);
-            
-            let commentTime = '';
-            if (comment.CommentedAt) {
-                const date = new Date(comment.CommentedAt);
-                const day = String(date.getDate()).padStart(2, '0');
-                const month = String(date.getMonth() + 1).padStart(2, '0');
-                const year = date.getFullYear();
-                const hours = String(date.getHours()).padStart(2, '0');
-                const minutes = String(date.getMinutes()).padStart(2, '0');
-                commentTime = `${day}/${month}/${year}, ${hours}:${minutes}`;
+            } else {
+                alert('Lỗi Reaction: ' + data.message);
             }
-            
-            return `
-                <div class="comment" id="comment-${comment.CommentId}">
-                    <img src="${avatar}" alt="Avatar" class="comment-avatar">
-                    <div class="comment-bubble">
-                        <div class="comment-content">
-                            <span class="comment-username">${username}:</span>
-                            <span class="comment-text">${htmlspecialchars(comment.Content)}</span>
-                        </div>
-                        <div class="comment-meta">
-                            <span class="comment-time">${commentTime}</span>
-                        </div>
-                        <div class="comment-actions">
-                            <button class="reply-btn" onclick="setReply(${postId}, ${comment.CommentId}, '${username}')">Trả lời</button>
-                        </div>
+        })
+        .catch(error => console.error('Lỗi khi reaction:', error));
+    }
+
+    // -----------------------
+    // XỬ LÝ COMMENT (AJAX)
+    // -----------------------
+    function setReply(postId, commentId, username) {
+        // ... (Code này giữ nguyên) ...
+        document.getElementById(`parent-id-input-${postId}`).value = commentId;
+        document.getElementById(`reply-username-${postId}`).textContent = username;
+        document.getElementById(`reply-info-${postId}`).style.display = 'block';
+        document.getElementById(`comment-input-${postId}`).focus();
+    }
+
+    function cancelReply(postId) {
+        // ... (Code này giữ nguyên) ...
+        document.getElementById(`parent-id-input-${postId}`).value = '0';
+        document.getElementById(`reply-info-${postId}`).style.display = 'none';
+    }
+
+    function createCommentHtml(comment, postId) {
+        // ... (Code này giữ nguyên) ...
+        const avatarPath = comment.AvatarPath ? htmlspecialchars(comment.AvatarPath) : htmlspecialchars(currentUserAvatar);
+        const avatar = avatarPath.startsWith('../../') ? avatarPath : '../../' + avatarPath;
+        const username = comment.Username ? htmlspecialchars(comment.Username) : htmlspecialchars(currentUsername);
+        
+        let commentTime = '';
+        if (comment.CommentedAt) {
+            const date = new Date(comment.CommentedAt);
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const year = date.getFullYear();
+            const hours = String(date.getHours()).padStart(2, '0');
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+            commentTime = `${day}/${month}/${year}, ${hours}:${minutes}`;
+        }
+        
+        return `
+            <div class="comment" id="comment-${comment.CommentId}">
+                <img src="${avatar}" alt="Avatar" class="comment-avatar">
+                <div class="comment-bubble">
+                    <div class="comment-content">
+                        <span class="comment-username">${username}:</span>
+                        <span class="comment-text">${htmlspecialchars(comment.Content)}</span>
+                    </div>
+                    <div class="comment-meta">
+                        <span class="comment-time">${commentTime}</span>
+                    </div>
+                    <div class="comment-actions">
+                        <button class="reply-btn" onclick="setReply(${postId}, ${comment.CommentId}, '${username}')">Trả lời</button>
                     </div>
                 </div>
-                <div class="reply-container" id="comment-replies-${comment.CommentId}"></div>
-            `;
-        }
+            </div>
+            <div class="reply-container" id="comment-replies-${comment.CommentId}"></div>
+        `;
+    }
 
-        function submitComment(event, postId) {
-            event.preventDefault(); 
-            const input = document.getElementById(`comment-input-${postId}`);
-            const parentIdInput = document.getElementById(`parent-id-input-${postId}`);
-            const content = input.value.trim();
-            const parentId = parentIdInput.value;
-            
-            if (content === '') return;
+    function submitComment(event, postId) {
+        // ... (Code này giữ nguyên) ...
+        event.preventDefault(); 
+        const input = document.getElementById(`comment-input-${postId}`);
+        const parentIdInput = document.getElementById(`parent-id-input-${postId}`);
+        const content = input.value.trim();
+        const parentId = parentIdInput.value;
+        
+        if (content === '') return;
 
-            fetch('./../../Handler/PostHandler/add-comment.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: `post_id=${postId}&content=${encodeURIComponent(content)}&parent_id=${parentId}`
-            })
-            .then(response => {
-                if (!response.ok) { throw new Error(`Lỗi mạng: ${response.statusText}`); }
-                return response.json();
-            })
-            .then(data => {
-                if (data.status === 'success') {
-                    input.value = '';
-                    cancelReply(postId);
-                    const comment = data.comment;
-                    const newCommentHtml = createCommentHtml(comment, postId);
+        fetch('./../../Handler/PostHandler/add-comment.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: `post_id=${postId}&content=${encodeURIComponent(content)}&parent_id=${parentId}`
+        })
+        .then(response => {
+            if (!response.ok) { throw new Error(`Lỗi mạng: ${response.statusText}`); }
+            return response.json();
+        })
+        .then(data => {
+            if (data.status === 'success') {
+                input.value = '';
+                cancelReply(postId);
+                const comment = data.comment;
+                const newCommentHtml = createCommentHtml(comment, postId);
 
-                    if (comment.ParentCommentId === null || comment.ParentCommentId == 0) {
-                        let list = document.querySelector(`#post-${postId} .comments-list`);
-                        if (!list) {
-                            const commentSection = document.querySelector(`#post-${postId} .comment-section`);
-                            const formContainer = document.querySelector(`#post-${postId} .comment-form-container`);
-                            list = document.createElement('div');
-                            list.className = 'comments-list';
-                            commentSection.insertBefore(list, formContainer);
-                        }
-                        list.innerHTML += newCommentHtml;
-                    } else {
-                        const replyContainer = document.getElementById(`comment-replies-${comment.ParentCommentId}`);
-                        if (replyContainer) {
-                            replyContainer.innerHTML += newCommentHtml;
-                        } else {
-                            document.querySelector(`#post-${postId} .comments-list`).innerHTML += newCommentHtml;
-                        }
+                if (comment.ParentCommentId === null || comment.ParentCommentId == 0) {
+                    let list = document.querySelector(`#post-${postId} .comments-list`);
+                    if (!list) {
+                        const commentSection = document.querySelector(`#post-${postId} .comment-section`);
+                        const formContainer = document.querySelector(`#post-${postId} .comment-form-container`);
+                        list = document.createElement('div');
+                        list.className = 'comments-list';
+                        commentSection.insertBefore(list, formContainer);
                     }
+                    list.innerHTML += newCommentHtml;
                 } else {
-                    alert('Lỗi từ Server: ' + data.message);
-                }
-            })
-            .catch(error => {
-                alert(`LỖI JAVASCRIPT:\n${error.message}`);
-                console.error('Lỗi khi bình luận:', error);
-            });
-        }
-
-        // -----------------------
-        // XỬ LÝ MENU TÙY CHỌN (Sửa/Xóa)
-        // -----------------------
-        function toggleOptions(postId) {
-            document.getElementById(`options-${postId}`).classList.toggle("show");
-        }
-
-        window.onclick = function(event) {
-            if (!event.target.matches('.options-btn')) {
-                var dropdowns = document.getElementsByClassName("options-dropdown");
-                for (var i = 0; i < dropdowns.length; i++) {
-                    var openDropdown = dropdowns[i];
-                    if (openDropdown.classList.contains('show')) {
-                        openDropdown.classList.remove('show');
+                    const replyContainer = document.getElementById(`comment-replies-${comment.ParentCommentId}`);
+                    if (replyContainer) {
+                        replyContainer.innerHTML += newCommentHtml;
+                    } else {
+                        document.querySelector(`#post-${postId} .comments-list`).innerHTML += newCommentHtml;
                     }
+                }
+            } else {
+                alert('Lỗi từ Server: ' + data.message);
+            }
+        })
+        .catch(error => {
+            alert(`LỖI JAVASCRIPT:\n${error.message}`);
+            console.error('Lỗi khi bình luận:', error);
+        });
+    }
+
+    // -----------------------
+    // XỬ LÝ MENU TÙY CHỌN (Sửa/Xóa)
+    // -----------------------
+    function toggleOptions(postId) {
+        // ... (Code này giữ nguyên) ...
+        document.getElementById(`options-${postId}`).classList.toggle("show");
+    }
+
+    window.onclick = function(event) {
+        // ... (Code này giữ nguyên) ...
+        if (!event.target.matches('.options-btn')) {
+            var dropdowns = document.getElementsByClassName("options-dropdown");
+            for (var i = 0; i < dropdowns.length; i++) {
+                var openDropdown = dropdowns[i];
+                if (openDropdown.classList.contains('show')) {
+                    openDropdown.classList.remove('show');
                 }
             }
         }
-        
-        function deletePost(postId) {
-            if (!confirm('Bạn có chắc chắn muốn xóa bài đăng này không?')) { return; }
+    }
+    
+    // ↓↓↓ THAY ĐỔI BẮT ĐẦU TỪ ĐÂY ↓↓↓
+
+    function deletePost(postId) {
+        // Gọi popup xác nhận toàn cục (thay vì confirm)
+        showGlobalConfirm('Bạn có chắc chắn muốn xóa bài đăng này không?', () => {
+            // Logic fetch được đưa vào trong callback
             fetch('./../../Handler/PostHandler/delete-post.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -781,18 +795,20 @@ function renderComments($post_id, $comments_by_parent, $parent_id = NULL) {
                     const postElement = document.getElementById(`post-${postId}`);
                     if (postElement) { postElement.remove(); }
                 } else {
-                    alert('Lỗi: ' + data.message);
+                    alert('Lỗi: ' + data.message); // Vẫn dùng alert cho thông báo lỗi
                 }
             })
             .catch(error => console.error('Lỗi khi xóa bài đăng:', error));
-        }
-        
-        // -----------------------
-        // 4 HÀM CHO CÁC TÍNH NĂNG MỚI
-        // -----------------------
+        });
+    }
+    
+    // -----------------------
+    // 4 HÀM CHO CÁC TÍNH NĂNG MỚI (ĐÃ SỬA)
+    // -----------------------
 
-        function unfriendUser(userId) {
-            if (!confirm('Bạn có chắc chắn muốn hủy kết bạn với người này?')) { return; }
+    function unfriendUser(userId) {
+        // Gọi popup xác nhận toàn cục
+        showGlobalConfirm('Bạn có chắc chắn muốn hủy kết bạn với người này?', () => {
             fetch('./../../Handler/PostHandler/unfriend.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -800,13 +816,19 @@ function renderComments($post_id, $comments_by_parent, $parent_id = NULL) {
             })
             .then(response => response.json())
             .then(data => {
-                alert(data.message); 
+                alert(data.message); // Dùng alert cho thông báo (thành công/thất bại)
+                if (data.status === 'success') {
+                    // Tải lại trang để cập nhật các nút "Xóa bạn" khác
+                    window.location.reload(); 
+                }
             })
             .catch(error => console.error('Lỗi khi hủy kết bạn:', error));
-        }
+        });
+    }
 
-        function hideFeed(userId, postId) {
-            if (!confirm('Bạn có muốn ẩn tất cả bài đăng từ người này?')) { return; }
+    function hideFeed(userId, postId) {
+        // Gọi popup xác nhận toàn cục
+        showGlobalConfirm('Bạn có muốn ẩn tất cả bài đăng từ người này?', () => {
             fetch('./../../Handler/PostHandler/hide-feed.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -816,14 +838,17 @@ function renderComments($post_id, $comments_by_parent, $parent_id = NULL) {
             .then(data => {
                 alert(data.message);
                 if (data.status === 'success') {
+                    // Xóa tất cả bài đăng của người đó khỏi DOM
                     document.querySelectorAll(`.post-card[data-user-id="${userId}"]`).forEach(post => post.remove());
                 }
             })
             .catch(error => console.error('Lỗi khi ẩn feed:', error));
-        }
+        });
+    }
 
-        function blockUser(userId) {
-            if (!confirm('Người này sẽ không thấy bài đăng của bạn nữa. Bạn chắc chứ?')) { return; }
+    function blockUser(userId) {
+        // Gọi popup xác nhận toàn cục
+        showGlobalConfirm('Người này sẽ không thấy bài đăng của bạn nữa. Bạn chắc chứ?', () => {
             fetch('./../../Handler/PostHandler/block-user.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -834,10 +859,12 @@ function renderComments($post_id, $comments_by_parent, $parent_id = NULL) {
                 alert(data.message);
             })
             .catch(error => console.error('Lỗi khi chặn:', error));
-        }
+        });
+    }
 
-        function reportPost(postId) {
-            if (!confirm('Bạn có chắc chắn muốn báo xấu bài đăng này?')) { return; }
+    function reportPost(postId) {
+        // Gọi popup xác nhận toàn cục
+        showGlobalConfirm('Bạn có chắc chắn muốn báo xấu bài đăng này?', () => {
             fetch('./../../Handler/PostHandler/report-post.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -848,8 +875,19 @@ function renderComments($post_id, $comments_by_parent, $parent_id = NULL) {
                 alert(data.message);
             })
             .catch(error => console.error('Lỗi khi báo xấu:', error));
-        }
-    </script>
-
+        });
+    }
+</script>
+    <?php 
+        // Giả sử file 'friend_helpers.php' đã được include ở file header/footer chung
+        // Nếu chưa, bạn cần require_once nó ở đầu trang
+        
+        // Gọi hàm để in ra HTML, CSS, JS của modal (bao gồm cả modal xác nhận)
+        render_global_profile_modal(
+            '/ChatApp/Handler/FriendHandler/friend-handler.php',
+            '/ChatApp/uploads/default-avatar.jpg',
+            '/ChatApp'
+        ); 
+    ?>
 </body>
 </html>

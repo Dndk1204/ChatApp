@@ -4,6 +4,19 @@
     box-sizing: border-box;
 }
 
+html {
+  height: 100%;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--color-bg);
+  margin: 0;
+  padding: 0;
+  color: var(--color-text);
+  height: 100vh;
+  overflow: hidden;
+}
 :root {
         --color-primary: #6F9DE1FF;
         --color-primary-dark: #74C0C9;
@@ -114,14 +127,7 @@ header.navbar .auth-buttons a:hover {
     background: var(--color-secondary);
 }
 
-		body {
-			font-family: 'Inter', sans-serif;
-			background: var(--color-bg);
-			margin: 0;
-			padding: 0;
-			color: var(--color-text);
-        }
-		header.admin-header {
+header.admin-header {
   background-color: var(--color-primary-dark);
   color: var(--color-secondary);
   display: flex;
