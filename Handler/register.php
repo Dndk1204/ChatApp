@@ -18,15 +18,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
 
         $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+        $defaultAvatar = 'uploads/default-avatar.jpg';
 
-        $sql = "INSERT INTO Users (Username, Email, Password, Role) VALUES (?, ?, ?, ?)";
+        $sql = "INSERT INTO Users (Username, Email, Password, Role, AvatarPath) VALUES (?, ?, ?, ?, ?)";
         $stmt = $conn->prepare($sql);
 
         if ($stmt === false) {
             throw new Exception("Lỗi chuẩn bị CSDL: " . $conn->error);
         }
 
-        $stmt->bind_param("ssss", $username, $email, $hashed_password, $role);
+        $stmt->bind_param("sssss", $username, $email, $hashed_password, $role, $defaultAvatar);
         $stmt->execute(); 
         
         $_SESSION['success_message'] = "Account registered successfully!";
