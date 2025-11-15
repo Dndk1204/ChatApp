@@ -7,7 +7,7 @@ if (file_exists(__DIR__ . '/email_config.local.php')) {
 
 // Giá trị mặc định (để test, không có thông tin nhạy cảm)
 return [
-    'smtp_host' => 'localhost',                // SMTP server
+    'smtp_host' => 'smtp.gmail.com',                // SMTP server
     'smtp_port' => 587,                        // Port (587 for TLS, 465 for SSL)
     'smtp_username' => '',                     // Email gửi
     'smtp_password' => '',                     // Password hoặc App Password
