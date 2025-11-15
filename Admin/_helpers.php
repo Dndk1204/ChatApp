@@ -31,9 +31,8 @@ function admin_render_header($active = '') {
     $messages_active = ($active === 'messages') ? 'class="active"' : '';
     $reports_active = ($active === 'reports') ? 'class="active"' : '';
 
-    // Lấy avatar (giống như code public, nhưng thêm ../)
-    $avatar_path = ltrim(($_SESSION['avatar'] ?? 'uploads/default-avatar.jpg'), '/');
-    $avatar_src = '../../' . htmlspecialchars($avatar_path); // Thêm ../ để quay lại thư mục gốc
+    $avatar_path = $_SESSION['avatar'] ?? 'uploads/default-avatar.jpg';
+    $avatar_src = '../' . htmlspecialchars($avatar_path);
 
     echo '
     <header class="navbar">
@@ -55,7 +54,7 @@ function admin_render_header($active = '') {
             <span class="logged-in-user">Admin: ' . $username . '</span>
             
             <div class="avatar-menu">
-                <img src="' . $avatar_src . '" alt="avatar" class="avatar-thumb" id="adminAvatarBtn" onerror="this.src=\'../uploads/default-avatar.jpg\'">
+                <img src="' . $avatar_src . '" alt="avatar" class="avatar-thumb" id="adminAvatarBtn" onerror="this.src=\'../../uploads/default-avatar.jpg\'">
                 
                 <div class="avatar-dropdown" id="adminAvatarDropdown">
                     <a href="../Pages/ProfilePages/Profile.php?id=' . $current_user_id . '">Trang cá nhân của tôi</a>

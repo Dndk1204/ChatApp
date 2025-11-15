@@ -19,11 +19,8 @@ if (!function_exists('renderComments')) {
             
             $js_safe_username = htmlspecialchars($comment['Username'], ENT_QUOTES, 'UTF-8');
             
-            // SỬA LỖI 1: Dùng đường dẫn tuyệt đối cho Avatar
             $avatar_path = htmlspecialchars($comment['AvatarPath'] ?: 'uploads/default-avatar.jpg');
-            $avatar_src = '/ChatApp/' . ltrim($avatar_path, '/'); 
-            
-            // SỬA LỖI 2: Dùng đường dẫn tuyệt đối cho Profile Link
+            $avatar_src = '/ChatApp/' . $avatar_path;
             $profile_link = '/ChatApp/Pages/ProfilePages/Profile.php?id=' . $comment['UserId'];
             
             ?>

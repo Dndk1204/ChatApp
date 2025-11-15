@@ -148,6 +148,15 @@ if ($conn) {
             display: flex;
             align-items: center;
             overflow: hidden;
+            gap: 8px;
+        }
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            min-width: 32px;
+            border-radius: 50%;
+            object-fit: cover;
+            background-color: var(--color-secondary);
         }
         .user-name {
             white-space: nowrap;
@@ -460,8 +469,8 @@ if ($conn) {
         <?php if (isset($_SESSION['user_id'])): ?>
             <span class="logged-in-user">Xin chào, <?php echo htmlspecialchars($current_username); ?></span>
             <div class="avatar-menu">
-                <?php $avatar = ltrim(($_SESSION['avatar'] ?? 'uploads/default-avatar.jpg'), '/'); ?>
-                <img src="../<?php echo htmlspecialchars($avatar); ?>" alt="avatar" class="avatar-thumb" id="avatarBtn" onerror="this.src='../../uploads/default-avatar.jpg'">
+                <?php $avatar = $_SESSION['avatar'] ?? 'uploads/default-avatar.jpg'; ?>
+                <img src="../../<?php echo htmlspecialchars($avatar); ?>" alt="avatar" class="avatar-thumb" id="avatarBtn" onerror="this.src='../../uploads/default-avatar.jpg'">
             <div class="avatar-dropdown" id="avatarDropdown">
                 <a href="../ProfilePages/Profile.php?id=<?php echo $current_user_id; ?>">Trang cá nhân của tôi</a>
                 <a href="../ProfilePages/edit_profile.php">Chỉnh sửa hồ sơ</a>
@@ -610,6 +619,7 @@ if ($conn) {
                             
                             userItem.innerHTML = `
                                 <div class="user-details">
+                                    <img src="../../${user.AvatarPath}" alt="avatar" class="user-avatar" onerror="this.src='../../uploads/default-avatar.jpg'">
                                     <span class="status-indicator ${statusClass}"></span>
                                     <span class="user-name">${htmlspecialchars(user.Username)}</span>
                                 </div>
@@ -736,6 +746,8 @@ if ($conn) {
                     if (shouldScroll || (messages.length > 0 && lastMessageTimestamp === latestTimestampInBatch && messageWindow.innerHTML === htmlToAppend)) {
                          messageWindow.scrollTop = messageWindow.scrollHeight;
                     }
+                    
+                    loadUsers();
                 }
             })
             .catch(error => {

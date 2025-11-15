@@ -77,10 +77,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 				if ($file['size'] > 3 * 1024 * 1024) {
 					throw new Exception('Kích thước ảnh tối đa 3MB.');
 				}
-				$ext = $allowed[$mime];
-				// Tạo thư mục theo user: uploads/avatars/u_{userId}
-				$baseDir = dirname(__DIR__) . '/uploads/avatars';
-				$userDir = $baseDir . '/u_' . $userId;
+			$ext = $allowed[$mime];
+			$baseDir = __DIR__ . '/../../uploads/avatars';
+			$userDir = $baseDir . '/u_' . $userId;
 				if (!is_dir($userDir)) {
 					if (!is_dir($baseDir)) {
 						mkdir($baseDir, 0755, true);
@@ -145,7 +144,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 $defaultAvatar = 'uploads/default-avatar.jpg';
 $avatar = $_SESSION['avatar'] ?? ($user['AvatarPath'] ?: $defaultAvatar);
-$avatar = ltrim($avatar, '/');
 ?>
 <!DOCTYPE html>
 <html lang="vi">
@@ -177,8 +175,8 @@ $avatar = ltrim($avatar, '/');
         <?php if (isset($_SESSION['user_id'])): ?>
             <span class="logged-in-user">Xin chào, <?php echo htmlspecialchars($current_username); ?></span>
             <div class="avatar-menu">
-                <?php $avatar = ltrim(($_SESSION['avatar'] ?? 'uploads/default-avatar.jpg'), '/'); ?>
-                <img src="../../<?php echo htmlspecialchars($avatar); ?>" alt="avatar" class="avatar-thumb" id="avatarBtn">
+                <?php $avatar = $_SESSION['avatar'] ?? 'uploads/default-avatar.jpg'; ?>
+                <img src="../../<?php echo htmlspecialchars($avatar); ?>" alt="avatar" class="avatar-thumb" id="avatarBtn" onerror="this.src='../../uploads/default-avatar.jpg'">
                 <div class="avatar-dropdown" id="avatarDropdown">
 					<a href="../ProfilePages/Profile.php?id=<?php echo $current_user_id; ?>">Trang cá nhân của tôi</a>
                     <a href="../ProfilePages/edit_profile.php">Chỉnh sửa hồ sơ</a>
@@ -209,7 +207,7 @@ $avatar = ltrim($avatar, '/');
 				<div class="form-group">
 					<label>Ảnh đại diện hiện tại</label>
 					<div style="display:flex;align-items:center;gap:12px;">
-						<img src="../../<?php echo htmlspecialchars($avatar); ?>" alt="avatar" style="width:64px;height:64px;border-radius:50%;object-fit:cover;border:1px solid #444;" onerror="this.src='../../uploads/default-avatar.jpg'">
+						<img src="<?php echo htmlspecialchars($avatar); ?>" alt="avatar" style="width:64px;height:64px;border-radius:50%;object-fit:cover;border:1px solid #444;" onerror="this.src='../../uploads/default-avatar.jpg'">
 						<input type="file" name="avatar" accept="image/*">
 					</div>
 				</div>

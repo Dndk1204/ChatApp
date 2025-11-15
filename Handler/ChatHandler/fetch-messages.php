@@ -83,6 +83,17 @@ try {
     }
     
     $stmt->close();
+    
+    // Cập nhật trạng thái IsRead = 1 cho tin nhắn chưa đọc từ receiver_id
+    $sql_update = "UPDATE Messages SET IsRead = 1 
+                   WHERE ReceiverId = ? AND SenderId = ? AND IsRead = 0 AND IsDeleted = 0";
+    $stmt_update = $conn->prepare($sql_update);
+    if ($stmt_update) {
+        $stmt_update->bind_param("ii", $sender_id, $receiver_id);
+        $stmt_update->execute();
+        $stmt_update->close();
+    }
+    
     $conn->close();
 
     echo json_encode($messages);
