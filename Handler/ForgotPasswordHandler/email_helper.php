@@ -4,7 +4,7 @@
 
 function sendOtpEmail($recipientEmail, $otpCode, $recipientName = '') {
     // Kiểm tra PHPMailer có được cài đặt không
-    if (file_exists(__DIR__ . '/../vendor/autoload.php')) {
+    if (file_exists(__DIR__ . '/../../vendor/autoload.php')) {
         return sendOtpEmailWithPHPMailer($recipientEmail, $otpCode, $recipientName);
     } else {
         return sendOtpEmailWithMailFunction($recipientEmail, $otpCode, $recipientName);
@@ -16,7 +16,7 @@ function sendOtpEmail($recipientEmail, $otpCode, $recipientName = '') {
  */
 function sendOtpEmailWithPHPMailer($recipientEmail, $otpCode, $recipientName = '') {
     try {
-        require __DIR__ . '/../vendor/autoload.php';
+        require __DIR__ . '/../../vendor/autoload.php';
         
         $emailConfig = require __DIR__ . '/email_config.php';
         

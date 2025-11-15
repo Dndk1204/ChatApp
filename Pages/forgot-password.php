@@ -227,7 +227,7 @@
             const messageBox = document.getElementById('messageBox');
             
             try {
-                const response = await fetch('../Handler/forgot-password.php', {
+                const response = await fetch('../Handler/ForgotPasswordHandler/forgot-password.php', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded'
@@ -283,7 +283,7 @@
             }
             
             try {
-                const response = await fetch('../Handler/verify-otp.php', {
+                const response = await fetch('../Handler/ForgotPasswordHandler/verify-otp.php', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded'
@@ -344,7 +344,7 @@
             }
             
             try {
-                const response = await fetch('../Handler/reset-password.php', {
+                const response = await fetch('../Handler/ForgotPasswordHandler/reset-password.php', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded'
@@ -404,7 +404,7 @@
             const messageBox = document.getElementById('messageBox');
             
             try {
-                const response = await fetch('../Handler/forgot-password.php', {
+                const response = await fetch('../Handler/ForgotPasswordHandler/forgot-password.php', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded'

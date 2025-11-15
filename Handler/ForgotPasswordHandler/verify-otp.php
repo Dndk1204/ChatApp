@@ -1,6 +1,6 @@
 <?php
 header('Content-Type: application/json');
-require_once '../Handler/db.php';
+require_once '../db.php';
 session_start();
 
 $response = ['success' => false, 'message' => ''];
