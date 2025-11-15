@@ -205,25 +205,40 @@ Installing phpmailer/phpmailer (v6.8.1)
 
 #### **3. Cấu Hình Email**
 
-Mở `Handler/email_config.php` và cập nhật:
+> **⚠️ Bảo mật:** Không bao giờ commit email/password thực vào git!
 
-**Cho Gmail:**
-```php
-return [
-    'smtp_host' => 'smtp.gmail.com',
-    'smtp_port' => 587,
-    'smtp_username' => 'your-email@gmail.com',
-    'smtp_password' => 'your-app-password',  // 16 ký tự từ Google
-    'from_email' => 'your-email@gmail.com', // Email người gửi
-    'from_name' => 'ChatApp',
-];
-```
+**Cách An Toàn (Khuyên dùng):**
 
-**Lấy App Password Gmail:**
+File `email_config.php` là **template công khai** (không chứa thông tin nhạy cảm).
+File `email_config.local.php` là **file cấu hình thực** (được ignore bởi git).
+
+1. **Mở file:** `Handler/ForgotPasswordHandler/email_config.local.php`
+2. **Thay đổi thông tin SMTP của bạn:**
+   ```php
+   return [
+       'smtp_host' => 'smtp.gmail.com',
+       'smtp_port' => 587,
+       'smtp_username' => 'your-email@gmail.com',
+       'smtp_password' => 'your-app-password',  // 16 ký tự từ Google
+       'from_email' => 'your-email@gmail.com',
+       'from_name' => 'ChatApp',
+   ];
+   ```
+3. **Lưu file** - Không cần sửa `email_config.php` nữa!
+
+**Cách Lấy App Password Gmail:**
 1. Vào: https://myaccount.google.com/
 2. Bảo mật → Xác thực 2 bước (bật nếu chưa)
 3. Mật khẩu ứng dụng → Chọn Mail + Windows Computer
-4. Copy mật khẩu 16 ký tự
+4. Copy mật khẩu 16 ký tự vào `email_config.local.php`
+
+**Lưu ý về .gitignore:**
+```
+email_config.local.php  ← File này KHÔNG được commit vào git
+.env                    ← Các file config cục bộ khác cũng được ignore
+```
+
+Khi clone repo ở máy khác, bạn chỉ cần tạo file `email_config.local.php` của riêng mình.
 
 #### **4. Test Email**
 
