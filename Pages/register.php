@@ -94,6 +94,9 @@
                         <input type="text" id="admin_code" name="admin_code">
                     </div>
                     <button type="submit" class="btn-submit">Register</button>
+                    <div style="text-align: center; margin-top: 15px;">
+                        <p>Đã có tài khoản? <a href="login.php" style="color: #007bff; text-decoration: none;">Đăng nhập ngay</a></p>
+                    </div>
                 </form>
             </div>
 
