@@ -306,7 +306,7 @@ function g_renderProfileButtons(status, userId) {
     const actionsDiv = document.getElementById("g-profile-actions");
     actionsDiv.innerHTML = "";
     const chatPage = `${G_BASE_PATH}/Pages/ChatPages/chat.php?friend_id=${userId}`;
-    const profilePage = `${G_BASE_PATH}/Pages/profile.php`;
+    const profilePage = `${G_BASE_PATH}/Pages/edit_profile.php`;
 
     switch (status) {
         case "is_self":

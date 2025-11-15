@@ -21,6 +21,11 @@ function admin_render_flash($flash_success, $flash_error) {
 function admin_render_header($active = '') {
     // Tách biến $active (tên trang hiện tại)
     $username = htmlspecialchars($_SESSION['username'] ?? 'Admin');
+    
+    // ↓↓↓ SỬA LỖI Ở ĐÂY: Lấy user_id từ SESSION ↓↓↓
+    $current_user_id = (int)($_SESSION['user_id'] ?? 0); 
+    // ↑↑↑ KẾT THÚC SỬA LỖI ↑↑↑
+
     $stats_active = ($active === 'stats') ? 'class="active"' : '';
     $users_active = ($active === 'users') ? 'class="active"' : '';
     $messages_active = ($active === 'messages') ? 'class="active"' : '';
@@ -28,7 +33,7 @@ function admin_render_header($active = '') {
 
     // Lấy avatar (giống như code public, nhưng thêm ../)
     $avatar_path = ltrim(($_SESSION['avatar'] ?? 'uploads/default-avatar.jpg'), '/');
-    $avatar_src = '../' . htmlspecialchars($avatar_path); // Thêm ../ để quay lại thư mục gốc
+    $avatar_src = '../../' . htmlspecialchars($avatar_path); // Thêm ../ để quay lại thư mục gốc
 
     echo '
     <header class="navbar">
@@ -53,9 +58,10 @@ function admin_render_header($active = '') {
                 <img src="' . $avatar_src . '" alt="avatar" class="avatar-thumb" id="adminAvatarBtn" onerror="this.src=\'../uploads/default-avatar.jpg\'">
                 
                 <div class="avatar-dropdown" id="adminAvatarDropdown">
-                    <a href="../Pages/profile.php">Chỉnh sửa hồ sơ</a>
-					<a href="../Pages/hidden_list.php">Quản lý Ẩn</a>
-                	<a href="../Pages/blocked_list.php">Quản lý Chặn</a>
+                    <a href="../Pages/ProfilePages/Profile.php?id=' . $current_user_id . '">Trang cá nhân của tôi</a>
+                    <a href="../Pages/ProfilePages/edit_profile.php">Chỉnh sửa hồ sơ</a>
+                    <a href="../Pages/hidden_list.php">Quản lý Ẩn</a>
+                    <a href="../Pages/blocked_list.php">Quản lý Chặn</a>
                     <a href="../Handler/logout.php">Logout</a>
                 </div>
             </div>

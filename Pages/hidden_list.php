@@ -97,7 +97,11 @@ $current_username = $_SESSION['username'];
                     <?php $avatar = ltrim(($_SESSION['avatar'] ?? 'uploads/default-avatar.jpg'), '/'); ?>
                     <img src="../<?php echo htmlspecialchars($avatar); ?>" alt="avatar" class="avatar-thumb" id="avatarBtn" onerror="this.src='../uploads/default-avatar.jpg'">
                     <div class="avatar-dropdown" id="avatarDropdown">
-                        <a href="profile.php">Chỉnh sửa hồ sơ</a> <a href="hidden_list.php">Quản lý Ẩn</a><a href="blocked_list.php">Quản lý Chặn</a> <a href="../Handler/logout.php">Logout</a> </div>
+                        <a href="ProfilePages/Profile.php?id=<?php echo $current_user_id; ?>">Trang cá nhân của tôi</a>
+                        <a href="ProfilePages/edit_profile.php">Chỉnh sửa hồ sơ</a> 
+                        <a href="hidden_list.php">Quản lý Ẩn</a>
+                        <a href="blocked_list.php">Quản lý Chặn</a> 
+                        <a href="../Handler/logout.php">Logout</a> </div>
                 </div>
             <?php endif; ?>
         </div>
