@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once '../Handler/db.php';
+require_once '../../Handler/db.php';
 
 // Kiểm tra xem người dùng đã đăng nhập chưa
 if (!isset($_SESSION['user_id'])) {
@@ -153,7 +153,7 @@ $avatar = ltrim($avatar, '/');
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Hồ sơ cá nhân</title>
-	<link rel="stylesheet" href="../css/style.css">
+	<link rel="stylesheet" href="../../css/style.css">
 	<link href="https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap" rel="stylesheet">
 </head>
 <body>
@@ -165,12 +165,12 @@ $avatar = ltrim($avatar, '/');
         </a>
     </div>
     <nav class="main-nav">
-        <a href="../index.php">HOME</a>
-        <a href="../Pages/PostPages/posts.php">POSTS</a>
-        <a href="../Pages/ChatPages/chat.php">CHAT</a>
-        <a href="../Pages/FriendPages/friends.php">FRIENDS</a>
+        <a href="../../index.php">HOME</a>
+        <a href="../PostPages/posts.php">POSTS</a>
+        <a href="../ChatPages/chat.php">CHAT</a>
+        <a href="../FriendPages/friends.php">FRIENDS</a>
         <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'Admin'): ?>
-            <a href="../../admin_dashboard.php">ADMIN</a>
+            <a href="../../Admin/index.php">ADMIN</a>
         <?php endif; ?>
     </nav>
     <div class="auth-buttons">
@@ -178,9 +178,12 @@ $avatar = ltrim($avatar, '/');
             <span class="logged-in-user">Xin chào, <?php echo htmlspecialchars($current_username); ?></span>
             <div class="avatar-menu">
                 <?php $avatar = ltrim(($_SESSION['avatar'] ?? 'uploads/default-avatar.jpg'), '/'); ?>
-                <img src="../<?php echo htmlspecialchars($avatar); ?>" alt="avatar" class="avatar-thumb" id="avatarBtn">
+                <img src="../../<?php echo htmlspecialchars($avatar); ?>" alt="avatar" class="avatar-thumb" id="avatarBtn">
                 <div class="avatar-dropdown" id="avatarDropdown">
-                    <a href="../Pages/profile.php">Chỉnh sửa hồ sơ</a>
+					<a href="../ProfilePages/Profile.php?id=<?php echo $current_user_id; ?>">Trang cá nhân của tôi</a>
+                    <a href="../ProfilePages/edit_profile.php">Chỉnh sửa hồ sơ</a>
+					<a href="../hidden_list.php">Quản lý Ẩn</a>
+                	<a href="../blocked_list.php">Quản lý Chặn</a>
                     <a href="../Handler/logout.php">Logout</a>
                 </div>
             </div>
@@ -206,7 +209,7 @@ $avatar = ltrim($avatar, '/');
 				<div class="form-group">
 					<label>Ảnh đại diện hiện tại</label>
 					<div style="display:flex;align-items:center;gap:12px;">
-						<img src="../<?php echo htmlspecialchars($avatar); ?>" alt="avatar" style="width:64px;height:64px;border-radius:50%;object-fit:cover;border:1px solid #444;" onerror="this.src='../uploads/default-avatar.jpg'">
+						<img src="../../<?php echo htmlspecialchars($avatar); ?>" alt="avatar" style="width:64px;height:64px;border-radius:50%;object-fit:cover;border:1px solid #444;" onerror="this.src='../../uploads/default-avatar.jpg'">
 						<input type="file" name="avatar" accept="image/*">
 					</div>
 				</div>

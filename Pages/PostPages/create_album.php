@@ -6,6 +6,8 @@ if (!isset($_SESSION['user_id'])) {
     header("Location: ../login.php");
     exit;
 }
+
+$current_user_id = $_SESSION['user_id'];
 $current_username = $_SESSION['username'] ?? 'Guest';
 ?>
 <!DOCTYPE html>
@@ -77,9 +79,12 @@ $current_username = $_SESSION['username'] ?? 'Guest';
                 <span class="logged-in-user">Xin chào, <?php echo htmlspecialchars($current_username); ?></span>
                 <div class="avatar-menu">
                     <?php $avatar = ltrim(($_SESSION['avatar'] ?? 'uploads/default-avatar.jpg'), '/'); ?>
-                    <img src="../../<?php echo htmlspecialchars($avatar); ?>" alt="avatar" class="avatar-thumb" id="avatarBtn">
+                    <img src="../<?php echo htmlspecialchars($avatar); ?>" alt="avatar" class="avatar-thumb" id="avatarBtn">
                     <div class="avatar-dropdown" id="avatarDropdown">
-                        <a href="../profile.php">Chỉnh sửa hồ sơ</a>
+                        <a href="../ProfilePages/Profile.php?id=<?php echo $current_user_id; ?>">Trang cá nhân của tôi</a>
+                        <a href="../ProfilePages/edit_profile.php">Chỉnh sửa hồ sơ</a>
+                        <a href="../../Pages/hidden_list.php">Quản lý Ẩn</a>
+                        <a href="../../Pages/blocked_list.php">Quản lý Chặn</a> 
                         <a href="../../Handler/logout.php">Logout</a>
                     </div>
                 </div>
@@ -132,6 +137,23 @@ $current_username = $_SESSION['username'] ?? 'Guest';
             </form>
         </div>
     </main>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const avatarBtn = document.getElementById('avatarBtn');
+            const avatarDropdown = document.getElementById('avatarDropdown');
+            if (avatarBtn && avatarDropdown) {
+                avatarBtn.addEventListener('click', function(event) {
+                    event.stopPropagation(); 
+                    avatarDropdown.classList.toggle('open');
+                });
+                document.addEventListener('click', function(event) {
+                    if (avatarDropdown.classList.contains('open') && !avatarDropdown.contains(event.target)) {
+                        avatarDropdown.classList.remove('open');
+                    }
+                });
+            }
+        });
+    </script>
 
      </body>
 </html>
