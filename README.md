@@ -6,10 +6,6 @@ ChatApp/
 ├─ chatappsql.sql
 ├─ index.php
 ├─ README.md
-├─ README_FORGOT_PASSWORD.md          [MỚI - Hướng dẫn Forgot Password]
-├─ SETUP_EMAIL.md                      [MỚI - Setup Email]
-├─ SETUP_GMAIL_DETAILED.md             [MỚI - Hướng dẫn Gmail Chi Tiết]
-├─ INSTALL_PHPMAILER_NO_COMPOSER.md    [MỚI - Cài PHPMailer Không Composer]
 ├─ Admin/
 │  ├─ _auth.php
 │  ├─ _helpers.php

@@ -75,10 +75,10 @@ if (mail($email, $subject, $message, $headers)) {
 }
 
 // Nếu PHPMailer đã cài, kiểm tra cấu hình
-require_once __DIR__ . '/../vendor/autoload.php';
-require_once __DIR__ . '/../Handler/email_helper.php';
+require_once __DIR__ . '/../../vendor/autoload.php';
+require_once __DIR__ . '/email_helper.php';
 
-$emailConfig = require __DIR__ . '/../Handler/email_config.php';
+$emailConfig = require __DIR__ . '/email_config.php';
 
 // Kiểm tra xem cấu hình có hợp lệ không
 $configValid = true;

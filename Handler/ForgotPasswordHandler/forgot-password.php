@@ -4,8 +4,8 @@ header('Content-Type: application/json');
 // Bắt lỗi PHP output
 ob_start();
 
-require_once '../Handler/db.php';
-require_once '../Handler/email_helper.php';
+require_once '../db.php';
+require_once 'email_helper.php';
 
 session_start();
 
