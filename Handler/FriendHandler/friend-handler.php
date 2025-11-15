@@ -136,9 +136,8 @@ switch ($action) {
             exit;
         }
         
-        // Chuẩn hóa AvatarPath (ltrim)
         if (!empty($user_data['AvatarPath'])) {
-             $user_data['AvatarPath'] = ltrim($user_data['AvatarPath'], '/');
+             // Keep AvatarPath as is, no ltrim needed
         }
 
         // 2. Kiểm tra trạng thái bạn bè
@@ -218,7 +217,6 @@ switch ($action) {
             if (empty($row['AvatarPath']) || $row['AvatarPath'] === '/uploads/default-avatar.jpg') {
                 $row['AvatarPath'] = 'uploads/default-avatar.jpg';
             }
-            $row['AvatarPath'] = ltrim($row['AvatarPath'], '/');
             $suggestions[] = $row;
         }
 

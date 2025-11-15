@@ -31,7 +31,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 if (empty($avatarPath)) {
                     $_SESSION['avatar'] = $defaultAvatar;
                 } else {
-                    $_SESSION['avatar'] = ltrim($avatarPath, '/');
+                    $_SESSION['avatar'] = $avatarPath;
                 }
 
                 // --- CẬP NHẬT TRẠNG THÁI ONLINE ---

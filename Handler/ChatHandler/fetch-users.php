@@ -16,7 +16,7 @@ $users = [];
 
 try {
     $sql = "
-        SELECT u.UserId, u.Username, u.IsOnline,
+        SELECT u.UserId, u.Username, u.IsOnline, u.AvatarPath,
                COALESCE((SELECT COUNT(*) FROM messages 
                         WHERE SenderId = u.UserId 
                         AND ReceiverId = ? 

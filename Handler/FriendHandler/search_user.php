@@ -61,7 +61,6 @@ while ($row = $res->fetch_assoc()) {
     if (empty($row['AvatarPath']) || $row['AvatarPath'] === '/uploads/default-avatar.jpg') {
         $row['AvatarPath'] = 'uploads/default-avatar.jpg';
     }
-    $row['AvatarPath'] = ltrim($row['AvatarPath'], '/');
     $users[] = $row;
 }
 
