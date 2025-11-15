@@ -247,3 +247,6 @@ http://localhost/ChatApp/Handler/test_email_config.php
 ```
 
 Nhập email → Click "Gửi Email Test" → Kiểm tra email nhận được
+
+
+Thay đổi nhẹ
