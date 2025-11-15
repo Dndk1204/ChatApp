@@ -40,7 +40,6 @@ try {
 
     $ext = $allowed[$mime];
     
-    // Tạo thư mục uploads/messages/u_{senderId}
     $baseDir = __DIR__ . '/../../uploads/messages';
     $userDir = $baseDir . '/u_' . $sender_id;
     if (!is_dir($userDir)) {
@@ -48,7 +47,6 @@ try {
         mkdir($userDir, 0755, true);
     }
 
-    // Tạo tên file ngẫu nhiên để tránh trùng lặp và đoán tên
     $filename = uniqid('img_') . '.' . $ext;
     $targetPath = $userDir . '/' . $filename;
     $publicPath = 'uploads/messages/u_' . $sender_id . '/' . $filename;
@@ -57,7 +55,6 @@ try {
         throw new Exception('Không thể lưu file ảnh.');
     }
 
-    // --- LƯU VÀO CSDL VỚI TIỀN TỐ [IMG] TRONG CỘT CONTENT ---
     $image_content = "[IMG]" . $publicPath;
     $sql = "INSERT INTO Messages (SenderId, ReceiverId, Content) VALUES (?, ?, ?)";
     $stmt = $conn->prepare($sql);

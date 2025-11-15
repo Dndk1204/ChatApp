@@ -88,7 +88,7 @@ $current_username = $_SESSION['username'];
         <nav class="main-nav">
             <a href="../index.php">HOME</a>
             <a href="PostPages/posts.php">POSTS</a> <a href="ChatPages/chat.php">CHAT</a> <a href="FriendPages/friends.php">FRIENDS</a> <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'Admin'): ?>
-                <a href="../admin_dashboard.php">ADMIN</a> <?php endif; ?>
+                <a href="../Handler/admin_dashboard.php">ADMIN</a> <?php endif; ?>
         </nav>
         <div class="auth-buttons">
             <?php if (isset($_SESSION['user_id'])): ?>

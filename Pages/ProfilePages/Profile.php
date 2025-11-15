@@ -4,9 +4,6 @@ require_once '../../Handler/db.php'; // Đi lên 2 cấp
 require_once '../../Handler/FriendHandler/friend_helpers.php'; // Đi lên 2 cấp
 require_once '../../Handler/PostHandler/post_helpers.php';
 
-// === 1. LẤY DỮ LIỆU ===
-
-// Lấy ID của người xem (bạn)
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
     exit;
@@ -15,26 +12,22 @@ $current_user_id = (int)$_SESSION['user_id'];
 $current_username = $_SESSION['username'] ?? 'Guest';
 $current_user_avatar = $_SESSION['avatar'] ?? 'uploads/default-avatar.jpg';
 
-// Lấy ID của chủ nhân trang cá nhân (từ URL)
 $profile_user_id = (int)($_GET['id'] ?? 0);
 if ($profile_user_id <= 0) {
     header("Location: posts.php"); // Nếu ID không hợp lệ, về trang posts
     exit;
 }
 
-// === 2. LẤY THÔNG TIN CHỦ TRANG VÀ KIỂM TRA QUAN HỆ ===
 $user_info = null;
 $is_self = false;
 $is_friend = false;
 
-// Lấy thông tin user
 $stmt_user = $conn->prepare("SELECT Username, AvatarPath, FullName, CreatedAt FROM users WHERE UserId = ?");
 $stmt_user->bind_param("i", $profile_user_id);
 $stmt_user->execute();
 $result_user = $stmt_user->get_result();
 
 if ($result_user->num_rows == 0) {
-    // Không tìm thấy user
     $_SESSION['error_message'] = "Không tìm thấy người dùng này.";
     header("Location: posts.php");
     exit;
@@ -46,7 +39,6 @@ $stmt_user->close();
 if ($current_user_id === $profile_user_id) {
     $is_self = true;
 } else {
-    // Kiểm tra xem có phải là bạn bè không
     $stmt_friend = $conn->prepare("SELECT FriendId FROM friends WHERE IsConfirmed = 1 AND 
                                     ((UserId = ? AND FriendUserId = ?) OR (UserId = ? AND FriendUserId = ?))");
     $stmt_friend->bind_param("iiii", $current_user_id, $profile_user_id, $profile_user_id, $current_user_id);
@@ -55,23 +47,21 @@ if ($current_user_id === $profile_user_id) {
     $stmt_friend->close();
 }
 
-// === 3. XÂY DỰNG CÂU QUERY CHO BÀI ĐĂNG (DỰA TRÊN QUYỀN RIÊNG TƯ) ===
-$privacy_sql = " AND (p.Privacy = 'public'"; // Mọi người luôn thấy public
+$privacy_sql = " AND (p.Privacy = 'public'";
 if ($is_self || $is_friend) {
     // Nếu là chủ nhân HOẶC là bạn bè, thì thấy cả bài 'friends'
     $privacy_sql .= " OR p.Privacy = 'friends'";
 }
 $privacy_sql .= ")";
 
-// Lấy tất cả bài đăng CỦA NGƯỜI NÀY, tuân thủ quyền riêng tư
 $sql_posts = "SELECT p.PostId, p.UserId, p.Content, p.Title, p.PostType, p.PostedAt, 
                      p.Privacy, 
                      u.Username, u.AvatarPath 
               FROM posts p
               JOIN users u ON p.UserId = u.UserId
               WHERE 
-                  p.UserId = ?  -- CHỈ lấy bài của người này
-                  $privacy_sql  -- Áp dụng điều kiện riêng tư
+                  p.UserId = ?
+                  $privacy_sql
               ORDER BY p.PostedAt DESC";
 
 $stmt_posts = $conn->prepare($sql_posts);
@@ -79,7 +69,6 @@ $stmt_posts->bind_param("i", $profile_user_id);
 $stmt_posts->execute();
 $result_posts = $stmt_posts->get_result();
 
-// Lấy tất cả emotes (cho phần reactions)
 $emotes_map = [];
 $result_emotes = $conn->query("SELECT * FROM emotes");
 while ($row = $result_emotes->fetch_assoc()) {
@@ -426,7 +415,7 @@ while ($row = $result_emotes->fetch_assoc()) {
         <a href="../ChatPages/chat.php">CHAT</a> 
         <a href="../FriendPages/friends.php">FRIENDS</a>
         <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'Admin'): ?>
-            <a href="../../admin_dashboard.php">ADMIN</a>
+            <a href="../../Handler/admin_dashboard.php">ADMIN</a>
         <?php endif; ?>
     </nav>
     <div class="auth-buttons">

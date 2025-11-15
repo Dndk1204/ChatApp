@@ -19,7 +19,6 @@ $current_user_avatar_result = $stmt_current_user->get_result();
 $current_user_avatar = $current_user_avatar_result->num_rows > 0 ? $current_user_avatar_result->fetch_assoc()['AvatarPath'] : 'uploads/default-avatar.jpg';
 $stmt_current_user->close();
 
-// Lấy TẤT CẢ các emotes một lần để dùng
 $emotes_map = [];
 $emotes_result = $conn->query("SELECT EmoteId, EmoteName, EmoteUnicode FROM emotes");
 while ($row = $emotes_result->fetch_assoc()) {
@@ -288,7 +287,7 @@ while ($row = $emotes_result->fetch_assoc()) {
         <a href="../ChatPages/chat.php">CHAT</a>
         <a href="../FriendPages/friends.php">FRIENDS</a>
         <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'Admin'): ?>
-            <a href="../../admin_dashboard.php">ADMIN</a>
+            <a href="../../Handler/admin_dashboard.php">ADMIN</a>
         <?php endif; ?>
     </nav>
     <div class="auth-buttons">
@@ -323,7 +322,6 @@ while ($row = $emotes_result->fetch_assoc()) {
 
             <?php
             
-            // Lọc theo Ẩn, Chặn, VÀ QUYỀN RIÊNG TƯ
             $sql_posts = "SELECT p.PostId, p.UserId, p.Content, p.Title, p.PostType, p.PostedAt, 
                                  p.Privacy, 
                                  u.Username, u.AvatarPath 
@@ -408,7 +406,6 @@ while ($row = $emotes_result->fetch_assoc()) {
                     <?php endif; ?>
                     
                     <?php
-                    // Chuẩn bị câu lệnh con để lấy ảnh
                     $sql_images = "SELECT ImagePath FROM post_images WHERE PostId = ? ORDER BY ImageId ASC";
                     $stmt_images = $conn->prepare($sql_images);
                     $stmt_images->bind_param("i", $post_id);
@@ -491,7 +488,6 @@ while ($row = $emotes_result->fetch_assoc()) {
 
                     <div class="comment-section">
                         <?php
-                        // Lấy và sắp xếp TẤT CẢ bình luận
                         $sql_comments = "SELECT c.CommentId, c.Content, c.ParentCommentId, c.CommentedAt, u.UserId, u.Username, u.AvatarPath
                                          FROM comments c
                                          JOIN users u ON c.UserId = u.UserId
@@ -508,7 +504,6 @@ while ($row = $emotes_result->fetch_assoc()) {
                         }
                         $stmt_comments->close();
 
-                        // Gọi hàm đệ quy để render bình luận (chỉ render gốc)
                         renderComments($post_id, $comments_by_parent, NULL);
                         ?>
 
@@ -559,11 +554,8 @@ while ($row = $emotes_result->fetch_assoc()) {
             }
         });
     </script>
-    
+
     <script>
-    // Script riêng của trang POSTS (cho like, comment, v.v.)
-    
-    // Truyền dữ liệu từ PHP sang JS
     const emotesMap = <?php echo json_encode($emotes_map); ?>;
     const currentUsername = <?php echo json_encode($current_username); ?>;
     const currentUserAvatar = '../../' + <?php echo json_encode($current_user_avatar); ?>;
@@ -614,7 +606,6 @@ while ($row = $emotes_result->fetch_assoc()) {
     // XỬ LÝ COMMENT (AJAX)
     // -----------------------
     function setReply(postId, commentId, username) {
-        // ... (Code này giữ nguyên) ...
         document.getElementById(`parent-id-input-${postId}`).value = commentId;
         document.getElementById(`reply-username-${postId}`).textContent = username;
         document.getElementById(`reply-info-${postId}`).style.display = 'block';
@@ -622,13 +613,11 @@ while ($row = $emotes_result->fetch_assoc()) {
     }
 
     function cancelReply(postId) {
-        // ... (Code này giữ nguyên) ...
         document.getElementById(`parent-id-input-${postId}`).value = '0';
         document.getElementById(`reply-info-${postId}`).style.display = 'none';
     }
 
     function createCommentHtml(comment, postId) {
-        // ... (Code này giữ nguyên) ...
         const avatarPath = comment.AvatarPath ? htmlspecialchars(comment.AvatarPath) : htmlspecialchars(currentUserAvatar);
         const avatar = avatarPath.startsWith('../../') ? avatarPath : '../../' + avatarPath;
         const username = comment.Username ? htmlspecialchars(comment.Username) : htmlspecialchars(currentUsername);
