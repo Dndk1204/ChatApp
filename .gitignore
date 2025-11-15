@@ -3,10 +3,6 @@
 email_config.local.php
 Handler/ForgotPasswordHandler/email_config.local.php
 
-# Composer
-vendor/
-composer.lock
-
 # IDE
 .vscode/
 .idea/
