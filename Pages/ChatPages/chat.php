@@ -11,7 +11,7 @@ if (!isset($_SESSION['user_id'])) {
 $current_user_id = $_SESSION['user_id'];
 $current_username = htmlspecialchars($_SESSION['username']);
 
-// Cập nhật trạng thái online ngay khi truy cập trang chat
+// Cập nhật trạng thái online khi truy cập trang chat
 if ($conn) {
     $sql_online = "UPDATE Users SET IsOnline = 1 WHERE UserId = ?";
     $stmt_online = $conn->prepare($sql_online);
@@ -20,6 +20,20 @@ if ($conn) {
         $stmt_online->execute();
         $stmt_online->close();
     }
+
+    // Đếm số tin nhắn chưa đọc
+    $sql_unread = "SELECT COUNT(*) as UnreadCount FROM messages WHERE ReceiverId = ? AND IsRead = 0 AND IsDeleted = 0";
+    $stmt_unread = $conn->prepare($sql_unread);
+    $unread_count = 0;
+    if ($stmt_unread) {
+        $stmt_unread->bind_param("i", $current_user_id);
+        $stmt_unread->execute();
+        $result_unread = $stmt_unread->get_result();
+        if ($result_unread && $row = $result_unread->fetch_assoc()) {
+            $unread_count = $row['UnreadCount'];
+        }
+        $stmt_unread->close();
+    }
 }
 ?>
 <!DOCTYPE html>
@@ -27,7 +41,7 @@ if ($conn) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat App - <?php echo $current_username; ?></title>
+    <title><?php echo $unread_count > 0 ? "($unread_count) Bạn có $unread_count chưa đọc" : "Chat App - " . $current_username; ?></title>
     <link rel="stylesheet" href="./../../css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap" rel="stylesheet">
     <style>
@@ -113,6 +127,21 @@ if ($conn) {
 
         .user-item.active .user-status-text {
             color: var(--color-text-muted);
+        }
+
+        .unread-badge {
+            background-color: #ff4444;
+            color: white;
+            border-radius: 50%;
+            padding: 2px 6px;
+            font-size: 0.75em;
+            font-weight: bold;
+            min-width: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            margin-left: 5px;
         }
 
         .user-details {
@@ -424,7 +453,7 @@ if ($conn) {
         <a href="../../Pages/ChatPages/chat.php">CHAT</a>
         <a href="../../Pages/FriendPages/friends.php">FRIENDS</a>
         <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'Admin'): ?>
-            <a href="../../admin_dashboard.php">ADMIN</a>
+            <a href="../../Handler/admin_dashboard.php">ADMIN</a>
         <?php endif; ?>
     </nav>
     <div class="auth-buttons">
@@ -531,7 +560,7 @@ if ($conn) {
         // Emoji list (có thể mở rộng)
         const emojis = ['😀', '😂', '😍', '🤔', '😎', '😭', '🥺', '👍', '❤️', '🔥', '🥳', '🤯'];
         
-        // --- CHUẨN BỊ EMOJI PICKER ---
+        // Khởi tạo emoji picker
         function initEmojiPicker() {
             emojiPicker.innerHTML = emojis.map(e => `<span class="emoji-item" data-emoji="${e}">${e}</span>`).join('');
             document.querySelectorAll('.emoji-item').forEach(item => {
@@ -544,13 +573,13 @@ if ($conn) {
         }
         initEmojiPicker();
 
-        // --- BẬT/TẮT EMOJI PICKER ---
+        // Bật/tắt emoji picker
         function toggleEmojiPicker() {
              if (receiverId === null) return;
              emojiPicker.classList.toggle('open');
         }
 
-        // --- 1. HÀM TẢI VÀ TÌM KIẾM NGƯỜI DÙNG ---
+        // Tải danh sách người dùng và tìm kiếm
         function loadUsers(search_query = '') {
             const url = `./../../Handler/ChatHandler/fetch-users.php?search=${encodeURIComponent(search_query)}`;
             
@@ -573,14 +602,18 @@ if ($conn) {
                             userItem.setAttribute('data-username', user.Username);
                             
                             const statusClass = user.IsOnline == 1 ? 'online' : 'offline';
-                            const statusText = user.IsOnline == 1 ? 'Online' : 'Offline';
+                            const unreadCount = user.UnreadCount || 0;
+                            
+                            const unreadBadge = unreadCount > 0 
+                                ? `<span class="unread-badge">${unreadCount}</span>` 
+                                : '';
                             
                             userItem.innerHTML = `
                                 <div class="user-details">
                                     <span class="status-indicator ${statusClass}"></span>
                                     <span class="user-name">${htmlspecialchars(user.Username)}</span>
                                 </div>
-                                <span class="user-status-text">(${statusText})</span>
+                                ${unreadBadge}
                             `;
                             
                             userItem.onclick = () => selectUser(user.UserId, user.Username);
@@ -599,13 +632,12 @@ if ($conn) {
                 });
         }
         
-        // Xử lý tìm kiếm khi người dùng gõ
         searchInput.addEventListener('input', () => {
             const query = searchInput.value.trim();
             loadUsers(query);
         });
 
-        // --- HÀM CHỌN NGƯỜI DÙNG ĐỂ CHAT (SELECT USER) ---
+        // Chọn người dùng để chat
         function selectUser(id, username) {
             if (receiverId === id) return;
 
@@ -642,7 +674,7 @@ if ($conn) {
             mediaPollInterval = setInterval(loadMediaViewer, 10000); 
         }
 
-        // --- HÀM TẢI VÀ HIỂN THỊ TIN NHẮN ---
+        // Tải và hiển thị tin nhắn
         function loadMessages() {
             if (!receiverId) return;
 
@@ -676,13 +708,10 @@ if ($conn) {
                             const timeString = date.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
                             let contentHTML = '';
 
-                            // Kiểm tra MessageType được giả lập từ PHP Handler
                             if (msg.MessageType === 'image' && msg.FilePath) {
-                                // Path được chuẩn hóa
                                 const imagePath = msg.FilePath.startsWith('/') ? msg.FilePath.substring(1) : msg.FilePath;
                                 contentHTML = `<img src="./../../${htmlspecialchars(imagePath)}" alt="Image" class="message-image" onclick="viewImage(this.src)">`;
                             } else {
-                                // Sử dụng content (text)
                                 contentHTML = `<div class="message-text-content">${linkify(htmlspecialchars(msg.Content))}</div>`;
                             }
 
@@ -714,7 +743,7 @@ if ($conn) {
             });
         }
         
-        // --- HÀM TẢI MEDIA CHO MEDIA VIEWER (KHO LƯU TRỮ ẢNH) ---
+        // Tải media cho media viewer
         function loadMediaViewer() {
             if (!receiverId) return;
             
@@ -723,7 +752,6 @@ if ($conn) {
             fetch(url, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                // Lấy tất cả tin nhắn
                 body: `receiver_id=${receiverId}&last_timestamp=0` 
             })
             .then(response => response.json())
@@ -731,10 +759,8 @@ if ($conn) {
                 mediaGrid.innerHTML = '';
                 let mediaCount = 0;
                 
-                messages.reverse().forEach(msg => { // Đảo ngược để ảnh mới nhất lên đầu
-                    // Kiểm tra MessageType được giả lập từ PHP Handler
+                messages.reverse().forEach(msg => {
                     if (msg.MessageType === 'image' && msg.FilePath) {
-                        // Path được chuẩn hóa
                         const imagePath = msg.FilePath.startsWith('/') ? msg.FilePath.substring(1) : msg.FilePath;
                         const mediaItem = document.createElement('div');
                         mediaItem.className = 'media-item';
@@ -752,7 +778,7 @@ if ($conn) {
         }
 
 
-        // --- HÀM GỬI TIN NHẮN (TEXT) ---
+        // Gửi tin nhắn text
         function sendMessage() {
             const content = messageInput.value.trim();
             if (content === '' || receiverId === null) return;
@@ -766,7 +792,6 @@ if ($conn) {
             fetch(url, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                // Gửi nội dung tin nhắn thường
                 body: `receiver_id=${receiverId}&content=${encodeURIComponent(tempMessageContent)}` 
             })
             .then(response => {
@@ -793,7 +818,7 @@ if ($conn) {
             });
         }
         
-        // --- HÀM GỬI MEDIA (IMAGE) ---
+        // Gửi ảnh/media
         fileInput.addEventListener('change', sendMedia);
 
         function sendMedia() {
@@ -803,8 +828,6 @@ if ($conn) {
             const formData = new FormData();
             formData.append('receiver_id', receiverId);
             formData.append('image', file);
-            
-            // Xóa file đã chọn khỏi input
             fileInput.value = '';
             
             const url = './../../Handler/ChatHandler/send-media.php';
@@ -837,20 +860,19 @@ if ($conn) {
             });
         }
         
-        // --- 3. HÀM CHUYỂN ĐỔI MEDIA VIEWER ---
+        // Chuyển đổi media viewer
         function toggleMediaViewer() {
             const isOpen = mediaViewer.classList.toggle('open');
             if (isOpen) {
                 chatArea.classList.add('with-media-viewer');
-                loadMediaViewer(); // Tải lại media khi mở
+                loadMediaViewer();
             } else {
                 chatArea.classList.remove('with-media-viewer');
             }
         }
         
-        // --- HÀM TIỆN ÍCH ---
+        // Xem ảnh
         function viewImage(src) {
-            // Mở ảnh trong cửa sổ mới khi click
             window.open(src, '_blank');
         }
 
@@ -877,8 +899,6 @@ if ($conn) {
             return replacedText;
         }
         
-        // --- KHỞI ĐỘNG VÀ LISTENERS ---
-        // Bắt sự kiện Enter để gửi tin nhắn
         messageInput.addEventListener('keydown', function(event) {
             if (event.key === 'Enter') {
                 event.preventDefault(); 
@@ -886,35 +906,28 @@ if ($conn) {
             }
         });
         
-        // Đóng emoji picker khi click ra ngoài
         document.addEventListener('click', (e) => {
              if (emojiPicker.classList.contains('open') && !emojiPicker.contains(e.target) && e.target !== emojiButton && !messageInput.contains(e.target)) {
                 emojiPicker.classList.remove('open');
             }
         });
         
-        // Kiểm tra friend_id từ URL và tự động chọn người dùng
         const urlParams = new URLSearchParams(window.location.search);
         const friendIdFromUrl = urlParams.get('friend_id');
         
         loadUsers().then(users => {
             if (friendIdFromUrl) {
                 const friendId = parseInt(friendIdFromUrl);
-                // Tìm user trong danh sách
                 const friendUser = users.find(u => u.UserId == friendId);
                 if (friendUser && friendUser.UserId != currentUserId) {
-                    // Tự động chọn người bạn này
                     selectUser(friendUser.UserId, friendUser.Username);
-                    // Xóa friend_id khỏi URL để tránh reload lại
                     const newUrl = window.location.pathname;
                     window.history.replaceState({}, '', newUrl);
                 }
             }
         });
         
-        userPollInterval = setInterval(loadUsers, 5000); // 5 giây
-        
-        // Avatar dropdown (giữ nguyên logic cũ)
+        userPollInterval = setInterval(loadUsers, 5000);
         (function(){
             const avatarBtn = document.getElementById('avatarBtn');
             const avatarDropdown = document.getElementById('avatarDropdown');

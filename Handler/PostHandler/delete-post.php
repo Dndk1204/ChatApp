@@ -34,7 +34,6 @@ try {
         $stmt_delete->execute();
 
         if (!empty($image_path)) {
-            // SỬA: Phải lên 2 cấp mới ra thư mục gốc để tìm 'uploads/'
             $image_path_on_server = "../../" . $image_path; 
             if (file_exists($image_path_on_server)) {
                 unlink($image_path_on_server);

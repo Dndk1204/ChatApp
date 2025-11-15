@@ -113,7 +113,7 @@ $current_username = $_SESSION['username'] ?? 'Guest';
           <a href="../../Pages/ChatPages/chat.php">CHAT</a>
           <a href="../../Pages/FriendPages/friends.php">FRIENDS</a>
           <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'Admin'): ?>
-              <a href="../../admin_dashboard.php">ADMIN</a>
+              <a href="../../Handler/admin_dashboard.php">ADMIN</a>
           <?php endif; ?>
       </nav>
       <div class="auth-buttons">

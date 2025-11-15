@@ -181,7 +181,7 @@ try {
         <nav class="main-nav">
             <a href="../../index.php">HOME</a>
             <a href="posts.php">POSTS</a> <a href="../ChatPages/chat.php">CHAT</a> <a href="../FriendPages/friends.php">FRIENDS</a> <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'Admin'): ?>
-                <a href="../../admin_dashboard.php">ADMIN</a>
+                <a href="../../Handler/admin_dashboard.php">ADMIN</a>
             <?php endif; ?>
         </nav>
         <div class="auth-buttons">

@@ -15,24 +15,24 @@ $search_query = isset($_GET['search']) ? trim($_GET['search']) : '';
 $users = [];
 
 try {
-    // Query mới: Chỉ lấy những người đã là bạn (IsConfirmed = 1)
     $sql = "
-        SELECT u.UserId, u.Username, u.IsOnline
+        SELECT u.UserId, u.Username, u.IsOnline,
+               COALESCE((SELECT COUNT(*) FROM messages 
+                        WHERE SenderId = u.UserId 
+                        AND ReceiverId = ? 
+                        AND IsRead = 0 
+                        AND IsDeleted = 0), 0) as UnreadCount
         FROM users u
         WHERE u.UserId IN (
-            -- Lấy những người mà BẠN đã gửi yêu cầu VÀ đã được chấp nhận
             SELECT FriendUserId FROM friends WHERE UserId = ? AND IsConfirmed = 1
             UNION
-            -- Lấy những người đã gửi yêu cầu cho BẠN VÀ bạn đã chấp nhận
             SELECT UserId FROM friends WHERE FriendUserId = ? AND IsConfirmed = 1
         )
     ";
     
-    // Gán 2 tham số ID của bạn vào
-    $params = [$current_user_id, $current_user_id];
-    $types = "ii";
+    $params = [$current_user_id, $current_user_id, $current_user_id];
+    $types = "iii";
 
-    // Thêm điều kiện tìm kiếm (nếu có)
     if (!empty($search_query)) {
         $sql .= " AND u.Username LIKE ?";
         $params[] = "%" . $search_query . "%";

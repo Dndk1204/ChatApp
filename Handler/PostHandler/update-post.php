@@ -1,6 +1,5 @@
 <?php
 session_start();
-// (1) Đường dẫn này ĐÚNG
 require_once '../db.php'; 
 
 // (2) Kiểm tra đăng nhập và POST
@@ -14,7 +13,6 @@ $user_id = $_SESSION['user_id'];
 $post_id = isset($_POST['post_id']) ? (int)$_POST['post_id'] : 0;
 $content = $_POST['content'];
 
-// [THAY ĐỔI 1] Lấy giá trị Privacy mới
 $privacy = (isset($_POST['privacy']) && $_POST['privacy'] === 'public') ? 'public' : 'friends';
 
 
@@ -25,7 +23,6 @@ if ($post_id === 0) {
 }
 
 try {
-    // (3) Kiểm tra quyền sở hữu và lấy ảnh cũ
     $sql_get = "SELECT ImagePath FROM posts WHERE PostId = ? AND UserId = ?";
     $stmt_get = $conn->prepare($sql_get);
     $stmt_get->bind_param("ii", $post_id, $user_id);
@@ -43,8 +40,6 @@ try {
     $new_image_path = $old_image_path; 
     $stmt_get->close();
 
-
-    // (4) Xử lý file upload MỚI
     if (isset($_FILES['image']) && $_FILES['image']['error'] == 0) {
         
         $target_dir = "../../uploads/posts/"; // ĐÚNG
@@ -58,7 +53,6 @@ try {
             if (move_uploaded_file($_FILES["image"]["tmp_name"], $target_file_path)) {
                 $new_image_path = "uploads/posts/" . $target_file_name;
                 
-                // (5) Xóa ảnh cũ
                 if (!empty($old_image_path)) {
                     $old_image_server_path = "../../" . $old_image_path; // ĐÚNG
                     if (file_exists($old_image_server_path)) {
@@ -77,19 +71,14 @@ try {
         }
     }
 
-    // (6) Cập nhật CSDL
-    // [THAY ĐỔI 2] Thêm `Privacy = ?`
     $sql_update = "UPDATE posts SET Content = ?, ImagePath = ?, Privacy = ? WHERE PostId = ? AND UserId = ?";
     $stmt_update = $conn->prepare($sql_update);
-    
-    // [THAY ĐỔI 3] Thêm 's' và $privacy (từ 'ssii' thành 'sssii')
     $stmt_update->bind_param("sssii", $content, $new_image_path, $privacy, $post_id, $user_id);
     $stmt_update->execute();
     
     $stmt_update->close();
     $conn->close();
     
-    // (7) Quay về trang posts
     header("Location: ../../Pages/PostPages/posts.php"); 
     exit();
 

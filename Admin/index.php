@@ -2,10 +2,7 @@
 require_once __DIR__ . '/_auth.php';
 require_once __DIR__ . '/_helpers.php';
 
-// Kiểm tra cột CreatedAt
 $hasCreatedAt = admin_has_created_at($conn);
-
-// Lấy thống kê
 $stats = admin_get_stats($conn, $hasCreatedAt);
 ?>
 <!DOCTYPE html>

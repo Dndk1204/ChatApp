@@ -5,7 +5,7 @@ require_once '../db.php';
 header('Content-Type: application/json');
 
 if (!isset($_SESSION['user_id']) || $_SERVER["REQUEST_METHOD"] != "POST" || !$conn) {
-    http_response_code(401); // Unauthorized
+    http_response_code(401);
     echo json_encode(['error' => 'Chưa đăng nhập hoặc phương thức không hợp lệ.']);
     exit();
 }
@@ -15,7 +15,7 @@ $receiver_id = isset($_POST['receiver_id']) ? (int)$_POST['receiver_id'] : 0;
 $last_timestamp_ms = isset($_POST['last_timestamp']) ? (float)$_POST['last_timestamp'] : 0;
 
 if ($receiver_id === 0) {
-    http_response_code(400); // Bad Request
+    http_response_code(400);
     echo json_encode(['error' => 'Thiếu ID người nhận.']);
     exit();
 }
@@ -29,14 +29,11 @@ try {
     $types = "";
     $params = [];
     
-    // Chỉ chọn MessageId, SenderId, Content, SentAt và Username
     $select_cols = "m.MessageId, m.SenderId, m.Content, m.SentAt, u.Username AS SenderName";
     
-    // Điều kiện chung cho tin nhắn giữa 2 người
     $where_conversation = "(m.SenderId = ? AND m.ReceiverId = ?) OR (m.SenderId = ? AND m.ReceiverId = ?)";
 
     if ($last_timestamp_ms == 0) {
-        // Tải LẦN ĐẦU: lấy tất cả tin nhắn
         $sql = "SELECT {$select_cols}
                 FROM Messages m
                 JOIN Users u ON m.SenderId = u.UserId
@@ -47,7 +44,6 @@ try {
         $params = [$sender_id, $receiver_id, $receiver_id, $sender_id];
 
     } else {
-        // Tải tin nhắn MỚI (Polling)
         $last_timestamp_sql = date('Y-m-d H:i:s', ($last_timestamp_ms / 1000) + 0.001);
 
         $sql = "SELECT {$select_cols}
