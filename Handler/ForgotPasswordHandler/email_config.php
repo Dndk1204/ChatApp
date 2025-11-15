@@ -1,12 +1,17 @@
 <?php
-// Cấu hình gửi email
-// Bạn cần cập nhật thông tin SMTP của mình
+// Cấu hình gửi email - TEMPLATE
+// Nếu file .local tồn tại, dùng nó; nếu không dùng mặc định
+if (file_exists(__DIR__ . '/email_config.local.php')) {
+    return require __DIR__ . '/email_config.local.php';
+}
+
+// Giá trị mặc định (để test, không có thông tin nhạy cảm)
 return [
-    'smtp_host' => 'smtp.gmail.com',           // SMTP server
+    'smtp_host' => 'localhost',                // SMTP server
     'smtp_port' => 587,                        // Port (587 for TLS, 465 for SSL)
-    'smtp_username' => 'huynhngoclong917@gmail.com', // Email gửi
-    'smtp_password' => 'lxnp ddxn ghjt hfsz',    // Password hoặc App Password
-    'from_email' => 'huynhngoclong917@gmail.com',    // Email gửi đi
+    'smtp_username' => '',                     // Email gửi
+    'smtp_password' => '',                     // Password hoặc App Password
+    'from_email' => '',                        // Email gửi đi
     'from_name' => 'ChatApp',                  // Tên người gửi
 ];
 ?>
