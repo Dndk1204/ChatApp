@@ -661,6 +661,47 @@ ALTER TABLE `post_images`
 ALTER TABLE `reports`
   ADD CONSTRAINT `FK_Reports_Post` FOREIGN KEY (`PostId`) REFERENCES `posts` (`PostId`) ON DELETE CASCADE,
   ADD CONSTRAINT `FK_Reports_Reporter` FOREIGN KEY (`ReporterId`) REFERENCES `users` (`UserId`) ON DELETE CASCADE;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `password_reset_otp`
+--
+
+CREATE TABLE `password_reset_otp` (
+  `OtpId` int(11) NOT NULL,
+  `UserId` int(11) NOT NULL,
+  `Email` varchar(100) NOT NULL,
+  `Otp` varchar(6) NOT NULL,
+  `IsUsed` tinyint(1) NOT NULL DEFAULT 0,
+  `ExpiresAt` datetime NOT NULL,
+  `CreatedAt` datetime NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Indexes for dumped tables
+--
+
+--
+-- Indexes for table `password_reset_otp`
+--
+ALTER TABLE `password_reset_otp`
+  ADD PRIMARY KEY (`OtpId`),
+  ADD KEY `UserId` (`UserId`),
+  ADD KEY `Email` (`Email`);
+
+--
+-- AUTO_INCREMENT for table `password_reset_otp`
+--
+ALTER TABLE `password_reset_otp`
+  MODIFY `OtpId` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- Constraints for table `password_reset_otp`
+--
+ALTER TABLE `password_reset_otp`
+  ADD CONSTRAINT `fk_otp_user` FOREIGN KEY (`UserId`) REFERENCES `users` (`UserId`) ON DELETE CASCADE;
+
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

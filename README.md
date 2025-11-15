@@ -3,9 +3,13 @@
 ```
 ChatApp/
 ├─ admin_dashboard.php
-├─ chatapp_db.sql
+├─ chatappsql.sql
 ├─ index.php
 ├─ README.md
+├─ README_FORGOT_PASSWORD.md          [MỚI - Hướng dẫn Forgot Password]
+├─ SETUP_EMAIL.md                      [MỚI - Setup Email]
+├─ SETUP_GMAIL_DETAILED.md             [MỚI - Hướng dẫn Gmail Chi Tiết]
+├─ INSTALL_PHPMAILER_NO_COMPOSER.md    [MỚI - Cài PHPMailer Không Composer]
 ├─ Admin/
 │  ├─ _auth.php
 │  ├─ _helpers.php
@@ -22,6 +26,12 @@ ChatApp/
 │  ├─ login.php
 │  ├─ logout.php
 │  ├─ register.php
+│  ├─ email_config.php                 [MỚI - Cấu hình SMTP]
+│  ├─ email_helper.php                 [MỚI - Hàm gửi email]
+│  ├─ forgot-password.php              [MỚI - API tạo OTP]
+│  ├─ verify-otp.php                   [MỚI - API verify OTP]
+│  ├─ reset-password.php               [MỚI - API reset password]
+│  ├─ test_email_config.php            [MỚI - Trang test email]
 │  ├─ ChatHandler/
 │  │  ├─ fetch-messages.php
 │  │  ├─ fetch-users.php
@@ -43,16 +53,30 @@ ChatApp/
 │     ├─ unfriend.php
 │     └─ update-post.php
 ├─ Pages/
-│  ├─ login.php
+│  ├─ blocked_list.php
+│  ├─ hidden_list.php
+│  ├─ login.php                        [CẬP NHẬT - Thêm link "Quên mật khẩu?"]
 │  ├─ profile.php
 │  ├─ register.php
+│  ├─ forgot-password.php              [MỚI - Trang reset password 3 bước]
 │  ├─ ChatPages/
 │  │  └─ chat.php
 │  ├─ FriendPages/
 │  │  └─ friends.php
 │  └─ PostPages/
+│     ├─ create_album.php
 │     ├─ create_post.php
+│     ├─ edit_post.php
 │     └─ posts.php
+├─ vendor/                             [MỚI - Composer dependencies]
+│  ├─ autoload.php
+│  ├─ composer/
+│  └─ phpmailer/
+│     └─ phpmailer/src/
+│        ├─ Exception.php
+│        ├── PHPMailer.php
+│        ├─ SMTP.php
+│        └─ ... (các file khác)
 └─ uploads/
 	├─ avatars/
 	├─ messages/
@@ -96,3 +120,119 @@ ChatApp/
 	- `messages/`: File media gửi kèm tin nhắn, chia theo user id.
 	- `posts/`: Ảnh/đính kèm của bài viết.
 
+---
+
+## 🔐 Chức Năng Quên Mật Khẩu Với OTP
+
+### 📌 Mô Tả
+
+Chức năng cho phép người dùng reset mật khẩu thông qua email OTP 6 chữ số:
+1. Nhập email để yêu cầu reset password
+2. Nhận mã OTP qua email (thời hạn 15 phút)
+3. Xác nhận OTP để verify danh tính
+4. Đặt mật khẩu mới
+5. Tự động quay về login sau 3 giây
+
+#### **Dependencies**
+- `vendor/` - Thư mục Composer (PHPMailer & dependencies)
+- `vendor/autoload.php` - Composer autoload
+### 🚀 Hướng Dẫn Cài Đặt Nhanh
+#### **1. Cài Đặt Composer**
+```powershell
+# Tải và cài từ: https://getcomposer.org/download/
+# Chạy Composer-Setup.exe
+# Kiểm tra
+composer --version
+```
+### Bước 2: Kiểm Tra Cài Đặt
+**Quan trọng:** Mở PowerShell/Terminal **MỚI** (không phải cửa sổ cũ)
+```powershell
+composer --version
+```
+**Kết quả mong đợi:**
+```
+Composer version 2.6.5 2023-10-06 10:11:52
+```
+---
+
+### Bước 3: Thêm Composer Vào PATH (Nếu Cần)
+
+Nếu `composer --version` hiển thị lỗi, bạn cần thêm Composer vào PATH.
+
+1. **Mở PowerShell as Administrator**
+   - Nhấn `Win + X` → Chọn **"Windows PowerShell (Admin)"**
+
+2. **Tìm đường dẫn Composer:**
+   ```powershell
+   Get-Command composer
+   # Hoặc
+   where.exe composer
+   ```
+   
+   Nếu tìm thấy, ghi lại đường dẫn (ví dụ: `C:\ProgramData\ComposerSetup\bin`)
+
+3. **Thêm vào PATH:**
+   ```powershell
+   setx PATH "$($env:PATH);C:\ProgramData\ComposerSetup\bin"
+   ```
+   
+   > **Lưu ý:** Thay `C:\ProgramData\ComposerSetup\bin` bằng đường dẫn thực tế nếu khác
+
+4. **Mở PowerShell mới và kiểm tra:**
+   ```powershell
+   composer --version
+   ```
+
+---
+
+## 📦 Cài Đặt PHPMailer
+
+### Cách 1: Dùng Composer (Khuyên Dùng) ⭐
+
+```powershell
+cd d:\Study\XAMPP\htdocs\MaNguonMo\thiCK\ChatApp
+composer require phpmailer/phpmailer
+```
+
+**Kết quả mong đợi:**
+```
+Using version ^6.8 for phpmailer/phpmailer
+./composer.json has been updated
+Loading composer repositories with package information
+...
+Installing phpmailer/phpmailer (v6.8.1)
+```
+
+✅ **Hoàn tất! PHPMailer đã được cài.**
+
+---
+
+#### **3. Cấu Hình Email**
+
+Mở `Handler/email_config.php` và cập nhật:
+
+**Cho Gmail:**
+```php
+return [
+    'smtp_host' => 'smtp.gmail.com',
+    'smtp_port' => 587,
+    'smtp_username' => 'your-email@gmail.com',
+    'smtp_password' => 'your-app-password',  // 16 ký tự từ Google
+    'from_email' => 'your-email@gmail.com', // Email người gửi
+    'from_name' => 'ChatApp',
+];
+```
+
+**Lấy App Password Gmail:**
+1. Vào: https://myaccount.google.com/
+2. Bảo mật → Xác thực 2 bước (bật nếu chưa)
+3. Mật khẩu ứng dụng → Chọn Mail + Windows Computer
+4. Copy mật khẩu 16 ký tự
+
+#### **4. Test Email**
+
+```
+http://localhost/ChatApp/Handler/test_email_config.php
+```
+
+Nhập email → Click "Gửi Email Test" → Kiểm tra email nhận được

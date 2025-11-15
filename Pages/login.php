@@ -65,7 +65,13 @@
                     <input type="password" id="password" name="password" required>
                 </div>
                 <button type="submit" class="btn-submit">Login</button>
+                <div style="text-align: center; margin-top: 15px;">
+                    <a href="forgot-password.php" style="color: #007bff; text-decoration: none;">Quên mật khẩu?</a>
+                </div>
             </form>
+            <div style="text-align: center; margin-top: 15px;">
+                <p>Chưa có tài khoản? <a href="register.php" style="color: #007bff; text-decoration: none;">Đăng ký ngay</a></p>
+            </div>
         </div>
     </main>
 
