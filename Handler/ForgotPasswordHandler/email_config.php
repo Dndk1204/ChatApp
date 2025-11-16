@@ -7,11 +7,11 @@ if (file_exists(__DIR__ . '/email_config.local.php')) {
 
 // Giá trị mặc định (để test, không có thông tin nhạy cảm)
 return [
-    'smtp_host' => 'smtp.gmail.com',                // SMTP server
-    'smtp_port' => 587,                        // Port (587 for TLS, 465 for SSL)
-    'smtp_username' => '',                     // Email gửi
-    'smtp_password' => '',                     // Password hoặc App Password
-    'from_email' => '',                        // Email gửi đi
-    'from_name' => 'ChatApp',                  // Tên người gửi
+    'smtp_host'     => 'smtp.gmail.com',           // Gmail SMTP host
+    'smtp_port'     => 587,                        // TLS port (465 for SSL)
+    'smtp_username' => 'deadordie159@gmail.com',   // Your Gmail address
+    'smtp_password' => 'uvdn hbxp nmpy djhk',      // App Password or Gmail password
+    'from_email'    => 'deadordie159@gmail.com',   // Sender email
+    'from_name'     => 'ChatApp',                  // Sender name
 ];
 ?>
