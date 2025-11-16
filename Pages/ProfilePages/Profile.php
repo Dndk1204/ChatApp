@@ -96,6 +96,7 @@ while ($row = $result_emotes->fetch_assoc()) {
             align-items: center;
             gap: 20px;
             margin-bottom: 20px;
+            width: auto;
         }
         .profile-avatar {
             width: 100px;

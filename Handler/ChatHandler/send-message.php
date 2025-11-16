@@ -6,41 +6,58 @@ header('Content-Type: application/json');
 
 if (!isset($_SESSION['user_id']) || $_SERVER["REQUEST_METHOD"] != "POST" || !$conn) {
     http_response_code(401);
-    echo json_encode(['status' => 'error', 'message' => 'Truy cập không hợp lệ hoặc chưa đăng nhập.']);
+    echo json_encode(['status' => 'error', 'message' => 'Yêu cầu không hợp lệ.']);
     exit();
 }
 
-$sender_id = $_SESSION['user_id'];
-$receiver_id = isset($_POST['receiver_id']) ? (int)$_POST['receiver_id'] : 0;
-$content = isset($_POST['content']) ? trim($_POST['content']) : '';
+$sender_id = (int)$_SESSION['user_id'];
+$receiver_id = (int)($_POST['receiver_id'] ?? 0);
+$group_id = (int)($_POST['group_id'] ?? 0);
+$content = trim($_POST['content'] ?? '');
 
-if ($receiver_id === 0 || empty($content)) {
-    http_response_code(400);
-    echo json_encode(['status' => 'error', 'message' => 'Người nhận hoặc nội dung không hợp lệ.']);
+// --- SỬA LỖI 400 ---
+// Nếu không có nội dung, HOẶC không có cả ID người nhận VÀ ID nhóm -> Lỗi
+if (empty($content) || ($receiver_id === 0 && $group_id === 0)) {
+    http_response_code(400); // Đây chính là lỗi 400
+    echo json_encode(['status' => 'error', 'message' => 'Dữ liệu gửi lên không hợp lệ.']);
     exit();
 }
 
 try {
-    $sql = "INSERT INTO Messages (SenderId, ReceiverId, Content) VALUES (?, ?, ?)";
-    $stmt = $conn->prepare($sql);
+    $sql = "";
+    $stmt = null;
 
-    if ($stmt === false) {
-        throw new Exception("Lỗi chuẩn bị CSDL: " . $conn->error);
+    if ($receiver_id > 0) {
+        // Đây là CHAT RIÊNG (1-với-1)
+        $sql = "INSERT INTO messages (SenderId, ReceiverId, Content, MessageType) VALUES (?, ?, ?, 'text')";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("iis", $sender_id, $receiver_id, $content);
+        
+    } else if ($group_id > 0) {
+        // Đây là CHAT NHÓM
+        $sql = "INSERT INTO messages (SenderId, GroupId, Content, MessageType) VALUES (?, ?, ?, 'text')";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("iis", $sender_id, $group_id, $content);
+        
+    } else {
+        // Trường hợp này đã bị chặn ở trên, nhưng để an toàn
+        throw new Exception("Không xác định được người nhận.");
     }
 
-    $stmt->bind_param("iis", $sender_id, $receiver_id, $content);
     $stmt->execute();
-
-    $new_message_id = $conn->insert_id;
+    
+    if ($stmt->affected_rows > 0) {
+        echo json_encode(['status' => 'success', 'message' => 'Gửi thành công.']);
+    } else {
+        throw new Exception("Không thể gửi tin nhắn.");
+    }
     
     $stmt->close();
     $conn->close();
 
-    echo json_encode(['status' => 'success', 'message_id' => $new_message_id]);
-
 } catch (Exception $e) {
     http_response_code(500);
-    echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
+    echo json_encode(['status' => 'error', 'message' => 'Lỗi server: ' . $e->getMessage()]);
     if (isset($stmt) && $stmt) $stmt->close();
     if ($conn) $conn->close();
 }

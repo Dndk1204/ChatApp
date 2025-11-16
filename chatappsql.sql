@@ -707,3 +707,59 @@ COMMIT;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+
+CREATE TABLE `group_members` (
+  `GroupMemberId` int(11) NOT NULL AUTO_INCREMENT,
+  `GroupId` int(11) NOT NULL,
+  `UserId` int(11) NOT NULL,
+  `JoinedAt` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`GroupMemberId`),
+  
+  -- Đảm bảo một người không thể tham gia 1 nhóm 2 lần
+  UNIQUE KEY `UQ_Group_User` (`GroupId`, `UserId`), 
+  
+  -- Liên kết với bảng users
+  KEY `FK_GroupMembers_User` (`UserId`),
+  
+  -- Liên kết với bảng groups (tự động xóa thành viên nếu nhóm bị xóa)
+  CONSTRAINT `FK_GroupMembers_Group` FOREIGN KEY (`GroupId`) REFERENCES `groups` (`GroupId`) ON DELETE CASCADE,
+  
+  -- Liên kết với bảng users (tự động xóa thành viên nếu user bị xóa)
+  CONSTRAINT `FK_GroupMembers_User` FOREIGN KEY (`UserId`) REFERENCES `users` (`UserId`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+ALTER TABLE `group_members`
+ADD COLUMN `Role` ENUM('Admin', 'Member') NOT NULL DEFAULT 'Member' AFTER `UserId`;
+
+ALTER TABLE `group_members`
+MODIFY COLUMN `Role` ENUM('Admin', 'Member') NOT NULL DEFAULT 'Member';
+
+-- 1. Thêm các cột còn thiếu
+ALTER TABLE `groups`
+ADD COLUMN `CreatedBy` INT NOT NULL AFTER `GroupName`,
+ADD COLUMN `CreatedAt` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP AFTER `CreatedBy`;
+
+-- 2. Thêm liên kết (Foreign Key) để đảm bảo an toàn dữ liệu
+ALTER TABLE `groups`
+ADD CONSTRAINT `FK_Groups_CreatedBy` FOREIGN KEY (`CreatedBy`) REFERENCES `users`(`UserId`) ON DELETE CASCADE;
+
+-- 3. Đảm bảo GroupId là AUTO_INCREMENT (file của bạn đã có, nhưng chạy lại cho chắc)
+ALTER TABLE `groups`
+MODIFY `GroupId` int(11) NOT NULL AUTO_INCREMENT;
+
+-- Bước 1: Cập nhật tất cả nhóm cũ đang có CreatedBy = 0
+-- Gán chúng cho tài khoản admin (UserId = 9)
+-- (Bạn có thể đổi số 9 thành ID admin khác nếu muốn)
+
+UPDATE `groups` 
+SET `CreatedBy` = 9 
+WHERE `CreatedBy` = 0 OR `CreatedBy` IS NULL;
+
+-- Bước 2: Chạy lại lệnh thêm liên kết (Foreign Key)
+-- Lần này nó sẽ thành công vì không còn UserId = 0 nữa
+
+ALTER TABLE `groups`
+ADD CONSTRAINT `FK_Groups_CreatedBy` FOREIGN KEY (`CreatedBy`) REFERENCES `users`(`UserId`) ON DELETE CASCADE;
+
+ALTER TABLE `groups`
+ADD COLUMN `AvatarPath` VARCHAR(255) NULL DEFAULT NULL COMMENT 'Đường dẫn ảnh đại diện của nhóm' AFTER `GroupName`;

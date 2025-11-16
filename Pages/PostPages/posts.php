@@ -119,7 +119,7 @@ while ($row = $emotes_result->fetch_assoc()) {
         }
         .post-album-grid.single-image img {
             height: auto; /* Chiều cao tự động */
-            max-height: 650px;
+            max-height: 1000px;
         }
         /* CSS đặc biệt nếu có 3 ảnh */
         .post-album-grid.three-images {
