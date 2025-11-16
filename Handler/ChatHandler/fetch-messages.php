@@ -48,7 +48,7 @@ try {
             $sql = "SELECT {$select_cols} FROM Messages m LEFT JOIN Users u ON m.SenderId = u.UserId WHERE {$where_conversation} ORDER BY m.SentAt ASC";
         } else {
             // Chỉ tải tin nhắn mới
-            $sql = "SELECT {$select_cols} FROM Messages m LEFT JOIN Users u ON m.SenderId = u.UserId WHERE ({$where_conversation}) AND m.SentAt >= ? ORDER BY m.SentAt ASC";
+            $sql = "SELECT {$select_cols} FROM Messages m LEFT JOIN Users u ON m.SenderId = u.UserId WHERE ({$where_conversation}) AND m.SentAt > ? ORDER BY m.SentAt ASC";
             $params[] = $last_timestamp_sql;
             $types .= "s";
         }
@@ -64,7 +64,7 @@ try {
             $sql = "SELECT {$select_cols} FROM Messages m LEFT JOIN Users u ON m.SenderId = u.UserId WHERE {$where_conversation} ORDER BY m.SentAt ASC";
         } else {
             // Chỉ tải tin nhắn mới
-            $sql = "SELECT {$select_cols} FROM Messages m LEFT JOIN Users u ON m.SenderId = u.UserId WHERE {$where_conversation} AND m.SentAt >= ? ORDER BY m.SentAt ASC";
+            $sql = "SELECT {$select_cols} FROM Messages m LEFT JOIN Users u ON m.SenderId = u.UserId WHERE {$where_conversation} AND m.SentAt > ? ORDER BY m.SentAt ASC";
             $params[] = $last_timestamp_sql;
             $types .= "s";
         }

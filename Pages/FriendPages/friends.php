@@ -95,6 +95,7 @@ $current_username = $_SESSION['username'] ?? 'Guest';
   button.accept { background: var(--color-success); color: #fff; }
   button.reject { background: var(--color-error); color: #fff; }
 </style>
+<?php global_render_css(); // <-- THÊM DÒNG NÀY VÀO ĐÂY ?>
 </head>
 <body>
   <header class="navbar">
@@ -157,6 +158,13 @@ $current_username = $_SESSION['username'] ?? 'Guest';
       </div>
   </div>
 
+  <?php 
+  render_global_profile_modal(
+      '/ChatApp/Handler/FriendHandler/friend-handler.php',
+      '/ChatApp/uploads/default-avatar.jpg',
+      '/ChatApp'
+  ); 
+?>
 <script>
   // === CÁC BIẾN VÀ HÀM CỐT LÕI CỦA TRANG NÀY ===
   const api = '../../Handler/FriendHandler/friend-handler.php';
@@ -259,7 +267,7 @@ async function loadRequests() {
       loadFriends();
       loadSuggestions();
     } catch (e) {
-      alert('Có lỗi xảy ra: ' + e.message);
+      showGlobalAlert('Có lỗi xảy ra: ' + e.message);
     }
   }
 
@@ -389,12 +397,5 @@ async function loadRequests() {
       }
   });
 </script>
-<?php 
-  render_global_profile_modal(
-      '/ChatApp/Handler/FriendHandler/friend-handler.php',
-      '/ChatApp/uploads/default-avatar.jpg',
-      '/ChatApp'
-  ); 
-?>
 </body>
 </html>

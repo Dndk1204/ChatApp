@@ -159,43 +159,46 @@ function admin_get_pagination($current_page, $total_items, $items_per_page) {
 /**
  * Render phân trang
  */
-function admin_render_pagination($current_page, $total_pages, $total_items, $item_label = 'mục') {
-	if ($total_pages <= 1) return;
-	
-	$start_page = max(1, $current_page - 2);
-	$end_page = min($total_pages, $current_page + 2);
-	
-	echo '<div class="pagination">';
-	
-	// Trang đầu tiên
-	if ($start_page > 1) {
-		echo '<a href="?page=1" class="pagination-btn">1</a>';
-		if ($start_page > 2) {
-			echo '<span class="pagination-ellipsis">...</span>';
-		}
-	}
-	
-	// Các trang xung quanh
-	for ($i = $start_page; $i <= $end_page; $i++) {
-		if ($i == $current_page) {
-			echo '<span class="pagination-btn active">' . $i . '</span>';
-		} else {
-			echo '<a href="?page=' . $i . '" class="pagination-btn">' . $i . '</a>';
-		}
-	}
-	
-	// Trang cuối cùng
-	if ($end_page < $total_pages) {
-		if ($end_page < $total_pages - 1) {
-			echo '<span class="pagination-ellipsis">...</span>';
-		}
-		echo '<a href="?page=' . $total_pages . '" class="pagination-btn">' . $total_pages . '</a>';
-	}
-	
-	echo '</div>';
-	echo '<div class="pagination-info">';
-	echo 'Trang ' . $current_page . ' / ' . $total_pages . ' (' . $total_items . ' ' . $item_label . ')';
-	echo '</div>';
+function admin_render_pagination($current_page, $total_pages, $total_items, $item_label = 'mục', $extra_params = '') {
+    if ($total_pages <= 1) return;
+    
+    // Xử lý tham số URL (ví dụ: 'tab=group')
+    $query_string = $extra_params ? '&' . ltrim(htmlspecialchars($extra_params), '&') : '';
+    
+    $start_page = max(1, $current_page - 2);
+    $end_page = min($total_pages, $current_page + 2);
+    
+    echo '<div class="pagination">';
+    
+    // Trang đầu tiên
+    if ($start_page > 1) {
+        echo '<a href="?page=1' . $query_string . '" class="pagination-btn">1</a>';
+        if ($start_page > 2) {
+            echo '<span class="pagination-ellipsis">...</span>';
+        }
+    }
+    
+    // Các trang xung quanh
+    for ($i = $start_page; $i <= $end_page; $i++) {
+        if ($i == $current_page) {
+            echo '<span class="pagination-btn active">' . $i . '</span>';
+        } else {
+            echo '<a href="?page=' . $i . $query_string . '" class="pagination-btn">' . $i . '</a>';
+        }
+    }
+    
+    // Trang cuối cùng
+    if ($end_page < $total_pages) {
+        if ($end_page < $total_pages - 1) {
+            echo '<span class="pagination-ellipsis">...</span>';
+        }
+        echo '<a href="?page=' . $total_pages . $query_string . '" class="pagination-btn">' . $total_pages . '</a>';
+    }
+    
+    echo '</div>';
+    echo '<div class="pagination-info">';
+    echo 'Trang ' . $current_page . ' / ' . $total_pages . ' (' . $total_items . ' ' . $item_label . ')';
+    echo '</div>';
 }
 
 /**
