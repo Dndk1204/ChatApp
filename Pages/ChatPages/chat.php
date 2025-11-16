@@ -655,10 +655,10 @@ if ($conn) {
             flex-direction: row;
             align-items: center; /* Đây là dòng căn giữa DỌC */
             justify-content: space-between; /* Đây là dòng căn NGANG (đẩy 2 bên) */
+            height: 48px;
             
             /* SỬA LỖI LỀ: 8px trên/dưới, 0px trái/phải */
             padding: 8px 10px; 
-            height: 80px; /* Cho phép chiều cao tự động */
             
             border: 2px solid var(--color-border);
             cursor: pointer;
@@ -673,6 +673,7 @@ if ($conn) {
             margin-right: auto;
             padding: 0;
             text-align: left;
+            height: 32px;
         }
 
         /* 4. AVATAR (Giữ vertical-align) */
@@ -1023,7 +1024,7 @@ if ($conn) {
         async function handleCreateGroup() {
             const groupName = groupNameInput.value.trim();
             if (!groupName) {
-                showGlobalConfirm('Vui lòng nhập tên nhóm.', null);
+                showGlobalAlert('Vui lòng nhập tên nhóm.');
                 return;
             }
             
@@ -1047,7 +1048,7 @@ if ($conn) {
                 }).then(res => res.json());
 
                 if (response.status === 'success') {
-                    showGlobalConfirm(response.message, null);
+                    showGlobalAlert(response.message);
                     closeCreateGroupModal();
                     loadUsers(); // <-- THÊM DÒNG NÀY ĐỂ TẢI LẠI DANH SÁCH
                 } else {
@@ -1055,7 +1056,7 @@ if ($conn) {
                 }
             } catch (e) {
                 console.error('Lỗi tạo nhóm:', e);
-                showGlobalConfirm('Lỗi: ' + e.message, null);
+                showGlobalAlert('Lỗi: ' + e.message);
             }
         }
 
@@ -1430,7 +1431,7 @@ if ($conn) {
             })
             .catch(error => {
                 console.error('Lỗi khi gửi tin nhắn:', error);
-                showGlobalConfirm('Lỗi mạng. Không thể gửi tin nhắn. Chi tiết: ' + error.message, null);
+                showGlobalAlert('Lỗi mạng. Không thể gửi tin nhắn. Chi tiết: ' + error.message);
                 messageInput.value = tempMessageContent; 
             });
         }
@@ -1476,7 +1477,7 @@ if ($conn) {
             })
             .catch(error => {
                 console.error('Lỗi khi gửi ảnh:', error);
-                showGlobalConfirm('Lỗi: ' + error.message, null);
+                showGlobalAlert('Lỗi: ' + error.message);
             });
         }
         
@@ -1518,17 +1519,30 @@ if ($conn) {
         const urlParams = new URLSearchParams(window.location.search);
         const friendIdFromUrl = urlParams.get('friend_id');
         
-        loadUsers().then(users => {
-            if (friendIdFromUrl) {
-                const friendId = parseInt(friendIdFromUrl);
-                const friendUser = users.find(u => u.UserId == friendId);
-                if (friendUser && friendUser.UserId != currentUserId) {
-                    selectUser(friendUser.UserId, friendUser.Username);
-                    const newUrl = window.location.pathname;
-                    window.history.replaceState({}, '', newUrl);
-                }
-            }
-        });
+        // Sửa tên biến `users` thành `allConversations` cho rõ nghĩa
+        loadUsers().then(allConversations => {
+            if (friendIdFromUrl) {
+                const friendId = parseInt(friendIdFromUrl);
+                
+                // Sửa lỗi: Tìm đúng 'ConversationId' và 'ConversationType'
+                const friendUser = allConversations.find(c => 
+                    c.ConversationId == friendId && c.ConversationType === 'user'
+                );
+                
+                // Sửa lỗi: Gọi đúng hàm 'selectConversation'
+                if (friendUser) {
+                    selectConversation(
+                        friendUser.ConversationId, 
+                        friendUser.ConversationName, 
+                        'user'
+                    );
+                    
+                    // Xóa ID khỏi URL
+                    const newUrl = window.location.pathname;
+                    window.history.replaceState({}, '', newUrl);
+                }
+            }
+        });
 
         // --- CÁC HÀM XỬ LÝ PANEL CỘT 3 ---
 
@@ -1708,12 +1722,12 @@ if ($conn) {
                     if (res.status !== 'success') throw new Error(res.message);
 
                     // Thông báo thành công và dọn dẹp
-                    showGlobalConfirm(res.message, null);
+                    showGlobalAlert(res.message);
                     resetChatUI(); // Dọn dẹp giao diện
                     loadUsers();   // Tải lại danh sách nhóm (sẽ thấy nhóm bị xóa)
                     
                 } catch(e) {
-                    showGlobalConfirm('Lỗi khi xóa: ' + e.message, null);
+                    showGlobalAlert('Lỗi khi xóa: ' + e.message);
                 }
             });
         }
@@ -1740,13 +1754,13 @@ if ($conn) {
                     if (res.status !== 'success') throw new Error(res.message);
 
                     // THAY THẾ ALERT
-                    showGlobalConfirm(res.message, null);
+                    showGlobalAlert(res.message);
                     handleShowMembers(); // Tải lại danh sách thành viên
                     loadMessages();
 
                 } catch(e) {
                     // THAY THẾ ALERT
-                    showGlobalConfirm('Lỗi: ' + e.message, null);
+                    showGlobalAlert('Lỗi: ' + e.message);
                 }
             });
         }
@@ -1774,13 +1788,13 @@ if ($conn) {
                     if (res.status !== 'success') throw new Error(res.message);
 
                     // THAY THẾ ALERT
-                    showGlobalConfirm(res.message, null);
+                    showGlobalAlert(res.message);
                     handleShowMembers(); // Tải lại danh sách thành viên
                     loadMessages();
 
                 } catch(e) {
                     // THAY THẾ ALERT
-                    showGlobalConfirm('Lỗi: ' + e.message, null);
+                    showGlobalAlert('Lỗi: ' + e.message);
                 }
             });
         }
@@ -1840,12 +1854,12 @@ if ($conn) {
 
                 if (res.status !== 'success') throw new Error(res.message);
 
-                showGlobalConfirm(res.message, null);
+                showGlobalAlert(res.message);
                 loadUsers(); // Tải lại danh sách bên trái để cập nhật avatar
                 loadMessages(); // Tải lại tin nhắn để thấy thông báo
             
             } catch (e) {
-                showGlobalConfirm('Lỗi: ' + e.message, null);
+                showGlobalAlert('Lỗi: ' + e.message);
             }
             
             // Reset input file để có thể tải lại cùng 1 ảnh
@@ -1878,7 +1892,7 @@ if ($conn) {
             });
 
             if (selectedMembers.length === 0) {
-                showGlobalConfirm("Bạn chưa chọn ai để mời.", null);
+                showGlobalAlert("Bạn chưa chọn ai để mời.");
                 return;
             }
 
@@ -1897,11 +1911,11 @@ if ($conn) {
                 
                 if (res.status !== 'success') throw new Error(res.message);
 
-                showGlobalConfirm("Đã mời thành công!", null);
+                showGlobalAlert("Đã mời thành công!");
                 handleShowMembers(); // Chuyển sang tab thành viên để xem ds mới
 
             } catch(e) {
-                showGlobalConfirm("Lỗi: " + e.message, null);
+                showGlobalAlert("Lỗi: " + e.message);
             }
         });
         

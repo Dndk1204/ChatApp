@@ -61,6 +61,17 @@ function isGroupAdmin($conn, $group_id, $user_id) {
     }
     return false;
 }
+
+// --- HÀM KIỂM TRA THÀNH VIÊN (MỚI) ---
+function isGroupMember($conn, $group_id, $user_id) {
+    $sql = "SELECT 1 FROM group_members WHERE GroupId = ? AND UserId = ?";
+    $stmt = $conn->prepare($sql);
+    if ($stmt === false) { return false; }
+    $stmt->bind_param("ii", $group_id, $user_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    return $result->num_rows > 0;
+}
 // -------------------------
 
 try {
@@ -123,8 +134,8 @@ try {
         // (Giữ nguyên như file cũ của bạn, chỉ thêm Role='Member' khi INSERT)
         case 'invite_members':
             // Chỉ Admin mới được mời
-            if (!isGroupAdmin($conn, $group_id, $current_user_id)) {
-                throw new Exception("Chỉ Admin mới có quyền mời thành viên.");
+            if (!isGroupMember($conn, $group_id, $current_user_id)) {
+                throw new Exception("Bạn phải là thành viên của nhóm để mời người khác.");
             }
 
             $member_ids = $_POST['member_ids'] ?? [];
