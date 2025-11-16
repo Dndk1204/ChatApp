@@ -12,52 +12,73 @@ if (!isset($_SESSION['user_id']) || $_SERVER["REQUEST_METHOD"] != "POST" || !$co
 
 $sender_id = $_SESSION['user_id'];
 $receiver_id = isset($_POST['receiver_id']) ? (int)$_POST['receiver_id'] : 0;
+$group_id = isset($_POST['group_id']) ? (int)$_POST['group_id'] : 0; // LẤY GROUP ID
 $last_timestamp_ms = isset($_POST['last_timestamp']) ? (float)$_POST['last_timestamp'] : 0;
 
-if ($receiver_id === 0) {
+// --- SỬA LỖI 1: KIỂM TRA VALIDATION ---
+// Chỉ báo lỗi nếu CẢ HAI ID đều bằng 0
+if ($receiver_id === 0 && $group_id === 0) {
     http_response_code(400);
-    echo json_encode(['error' => 'Thiếu ID người nhận.']);
+    echo json_encode(['error' => 'Thiếu ID người nhận hoặc ID nhóm.']);
     exit();
 }
 
 $messages = [];
 
 try {
-    
     $sql = "";
     $stmt = null;
     $types = "";
     $params = [];
     
-    $select_cols = "m.MessageId, m.SenderId, m.Content, m.SentAt, u.Username AS SenderName";
+    // SỬA LỖI 2: Đã thêm m.IsRead, m.GroupId
+    $select_cols = "m.MessageId, m.SenderId, m.Content, m.SentAt, u.Username AS SenderName, u.AvatarPath as SenderAvatarPath, m.IsRead, m.MessageType, m.GroupId";
     
-    $where_conversation = "(m.SenderId = ? AND m.ReceiverId = ?) OR (m.SenderId = ? AND m.ReceiverId = ?)";
+    $last_timestamp_sql = date('Y-m-d H:i:s', ($last_timestamp_ms / 1000));
 
-    if ($last_timestamp_ms == 0) {
-        $sql = "SELECT {$select_cols}
-                FROM Messages m
-                JOIN Users u ON m.SenderId = u.UserId
-                WHERE {$where_conversation}
-                ORDER BY m.SentAt ASC";
-        
-        $types = "iiii";
+    // --- SỬA LỖI 3: TÁCH LOGIC CHAT RIÊNG VÀ CHAT NHÓM ---
+    if ($receiver_id > 0) {
+        // Đây là CHAT RIÊNG
+        $where_conversation = "(m.SenderId = ? AND m.ReceiverId = ?) OR (m.SenderId = ? AND m.ReceiverId = ?)";
         $params = [$sender_id, $receiver_id, $receiver_id, $sender_id];
+        $types = "iiii";
 
-    } else {
-        $last_timestamp_sql = date('Y-m-d H:i:s', ($last_timestamp_ms / 1000) + 0.001);
+        if ($last_timestamp_ms == 0) {
+            // Tải toàn bộ lịch sử
+            $sql = "SELECT {$select_cols} FROM Messages m LEFT JOIN Users u ON m.SenderId = u.UserId WHERE {$where_conversation} ORDER BY m.SentAt ASC";
+        } else {
+            // Chỉ tải tin nhắn mới
+            $sql = "SELECT {$select_cols} FROM Messages m LEFT JOIN Users u ON m.SenderId = u.UserId WHERE ({$where_conversation}) AND m.SentAt >= ? ORDER BY m.SentAt ASC";
+            $params[] = $last_timestamp_sql;
+            $types .= "s";
+        }
 
-        $sql = "SELECT {$select_cols}
-                FROM Messages m
-                JOIN Users u ON m.SenderId = u.UserId
-                WHERE ({$where_conversation})
-                AND m.SentAt > ?
-                ORDER BY m.SentAt ASC";
-        
-        $types = "iiiis";
-        $params = [$sender_id, $receiver_id, $receiver_id, $sender_id, $last_timestamp_sql];
+    } else if ($group_id > 0) {
+        // Đây là CHAT NHÓM
+        $where_conversation = "m.GroupId = ?";
+        $params = [$group_id];
+        $types = "i";
+
+        if ($last_timestamp_ms == 0) {
+            // Tải toàn bộ lịch sử
+            $sql = "SELECT {$select_cols} FROM Messages m LEFT JOIN Users u ON m.SenderId = u.UserId WHERE {$where_conversation} ORDER BY m.SentAt ASC";
+        } else {
+            // Chỉ tải tin nhắn mới
+            $sql = "SELECT {$select_cols} FROM Messages m LEFT JOIN Users u ON m.SenderId = u.UserId WHERE {$where_conversation} AND m.SentAt >= ? ORDER BY m.SentAt ASC";
+            $params[] = $last_timestamp_sql;
+            $types .= "s";
+        }
+    }
+
+    if (empty($sql)) {
+        throw new Exception("Không thể xây dựng câu lệnh SQL.");
     }
 
     $stmt = $conn->prepare($sql);
+    if ($stmt === false) {
+        throw new Exception("Lỗi CSDL (prepare): " . $conn->error);
+    }
+    
     $stmt->bind_param($types, ...$params);
     $stmt->execute();
     $result = $stmt->get_result();
@@ -65,37 +86,45 @@ try {
     if ($result) {
         while ($row = $result->fetch_assoc()) {
             
-            // Xử lý để xác định MessageType và FilePath
-            $content = $row['Content'] ?? '';
-            $row['MessageType'] = 'text';
-            $row['FilePath'] = null;
+            // 1. KIỂM TRA NẾU LÀ TIN NHẮN HỆ THỐNG (TỪ DB)
+            if ($row['MessageType'] === 'system') {
+                $row['FilePath'] = null; 
+                // Cứ giữ nguyên là 'system', không làm gì cả
+            } 
+            // 2. NẾU KHÔNG PHẢI, THÌ MỚI XỬ LÝ TEXT/IMAGE
+            else {
+                $content = $row['Content'] ?? '';
+                $row['FilePath'] = null;
 
-            if (str_starts_with($content, '[IMG]')) {
-                $row['MessageType'] = 'image';
-                // Lấy đường dẫn ảnh (loại bỏ tiền tố "[IMG]")
-                $row['FilePath'] = substr($content, 5); 
-                // Thiết lập lại Content là rỗng để frontend không hiển thị chuỗi "[IMG]..."
-                $row['Content'] = ''; 
+                if (str_starts_with($content, '[IMG]')) {
+                    $row['MessageType'] = 'image';
+                    $row['FilePath'] = substr($content, 5); 
+                    $row['Content'] = ''; 
+                } else {
+                    $row['MessageType'] = 'text'; // Chỉ set là text nếu nó không phải [IMG]
+                }
             }
             
             $messages[] = $row;
         }
     }
-    
     $stmt->close();
     
-    // Cập nhật trạng thái IsRead = 1 cho tin nhắn chưa đọc từ receiver_id
-    $sql_update = "UPDATE Messages SET IsRead = 1 
-                   WHERE ReceiverId = ? AND SenderId = ? AND IsRead = 0 AND IsDeleted = 0";
-    $stmt_update = $conn->prepare($sql_update);
-    if ($stmt_update) {
-        $stmt_update->bind_param("ii", $sender_id, $receiver_id);
-        $stmt_update->execute();
-        $stmt_update->close();
+    // --- SỬA LỖI 4: CHỈ ĐÁNH DẤU ĐÃ ĐỌC KHI LÀ CHAT RIÊNG ---
+    if ($receiver_id > 0) {
+        $sql_update = "UPDATE Messages SET IsRead = 1 
+                       WHERE ReceiverId = ? AND SenderId = ? AND IsRead = 0 AND IsDeleted = 0";
+        $stmt_update = $conn->prepare($sql_update);
+        if ($stmt_update) {
+            $stmt_update->bind_param("ii", $sender_id, $receiver_id);
+            $stmt_update->execute();
+            $stmt_update->close();
+        }
     }
+    // (Lưu ý: Đánh dấu đã đọc cho chat nhóm cần 1 bảng riêng,
+    // nhưng code này sẽ cho phép bạn TẢI được tin nhắn nhóm)
     
     $conn->close();
-
     echo json_encode($messages);
 
 } catch (Exception $e) {

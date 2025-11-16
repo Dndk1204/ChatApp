@@ -22,9 +22,6 @@ $current_username = $_SESSION['username'] ?? 'Guest';
 <link rel="stylesheet" href="./../../css/style.css">
 <style>
   body {
-      font-family: 'Inter', sans-serif;
-      background: var(--color-bg);
-          color: var(--color-text);
       display: flex;
       flex-direction: column;
       min-height: 100vh;
