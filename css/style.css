@@ -676,3 +676,17 @@ a.post-username-link:hover .post-username {
 .comment-username-link:hover .comment-username {
     text-decoration: underline;
 }
+/* Thêm animation xoay khi đang tải */
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.spinning {
+    animation: spin 1s linear infinite;
+}

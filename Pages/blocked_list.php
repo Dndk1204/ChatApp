@@ -15,6 +15,7 @@ $current_username = $_SESSION['username'];
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quản lý Chặn</title>
+    <link rel="icon" type="image/x-icon" href="/ChatApp/Favicon64x64.ico"> 
     <link rel="stylesheet" href="../css/style.css"> 
     
     <style>
@@ -74,6 +75,20 @@ $current_username = $_SESSION['username'];
         .unblock-btn:hover {
             opacity: 0.8;
         }
+        .logo>a {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: var(--color-text);
+            font-weight: bold;
+            font-size: 1.5em;
+            gap: 10px;
+        }
+        .logo-circle>img {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+        }
     </style>
 </head>
 <body>
@@ -81,7 +96,7 @@ $current_username = $_SESSION['username'];
     <header class="navbar">
         <div class="logo">
             <a href="../index.php">
-                <div class="logo-circle"></div>
+                <div class="logo-circle"><img src="/ChatApp/ChatApp_Logo.ico" alt="Logo"></div>
                 <span>ChatApp</span>
             </a>
         </div>

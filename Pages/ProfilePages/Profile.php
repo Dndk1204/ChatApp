@@ -4,6 +4,9 @@ require_once '../../Handler/db.php'; // Đi lên 2 cấp
 require_once '../../Handler/FriendHandler/friend_helpers.php'; // Đi lên 2 cấp
 require_once '../../Handler/PostHandler/post_helpers.php';
 
+// === 1. LẤY DỮ LIỆU ===
+
+// Lấy ID của người xem (bạn)
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
     exit;
@@ -12,22 +15,26 @@ $current_user_id = (int)$_SESSION['user_id'];
 $current_username = $_SESSION['username'] ?? 'Guest';
 $current_user_avatar = $_SESSION['avatar'] ?? 'uploads/default-avatar.jpg';
 
+// Lấy ID của chủ nhân trang cá nhân (từ URL)
 $profile_user_id = (int)($_GET['id'] ?? 0);
 if ($profile_user_id <= 0) {
     header("Location: posts.php"); // Nếu ID không hợp lệ, về trang posts
     exit;
 }
 
+// === 2. LẤY THÔNG TIN CHỦ TRANG VÀ KIỂM TRA QUAN HỆ ===
 $user_info = null;
 $is_self = false;
 $is_friend = false;
 
+// Lấy thông tin user
 $stmt_user = $conn->prepare("SELECT Username, AvatarPath, FullName, CreatedAt FROM users WHERE UserId = ?");
 $stmt_user->bind_param("i", $profile_user_id);
 $stmt_user->execute();
 $result_user = $stmt_user->get_result();
 
 if ($result_user->num_rows == 0) {
+    // Không tìm thấy user
     $_SESSION['error_message'] = "Không tìm thấy người dùng này.";
     header("Location: posts.php");
     exit;
@@ -39,6 +46,7 @@ $stmt_user->close();
 if ($current_user_id === $profile_user_id) {
     $is_self = true;
 } else {
+    // Kiểm tra xem có phải là bạn bè không
     $stmt_friend = $conn->prepare("SELECT FriendId FROM friends WHERE IsConfirmed = 1 AND 
                                     ((UserId = ? AND FriendUserId = ?) OR (UserId = ? AND FriendUserId = ?))");
     $stmt_friend->bind_param("iiii", $current_user_id, $profile_user_id, $profile_user_id, $current_user_id);
@@ -47,21 +55,23 @@ if ($current_user_id === $profile_user_id) {
     $stmt_friend->close();
 }
 
-$privacy_sql = " AND (p.Privacy = 'public'";
+// === 3. XÂY DỰNG CÂU QUERY CHO BÀI ĐĂNG (DỰA TRÊN QUYỀN RIÊNG TƯ) ===
+$privacy_sql = " AND (p.Privacy = 'public'"; // Mọi người luôn thấy public
 if ($is_self || $is_friend) {
     // Nếu là chủ nhân HOẶC là bạn bè, thì thấy cả bài 'friends'
     $privacy_sql .= " OR p.Privacy = 'friends'";
 }
 $privacy_sql .= ")";
 
+// Lấy tất cả bài đăng CỦA NGƯỜI NÀY, tuân thủ quyền riêng tư
 $sql_posts = "SELECT p.PostId, p.UserId, p.Content, p.Title, p.PostType, p.PostedAt, 
                      p.Privacy, 
                      u.Username, u.AvatarPath 
               FROM posts p
               JOIN users u ON p.UserId = u.UserId
               WHERE 
-                  p.UserId = ?
-                  $privacy_sql
+                  p.UserId = ?  -- CHỈ lấy bài của người này
+                  $privacy_sql  -- Áp dụng điều kiện riêng tư
               ORDER BY p.PostedAt DESC";
 
 $stmt_posts = $conn->prepare($sql_posts);
@@ -69,6 +79,7 @@ $stmt_posts->bind_param("i", $profile_user_id);
 $stmt_posts->execute();
 $result_posts = $stmt_posts->get_result();
 
+// Lấy tất cả emotes (cho phần reactions)
 $emotes_map = [];
 $result_emotes = $conn->query("SELECT * FROM emotes");
 while ($row = $result_emotes->fetch_assoc()) {
@@ -82,6 +93,7 @@ while ($row = $result_emotes->fetch_assoc()) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Trang cá nhân của <?php echo htmlspecialchars($user_info['Username']); ?></title>
+    <link rel="icon" type="image/x-icon" href="/ChatApp/Favicon64x64.ico"> 
     <link rel="stylesheet" href="../../css/style.css"> 
     <style>
         .profile-container {
@@ -96,7 +108,6 @@ while ($row = $result_emotes->fetch_assoc()) {
             align-items: center;
             gap: 20px;
             margin-bottom: 20px;
-            width: auto;
         }
         .profile-avatar {
             width: 100px;
@@ -400,15 +411,34 @@ while ($row = $result_emotes->fetch_assoc()) {
             color: black;
         }
         .options-dropdown.show { display: block; }
+
+        .logo>a {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: var(--color-text);
+            font-weight: bold;
+            font-size: 1.5em;
+            gap: 10px;
+        }
+
+        .logo-circle>img {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+        }
     </style>
 </head>
 <body class="font-inter light-theme">
 
 <header class="navbar">
     <div class="logo">
-        <a href="../../index.php"> <div class="logo-circle"></div>
+        <div class="logo">
+        <a href="../../index.php">
+            <div class="logo-circle"><img src="/ChatApp/ChatApp_Logo.ico" alt="Logo"></div>
             <span>ChatApp</span>
         </a>
+    </div>
     </div>
     <nav class="main-nav">
         <a href="../../index.php">HOME</a> 
@@ -416,14 +446,14 @@ while ($row = $result_emotes->fetch_assoc()) {
         <a href="../ChatPages/chat.php">CHAT</a> 
         <a href="../FriendPages/friends.php">FRIENDS</a>
         <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'Admin'): ?>
-            <a href="../../Handler/admin_dashboard.php">ADMIN</a>
+            <a href="../../Admin/index.php">ADMIN</a>
         <?php endif; ?>
     </nav>
     <div class="auth-buttons">
         <?php if (isset($_SESSION['user_id'])): ?>
             <span class="logged-in-user">Xin chào, <?php echo htmlspecialchars($current_username); ?></span>
             <div class="avatar-menu">
-                <?php $avatar = $_SESSION['avatar'] ?? 'uploads/default-avatar.jpg'; ?>
+                <?php $avatar = ltrim(($_SESSION['avatar'] ?? 'uploads/default-avatar.jpg'), '/'); ?>
                 <img src="../../<?php echo htmlspecialchars($avatar); ?>" alt="avatar" class="avatar-thumb" id="avatarBtn" onerror="this.src='../../uploads/default-avatar.jpg'">
             <div class="avatar-dropdown" id="avatarDropdown">
                 <a href="../ProfilePages/Profile.php?id=<?php echo $current_user_id; ?>">Trang cá nhân của tôi</a>

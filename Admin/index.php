@@ -11,6 +11,7 @@ $stats = admin_get_stats($conn, $hasCreatedAt);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin - Thống kê</title>
+    <link rel="icon" type="image/x-icon" href="/ChatApp/favicon64x64.ico"> 
     <link rel="stylesheet" href="../css/admin.css">
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap" rel="stylesheet">
     
