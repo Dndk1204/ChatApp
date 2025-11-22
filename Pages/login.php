@@ -5,15 +5,32 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
+    <link rel="icon" type="image/x-icon" href="/ChatApp/Favicon64x64.ico"> 
     <link rel="stylesheet" href="../css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap" rel="stylesheet">
+    <style>
+        .logo>a {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: var(--color-text);
+            font-weight: bold;
+            font-size: 1.5em;
+            gap: 10px;
+        }
+        .logo-circle>img {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+        }
+    </style>
 </head>
 <body>
 
 	<header class="navbar">
     <div class="logo">
-        <a href="index.php">
-            <div class="logo-circle"></div>
+        <a href="../index.php">
+            <div class="logo-circle"><img src="/ChatApp/ChatApp_Logo.ico" alt="Logo"></div>
             <span>ChatApp</span>
         </a>
     </div>
